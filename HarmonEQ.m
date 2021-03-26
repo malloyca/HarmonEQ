@@ -1,4 +1,4 @@
-classdef (StrictDefaults)HarmonEQ_test < matlab.System & audioPlugin
+classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
 % HarmonEQ.m
 % Harmonic equalizer plugin
 % Updated: 17 March 2021
@@ -76,9 +76,9 @@ classdef (StrictDefaults)HarmonEQ_test < matlab.System & audioPlugin
         QualityFactor3 = 20
         
         % dB gain for each band
-        PeakGain1 = 3
-        PeakGain2 = 3
-        PeakGain3 = 3
+        PeakGain1 = 0
+        PeakGain2 = 0
+        PeakGain3 = 0
         
         %---
         ReferencePitch = 440;
@@ -117,7 +117,18 @@ classdef (StrictDefaults)HarmonEQ_test < matlab.System & audioPlugin
         rootGain7 = 3;
         rootGain8 = 3;
         rootGain9 = 3;
-                
+        
+        % Status variables for filters
+        updateRoot1 = false;
+        updateRoot2 = false;
+        updateRoot3 = false;
+        updateRoot4 = false;
+        updateRoot5 = false;
+        updateRoot6 = false;
+        updateRoot7 = false;
+        updateRoot8 = false;
+        updateRoot9 = false;
+        
     end
     
     %----------------------------------------------------------------------
@@ -202,7 +213,7 @@ classdef (StrictDefaults)HarmonEQ_test < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     methods
         
-        function plugin = HarmonEQ_test(N)
+        function plugin = HarmonEQ(N)
             % Construct biquad filter
             plugin.sos =  dsp.BiquadFilter('SOSMatrixSource','Input port',...
                 'ScaleValuesInputPort',false);
