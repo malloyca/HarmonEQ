@@ -19,6 +19,7 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
 % - Include instructions for running the plugin (eq = HarmonEQ;
 % visualize(eq); audioTestBench(eq);
 % - Intonation knob / Reference pitch
+% - Add rootFreq0 = 22.5?
     
 
 % This is a test program for understanding how creating a visualization
@@ -75,10 +76,10 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
         QualityFactor2 = 20
         QualityFactor3 = 20
         
-        % dB gain for each band
-        PeakGain1 = 0
-        PeakGain2 = 0
-        PeakGain3 = 0
+        % dB gain for each band % Set to non-zerof or testing
+        PeakGain1 = -3
+        PeakGain2 = -3
+        PeakGain3 = -3
         
         %---
         ReferencePitch = 440;
@@ -118,7 +119,18 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
         rootGain8 = 3;
         rootGain9 = 3;
         
-        % Status variables for filters
+        % Previous state of filters
+        rootPrevState1 = zeros(2);
+        rootPrevState2 = zeros(2);
+        rootPrevState3 = zeros(2);
+        rootPrevState4 = zeros(2);
+        rootPrevState5 = zeros(2);
+        rootPrevState6 = zeros(2);
+        rootPrevState7 = zeros(2);
+        rootPrevState8 = zeros(2);
+        rootPrevState9 = zeros(2);
+        
+        % Update status variables for filters
         updateRoot1 = false;
         updateRoot2 = false;
         updateRoot3 = false;
@@ -177,7 +189,9 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
         % matrices. One column for each band. Leading 1 in denominator
         % coefficients is omitted
         Num 
-        Den 
+        Den
+        B; % for storing the numerator coefficients
+        A; % for storing the denominator coefficients
     end
     
     %----------------------------------------------------------------------
@@ -231,6 +245,10 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
             plugin.udpsend = dsp.UDPSender('RemoteIPPort', 20000);
         end
         
+        %------------------------------------------------------------------
+        % SETTERS & GETTERS
+        %------------------------------------------------------------------
+        
         function set.CenterFrequency1(plugin,value)                                    
             plugin.CenterFrequency1 = value;
             needToDesignFilters(plugin);
@@ -275,6 +293,16 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
                 'D# / Eb','E','F','F# / Gb','G','G# / Ab'},...
                 'set.RootNote', 'RootName');
             plugin.RootNote = val;
+            plugin.updateRoot1 = true;
+            plugin.updateRoot2 = true;
+            plugin.updateRoot3 = true;
+            plugin.updateRoot4 = true;
+            plugin.updateRoot5 = true;
+            plugin.updateRoot6 = true;
+            plugin.updateRoot7 = true;
+            plugin.updateRoot8 = true;
+            plugin.updateRoot9 = true;
+            needToDesignFilters(plugin); % TODO: create custom function for this
         end
         
         function visualize(plugin,NFFT)
@@ -297,9 +325,9 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
                     NFFT,Fs,[20 20e3], ...
                     'XScale','Log', ...
                     'YLimits', [-25 25], ...
-                    'Title', 'Three-band Parametric Equalizer',...
-                    'ShowLegend', true, ...
-                    'FilterNames', {'Band 1','Band 2','Band 3','Overall Equalizer'}); 
+                    'Title', 'HarmonEQ');%,...
+%                     'ShowLegend', true, ...
+%                     'FilterNames', {'Band 1','Band 2','Band 3','Overall Equalizer'}); 
             else
                 if ~isVisible(plugin.visualObj)
                     show(plugin.visualObj);
@@ -370,7 +398,23 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
     
     methods (Access = private)
         function needToDesignFilters(plugin)
-            plugin.AreFiltersDesigned = false; 
+            plugin.AreFiltersDesigned = false;
+            if plugin.updateRoot1 == true
+                
+            end
+            
+            plugin.updateRoot1 = false;
+            plugin.updateRoot2 = false;
+            plugin.updateRoot3 = false;
+            plugin.updateRoot4 = false;
+            plugin.updateRoot5 = false;
+            plugin.updateRoot6 = false;
+            plugin.updateRoot7 = false;
+            plugin.updateRoot8 = false;
+            plugin.updateRoot9 = false;
+            
+            %TODO: Add code to update root note filters
+            
             % Update visual if visualize has been called
             if isempty(coder.target) && ~isempty(plugin.visualObj) 
                 designFilters(plugin);
@@ -382,10 +426,10 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
             if isempty(coder.target) && ~isempty(plugin.visualObj)
                 [num1,den1,num2,den2,num3,den3,num4,den4] = getFilterCoefficients(plugin);
                 step(plugin.visualObj, ...
-                     num1, den1, ...
-                     num2, den2, ...
-                     num3, den3, ...
-                     num4, den4);
+                     num1, den1, ... % First band coefficients
+                     num2, den2, ... % second band coefficients
+                     num3, den3, ... % third band coefficients
+                     num4, den4); % overall filter coefficients
                 plugin.visualObj.SampleRate = plugin.getSampleRate;
             end
         end
@@ -405,11 +449,30 @@ classdef (StrictDefaults)HarmonEQ < matlab.System & audioPlugin
             plugin.Den = A;              
             plugin.AreFiltersDesigned = true;
         end
+        
+        function [b, a] = peakNotchFilterCoeffs(~, fs, frequency, Q, gain)
+            % prep
+            A = sqrt(10.^(gain/20));
+            omega0 = 2 * pi * frequency / fs;
+            cos_omega = -2 * cos(omega0);
+            alpha = sin(omega0) / (2  * Q);
+            alpha_A = alpha * A;
+            alpha_div_A = alpha / A;
+            
+            % Coefficients
+            b0 = 1 + alpha_A;
+            b1 = cos_omega;
+            b2 = 1 - alpha_A;
+            a0 = 1 + alpha_div_A;
+            a1 = cos_omega;
+            a2 = 1 - alpha_div_A;
+            
+            b = [b0, b1, b2];
+            a = [a0, a1, a2];
+        end
+        
     end
     
-%     function [b, a] = rootFilterCoeffs(~, fs, frequency, Q, gain)
-%         
-%     end
     
     methods (Hidden)
         function h = freqz(plugin, f, Fs)
