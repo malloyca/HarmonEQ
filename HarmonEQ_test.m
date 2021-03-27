@@ -27,7 +27,7 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
         rootQFactor1 = 20;
         
         % Gain for root bands (dB)
-        rootGain1 = 3;
+        rootGain1 = 9;
         
         % Update status variables for root filters
         updateRoot1 = false;
@@ -65,11 +65,14 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
         rootCoeffa1;
         rootPrevState1 = zeros(2);
         
+        % For visalization
+        visualizerObject;
+        
     end
     
     
     %----------------------------------------------------------------------
-    % PUBLIC METHODS
+    % PROTECTED METHODS
     %----------------------------------------------------------------------
     methods (Access = protected)
         function out = stepImpl(plugin,in)
@@ -86,6 +89,9 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
                 plugin.updateRoot1 = false;
             end
             
+            plugin.B = [plugin.rootCoeffb1];
+            plugin.A = [plugin.rootCoeffa1];
+            
             %------------------------Process audio-------------------------
             %TODO: Implement universal gain
             %TODO: Do I want pre-filter gain or just post-filter gain?
@@ -98,6 +104,12 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
             %TODO: output gain?
             %out = 10.^(plugin.outputGain/20) * in);
             out = in;
+            
+            %TODO: updating visualizer too often? Really only need to
+            %update it if the values change. Can track those.
+            if ~isempty(plugin.visualizerObject)
+                updateVisualizer(plugin);
+            end
         end
         
         function setupImpl(plugin,~)
@@ -112,7 +124,7 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
             
         end
         
-        function resetImpl(plugin)
+        function resetImpl(~)
             %TODO: resetFilters / resetAllFilters / resetRootFilters /
             %resetThirdFilters / resetFifthFilters / resetSeventhFilters
             
@@ -120,9 +132,34 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
         
     end
     
+    %----------------------------------------------------------------------
+    % PUBLIC METHODS
+    %----------------------------------------------------------------------
     methods
         
+        function plugin = HarmonEQ_test()
+            plugin.B = [1 -2 1];
+            plugin.A = [1 -2 1];
+        end
         
+        function Visualizer(plugin)
+            if isempty(plugin.visualizerObject)
+                fs = getSampleRate(plugin);
+                % TODO: design filters...
+                plugin.visualizerObject = dsp.DynamicFilterVisualizer(...
+                    512, fs, [20 20e3],...
+                    'XScale','Log',...
+                    'YLimits',[-20 20],...
+                    'Title','HarmonEQ');
+            else
+                if ~isVisible(plugin.visualizerObject)
+                    show(plugin.visualizerObject);
+                end
+            end
+            
+            % Step the visual object with the filter
+            step(plugin.visualizerObject, plugin.B, plugin.A);
+        end
         
         
         %------------------------------------------------------------------
@@ -136,7 +173,7 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
             plugin.updateRoot1 = true; %TODO: create a function to update the root frequency
             %plugin.updateThird1 = true;
             updateRootFrequencies(plugin,val);
-            display(val);
+            disp(val);
         end
         
         
@@ -168,6 +205,8 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
             
             b = [b0, b1, b2];
             a = [a0, a1, a2];
+            disp(b);
+            disp(a);
         end
         
         function updateRootFrequencies(plugin, val)
@@ -199,7 +238,15 @@ classdef HarmonEQ_test < matlab.System & audioPlugin
             end
             
             %TEST
-            display(plugin.rootFrequency1);
+            disp(plugin.rootFrequency1);
+        end
+        
+        function updateVisualizer(plugin)
+            if ~isempty(plugin.visualizerObject)
+                step(plugin.visualizerObject,...
+                    plugin.B, plugin.A);
+                plugin.visualizerObject.SampleRate = plugin.getSampleRate;
+            end
         end
         
     end
