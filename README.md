@@ -5,14 +5,13 @@ HarmonEQ differs from other equalizers in its control scheme. It is a parametric
 Rather than having precise control over filter frequencies, the user tunes HarmonEQ to a specific musical note or chord.
 The user can then define gain and Q values for five different ranges: low, low-mid, mid, high-mid, high.
 
----
 
 ## Prereqs
 - MATLAB
   - DSP Toolbox
   - Audio Toolbox
 
----
+
 ## Development Roadmap
 This project is currently in active development.
 
