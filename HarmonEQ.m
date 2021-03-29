@@ -15,6 +15,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     properties
         rootNote = 'A';
+        %TODO: these are placeholders until I implement these filters
+        thirdNote = 'C';
+        fifthNote = 'E';
+        seventhNote = 'G';
                 
     end
     
@@ -63,6 +67,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         updateRootFilter7 = false;
         updateRootFilter8 = false;
         updateRootFilter9 = false;
+        
+        % General change of state variable to minimize visualizer updates
+        stateChange = false;
         
     end
     
@@ -142,9 +149,32 @@ classdef HarmonEQ < matlab.System & audioPlugin
             if plugin.updateRootFilter2
                 buildRootFilter2(plugin, fs);
             end
+            if plugin.updateRootFilter3
+                buildRootFilter3(plugin, fs);
+            end
+            %TEST
+            if plugin.updateRootFilter4
+                buildRootFilter4(plugin, fs);
+            end
+            if plugin.updateRootFilter5
+                buildRootFilter5(plugin, fs);
+            end
+            if plugin.updateRootFilter6
+                buildRootFilter6(plugin, fs);
+            end
+            if plugin.updateRootFilter7
+                buildRootFilter7(plugin, fs);
+            end
+            if plugin.updateRootFilter8
+                buildRootFilter8(plugin, fs);
+            end
+            if plugin.updateRootFilter9
+                buildRootFilter9(plugin, fs);
+            end
             
-            plugin.B = [plugin.rootCoeffb1; plugin.rootCoeffb2];
-            plugin.A = [plugin.rootCoeffa1; plugin.rootCoeffa2];
+            % update plugin.B and plugin.A coefficient matrices for
+            % visualization
+            updateFilterCoefficientsMatrix(plugin);
             
             %------------------------Process audio-------------------------
             %TODO: Implement universal gain
@@ -152,10 +182,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %in = 10.^(plugin.inputGain/20) * in;
             
             % Root note filters
+            %TODO: convert these to functions
             [in, plugin.rootPrevState1] = filter(plugin.rootCoeffb1,...
                 plugin.rootCoeffa1, in, plugin.rootPrevState1);
             [in, plugin.rootPrevState2] = filter(plugin.rootCoeffb2,...
                 plugin.rootCoeffa2, in, plugin.rootPrevState2);
+            [in, plugin.rootPrevState3] = filter(plugin.rootCoeffb3,...
+                plugin.rootCoeffa3, in, plugin.rootPrevState3);
+            %TODO: update these
+            [in, plugin.rootPrevState4] = filter(plugin.rootCoeffb4,...
+                plugin.rootCoeffa4, in, plugin.rootPrevState4);
+            [in, plugin.rootPrevState5] = filter(plugin.rootCoeffb5,...
+                plugin.rootCoeffa5, in, plugin.rootPrevState5);
+            [in, plugin.rootPrevState6] = filter(plugin.rootCoeffb6,...
+                plugin.rootCoeffa6, in, plugin.rootPrevState6);
+            [in, plugin.rootPrevState7] = filter(plugin.rootCoeffb7,...
+                plugin.rootCoeffa7, in, plugin.rootPrevState7);
+            [in, plugin.rootPrevState8] = filter(plugin.rootCoeffb8,...
+                plugin.rootCoeffa8, in, plugin.rootPrevState8);
+            [in, plugin.rootPrevState9] = filter(plugin.rootCoeffb9,...
+                plugin.rootCoeffa9, in, plugin.rootPrevState9);
             
             %TODO: output gain?
             %out = 10.^(plugin.outputGain/20) * in);
@@ -174,6 +220,13 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % Initialize filters
             buildRootFilter1(plugin, fs);
             buildRootFilter2(plugin, fs);
+            buildRootFilter3(plugin, fs);
+            buildRootFilter4(plugin, fs);
+            buildRootFilter5(plugin, fs);
+            buildRootFilter6(plugin, fs);
+            buildRootFilter7(plugin, fs);
+            buildRootFilter8(plugin, fs);
+            buildRootFilter9(plugin, fs);
             
         end
         
@@ -287,6 +340,69 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateRootFilter2 = false;
         end
         
+        function buildRootFilter3(plugin, fs)
+            [plugin.rootCoeffb3, plugin.rootCoeffa3] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.rootFrequency3,...
+                plugin.rootQFactor3,...
+                plugin.rootGain3);
+            plugin.updateRootFilter3 = false;
+        end
+        
+        function buildRootFilter4(plugin, fs)
+            [plugin.rootCoeffb4, plugin.rootCoeffa4] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.rootFrequency4,...
+                plugin.rootQFactor4,...
+                plugin.rootGain4);
+            plugin.updateRootFilter4 = false;
+        end
+        
+        function buildRootFilter5(plugin, fs)
+            [plugin.rootCoeffb5, plugin.rootCoeffa5] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.rootFrequency5,...
+                plugin.rootQFactor5,...
+                plugin.rootGain5);
+            plugin.updateRootFilter5 = false;
+        end
+        
+        function buildRootFilter6(plugin, fs)
+            [plugin.rootCoeffb6, plugin.rootCoeffa6] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.rootFrequency6,...
+                plugin.rootQFactor6,...
+                plugin.rootGain6);
+            plugin.updateRootFilter6 = false;
+        end
+        
+        function buildRootFilter7(plugin, fs)
+            [plugin.rootCoeffb7, plugin.rootCoeffa7] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.rootFrequency7,...
+                plugin.rootQFactor7,...
+                plugin.rootGain7);
+            plugin.updateRootFilter7 = false;
+        end
+        
+        function buildRootFilter8(plugin, fs)
+            [plugin.rootCoeffb8, plugin.rootCoeffa8] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.rootFrequency8,...
+                plugin.rootQFactor8,...
+                plugin.rootGain8);
+            plugin.updateRootFilter8 = false;
+        end
+        
+        function buildRootFilter9(plugin, fs)
+            [plugin.rootCoeffb9, plugin.rootCoeffa9] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.rootFrequency9,...
+                plugin.rootQFactor9,...
+                plugin.rootGain9);
+            plugin.updateRootFilter9 = false;
+        end
+        
         
         
         %-----------------------------Updaters-----------------------------
@@ -294,55 +410,39 @@ classdef HarmonEQ < matlab.System & audioPlugin
             switch val %TODO: Eventually create a getBaseFreq function for this...
                 case 'A'
                     rootFreq = 55;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
-                    %TODO: If this works, implement the rest of the root
-                    %freq bands
                 case 'A# / Bb'
                     rootFreq = 58.27047;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'B'
                     rootFreq = 61.73541;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'C'
                     rootFreq = 32.70320;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'C# / Db'
                     rootFreq = 34.64783;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'D'
                     rootFreq = 36.70810;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'D# / Eb'
                     rootFreq = 38.89087;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'E'
                     rootFreq = 41.20344;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'F'
                     rootFreq = 43.65353;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'F# / Gb'
                     rootFreq = 46.24930;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'G'
                     rootFreq = 48.99943;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
                 case 'G# / Ab'
                     rootFreq = 51.91309;
-                    plugin.rootFrequency1 = rootFreq;
-                    plugin.rootFrequency2 = 2 * rootFreq;
             end
+            
+            plugin.rootFrequency1 = rootFreq;
+            plugin.rootFrequency2 = 2 * rootFreq;
+            plugin.rootFrequency3 = 4 * rootFreq;
+            plugin.rootFrequency4 = 8 * rootFreq;
+            plugin.rootFrequency5 = 16 * rootFreq;
+            plugin.rootFrequency6 = 32 * rootFreq;
+            plugin.rootFrequency7 = 64 * rootFreq;
+            plugin.rootFrequency8 = 128 * rootFreq;
+            plugin.rootFrequency9 = 256 * rootFreq;
             
             %TEST
             disp(plugin.rootFrequency1);
@@ -358,6 +458,29 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateRootFilter7 = true;
             plugin.updateRootFilter8 = true;
             plugin.updateRootFilter9 = true;
+            plugin.stateChange = true;
+        end
+        
+        function updateFilterCoefficientsMatrix(plugin)
+            %TEST
+            plugin.B = [plugin.rootCoeffb1;...
+                plugin.rootCoeffb2;...
+                plugin.rootCoeffb3;...
+                plugin.rootCoeffb4;...
+                plugin.rootCoeffb5;...
+                plugin.rootCoeffb6;...
+                plugin.rootCoeffb7;...
+                plugin.rootCoeffb8;...
+                plugin.rootCoeffb9];
+            plugin.A = [plugin.rootCoeffa1;...
+                plugin.rootCoeffa2;...
+                plugin.rootCoeffa3;...
+                plugin.rootCoeffa4;...
+                plugin.rootCoeffa5;...
+                plugin.rootCoeffa6;...
+                plugin.rootCoeffa7;...
+                plugin.rootCoeffa8;...
+                plugin.rootCoeffa9];
         end
         
         function updateVisualizer(plugin)
@@ -366,6 +489,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.B, plugin.A);
                 plugin.visualizerObject.SampleRate = plugin.getSampleRate;
             end
+            %TODO: Test this method of minimizing updates to the visualizer
+            %plugin.stateChange = false;
         end
         
     end
