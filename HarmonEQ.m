@@ -19,6 +19,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         thirdNote = 'C';
         fifthNote = 'E';
         seventhNote = 'G';
+        
+        rootGain = 0;
+        rootQFactor = 20;
                 
     end
     
@@ -83,7 +86,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'PluginName','HarmonEQ',...
             audioPluginParameter('rootNote','DisplayName','Root Note',...
             'Mapping',{'enum','off','A','A# / Bb','B','C','C# / Db','D',...
-            'D# / Eb','E','F','F# / Gb','G','G# / Ab'},'Layout',[2 4]));
+            'D# / Eb','E','F','F# / Gb','G','G# / Ab'}),...
+            audioPluginParameter('rootGain','DisplayName','Root Note Gain',...
+            'Mapping',{'lin',-15,15})...
+            );
     end
     
     
@@ -315,6 +321,25 @@ classdef HarmonEQ < matlab.System & audioPlugin
             disp(val);
         end
         
+        function set.rootGain(plugin,val)
+            plugin.rootGain = val;
+            
+            %TODO: This is temporary until I implement range gain controls
+            plugin.rootGain1 = val;
+            plugin.rootGain2 = val;
+            plugin.rootGain3 = val;
+            plugin.rootGain4 = val;
+            plugin.rootGain5 = val;
+            plugin.rootGain6 = val;
+            plugin.rootGain7 = val;
+            plugin.rootGain8 = val;
+            plugin.rootGain9 = val;
+            
+            updateRootFilters(plugin);
+            % for visualization upate control
+            plugin.stateChange = true;
+        end
+        
         
     end
     
@@ -344,8 +369,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             b = [b0, b1, b2];
             a = [a0, a1, a2];
-            disp(b);
-            disp(a);
         end
         
         
