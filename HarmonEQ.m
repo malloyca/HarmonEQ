@@ -7,7 +7,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
 % something very basic that hopefully I can understand.
 %
 % TODO:
-%
+% - Look into State-variable filters vs biquads
 %
 
     %----------------------------------------------------------------------
@@ -50,15 +50,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootQFactor9 = 20;
         
         % Gain for root bands (dB)
-        rootGain1 = 9;
-        rootGain2 = 9;
-        rootGain3 = 9;
-        rootGain4 = 9;
-        rootGain5 = 9;
-        rootGain6 = 9;
-        rootGain7 = 9;
-        rootGain8 = 9;
-        rootGain9 = 9;
+        rootGain1 = 0;
+        rootGain2 = 0;
+        rootGain3 = 0;
+        rootGain4 = 0;
+        rootGain5 = 0;
+        rootGain6 = 0;
+        rootGain7 = 0;
+        rootGain8 = 0;
+        rootGain9 = 0;
         
         % Update status variables for root filters
         updateRootFilter1 = false;
@@ -88,7 +88,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'Mapping',{'enum','off','A','A# / Bb','B','C','C# / Db','D',...
             'D# / Eb','E','F','F# / Gb','G','G# / Ab'}),...
             audioPluginParameter('rootGain','DisplayName','Root Note Gain',...
-            'Mapping',{'lin',-15,15})...
+            'Mapping',{'lin',-15,15}),...
+            audioPluginParameter('rootQFactor','DisplayName','Root Q Factor',...
+            'Mapping',{'pow', 2, 0.5, 100})...
             );
     end
     
@@ -336,10 +338,28 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain9 = val;
             
             updateRootFilters(plugin);
-            % for visualization upate control
+            % for visualization update control
             plugin.stateChange = true;
         end
         
+        function set.rootQFactor(plugin,val)
+            plugin.rootQFactor = val;
+            
+            %TODO: This is temporary until I implement controls by range
+            plugin.rootQFactor1 = val;
+            plugin.rootQFactor2 = val;
+            plugin.rootQFactor3 = val;
+            plugin.rootQFactor4 = val;
+            plugin.rootQFactor5 = val;
+            plugin.rootQFactor6 = val;
+            plugin.rootQFactor7 = val;
+            plugin.rootQFactor8 = val;
+            plugin.rootQFactor9 = val;
+            
+            updateRootFilters(plugin);
+            % for visualization update control
+            plugin.stateChange = true;
+        end
         
     end
     
