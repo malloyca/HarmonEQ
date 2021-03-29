@@ -16,6 +16,10 @@ The user can then define gain and Q values for five different ranges: low, low-m
 This project is currently in active development.
 
 TODO list:
-- Implement remainder of root filters (3-9)
 - Implement initial gain and Q controls for root filters (do not need to be split into groups yet)
+- Implement single third note filter for testing
+  - This will need to update every time the root updates as well as when the quality of the third note is updated
 - Test to see if the filter frequency jumps needs smoothing
+- Is there a way to display the current chord?
+  - Yes. This can be accomlished by having a dropdown box with a getter function that does nothing, but a setter function that updates every time there is a harmonic change.
+  - In order to implement this, maybe I should convert the chord information to matrix form?
