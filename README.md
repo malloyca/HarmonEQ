@@ -16,7 +16,7 @@ The user can then define gain and Q values for five different ranges: low, low-m
 This project is currently in active development.
 
 TODO list:
-- Implement initial gain and Q controls for root filters (do not need to be split into groups yet)
+- Implement initial ~~gain~~ and Q controls for root filters (do not need to be split into groups yet)
 - Implement single third note filter for testing
   - This will need to update every time the root updates as well as when the quality of the third note is updated
 - Test to see if the filter frequency jumps needs smoothing
