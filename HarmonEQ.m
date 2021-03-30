@@ -156,15 +156,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         fifthQFactor9 = 20;
         
         % Gain for fifth bands (dB)
-        fifthGain1 = 9;
-        fifthGain2 = 9;
-        fifthGain3 = 9;
-        fifthGain4 = 9;
-        fifthGain5 = 9;
-        fifthGain6 = 9;
-        fifthGain7 = 9;
-        fifthGain8 = 9;
-        fifthGain9 = 9;
+        fifthGain1 = 0;
+        fifthGain2 = 0;
+        fifthGain3 = 0;
+        fifthGain4 = 0;
+        fifthGain5 = 0;
+        fifthGain6 = 0;
+        fifthGain7 = 0;
+        fifthGain8 = 0;
+        fifthGain9 = 0;
         
         % Update status variables for fifth filters
         updateFifthFilter1 = false;
@@ -202,14 +202,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
             audioPluginParameter('thirdInterval',...
             'DisplayName','Harmonic Third Interval',...
             'Mapping',{'enum','off','Sus2','Min3','Maj3','Sus4'}),...
-            audioPluginParameter('thirdGain','DisplayName','harmonic Third Gain',...
+            audioPluginParameter('thirdGain',...
+            'DisplayName','Harmonic Third Gain',...
             'Mapping',{'lin',-15,15}),...
             audioPluginParameter('thirdQFactor','DisplayName','Harmonic Third Q Factor',...
             'Mapping',{'pow', 2, 0.5, 100}),...
             ...
             audioPluginParameter('fifthInterval',...
             'DisplayName','Harmonic Fifth Interval',...
-            'Mapping',{'enum','off','Dim5','Perf5','Aug5'})...
+            'Mapping',{'enum','off','Dim5','Perf5','Aug5'}),...
+            audioPluginParameter('fifthGain',...
+            'DisplayName','Harmonic Fifth Gain',...
+            'Mapping',{'lin',-15,15})...
             );
     end
     
@@ -759,8 +763,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.fifthFiltersActive = true;
                 updateFifthFrequencies(plugin);
                 setUpdateFifthFilters(plugin);
-            end
+            end 
+        end
+        
+        function set.fifthGain(plugin,val)
+            plugin.fifthGain = val;
             
+            %TODO: This is temporary until I implement range gain controls
+            plugin.fifthGain1 = val;
+            plugin.fifthGain2 = val;
+            plugin.fifthGain3 = val;
+            plugin.fifthGain4 = val;
+            plugin.fifthGain5 = val;
+            plugin.fifthGain6 = val;
+            plugin.fifthGain7 = val;
+            plugin.fifthGain8 = val;
+            plugin.fifthGain9 = val;
+            
+            setUpdateFifthFilters(plugin);
+            % for visualization update control
+            plugin.stateChange = true;
         end
         
     end
