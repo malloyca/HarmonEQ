@@ -55,4 +55,4 @@ TODO list:
 
 
 ## Bug List
-- Although harmonic third setting initialize to 'off', the filters are on and being built.
+
