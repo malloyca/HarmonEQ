@@ -14,29 +14,36 @@ classdef HarmonEQ < matlab.System & audioPlugin
     % TUNABLE PROPERTIES
     %----------------------------------------------------------------------
     properties
-        rootNote = 'A';
-        %TODO: these are placeholders until I implement these filters
-        thirdNote = 'C';
-        fifthNote = 'E';
-        seventhNote = 'G';
-        
+        rootNote = 'C';
+        rootNoteValue = 0;
         rootGain = 0;
         rootQFactor = 20;
+        
+        thirdInterval = 'off';
+        thirdIntervalDistance = 4;
+        thirdNote = 'E';
+        
+        %TODO: these are placeholders until I implement these filters
+        fifthNote = 'G';
+        seventhNote = 'B';
+        
+        
                 
     end
     
     
     properties
+        %--------------------------Harmonic root---------------------------
         % Center frequencies for root bands
-        rootFrequency1 = 55;
-        rootFrequency2 = 110;
-        rootFrequency3 = 220;
-        rootFrequency4 = 440;
-        rootFrequency5 = 880;
-        rootFrequency6 = 1760;
-        rootFrequency7 = 3520;
-        rootFrequency8 = 7040;
-        rootFrequency9 = 14080;
+        rootFrequency1 = 32.70320;
+        rootFrequency2 = 2 * 32.70320;
+        rootFrequency3 = 4 * 32.70320;
+        rootFrequency4 = 8 * 32.70320;
+        rootFrequency5 = 16 * 32.70320;
+        rootFrequency6 = 32 * 32.70320;
+        rootFrequency7 = 64 * 32.70320;
+        rootFrequency8 = 128 * 32.70320;
+        rootFrequency9 = 256 * 32.70320;
         
         % Q factors for root bands
         rootQFactor1 = 20;
@@ -71,6 +78,52 @@ classdef HarmonEQ < matlab.System & audioPlugin
         updateRootFilter8 = false;
         updateRootFilter9 = false;
         
+        %-------------------------Harmonic Third---------------------------
+        % Center frequencies for harmonic third bands
+        thirdFrequency1 = 41.20344;
+        thirdFrequency2 = 2 * 41.20344;
+        thirdFrequency3 = 4 * 41.20344;
+        thirdFrequency4 = 8 * 41.20344;
+        thirdFrequency5 = 16 * 41.20344;
+        thirdFrequency6 = 32 * 41.20344;
+        thirdFrequency7 = 64 * 41.20344;
+        thirdFrequency8 = 128 * 41.20344;
+        thirdFrequency9 = 256 * 41.20344;
+        
+        % Q factors for third bands
+        thirdQFactor1 = 20;
+        thirdQFactor2 = 20;
+        thirdQFactor3 = 20;
+        thirdQFactor4 = 20;
+        thirdQFactor5 = 20;
+        thirdQFactor6 = 20;
+        thirdQFactor7 = 20;
+        thirdQFactor8 = 20;
+        thirdQFactor9 = 20;
+        
+        % Gain for third bands (dB)
+        thirdGain1 = 9;
+        thirdGain2 = 9;
+        thirdGain3 = 9;
+        thirdGain4 = 9;
+        thirdGain5 = 9;
+        thirdGain6 = 9;
+        thirdGain7 = 9;
+        thirdGain8 = 9;
+        thirdGain9 = 9;
+        
+        % Update status variables for third filters
+        updateThirdFilter1 = false;
+        updateThirdFilter2 = false;
+        updateThirdFilter3 = false;
+        updateThirdFilter4 = false;
+        updateThirdFilter5 = false;
+        updateThirdFilter6 = false;
+        updateThirdFilter7 = false;
+        updateThirdFilter8 = false;
+        updateThirdFilter9 = false;
+        
+        
         % General change of state variable to minimize visualizer updates
         stateChange = false;
         
@@ -90,7 +143,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
             audioPluginParameter('rootGain','DisplayName','Root Note Gain',...
             'Mapping',{'lin',-15,15}),...
             audioPluginParameter('rootQFactor','DisplayName','Root Q Factor',...
-            'Mapping',{'pow', 2, 0.5, 100})...
+            'Mapping',{'pow', 2, 0.5, 100}),...
+            ...
+            audioPluginParameter('thirdInterval','DisplayName',...
+            'Harmonic Third Interval',...
+            'Mapping',{'enum','off','Sus2','Min3','Maj3','Sus4'})...
             );
     end
     
@@ -107,7 +164,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
     % PRIVATE PROPERTIES
     %----------------------------------------------------------------------
     properties (Access = private, Hidden)
-        % Root band coefficients
+        
+        %----------------------Root band coefficients----------------------
         rootCoeffb1;
         rootCoeffa1;
         rootPrevState1 = zeros(2);
@@ -136,9 +194,41 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootCoeffa9;
         rootPrevState9 = zeros(2);
         
+        
+        %----------------Harmonic third band coefficients------------------
+        thirdCoeffb1;
+        thirdCoeffa1;
+        thirdPrevState1 = zeros(2);
+        thirdCoeffb2;
+        thirdCoeffa2;
+        thirdPrevState2 = zeros(2);
+        thirdCoeffb3;
+        thirdCoeffa3;
+        thirdPrevState3 = zeros(2);
+        thirdCoeffb4;
+        thirdCoeffa4;
+        thirdPrevState4 = zeros(2);
+        thirdCoeffb5;
+        thirdCoeffa5;
+        thirdPrevState5 = zeros(2);
+        thirdCoeffb6;
+        thirdCoeffa6;
+        thirdPrevState6 = zeros(2);
+        thirdCoeffb7;
+        thirdCoeffa7;
+        thirdPrevState7 = zeros(2);
+        thirdCoeffb8;
+        thirdCoeffa8;
+        thirdPrevState8 = zeros(2);
+        thirdCoeffb9;
+        thirdCoeffa9;
+        thirdPrevState9 = zeros(2);
+        
+        
+        
         % Active state variables
         rootFiltersActive = true;
-        thirdFiltersActive = false;
+        thirdFiltersActive = true;
         fifthFiltersActive = false;
         seventhFiltersActive = false
         
@@ -186,6 +276,35 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 buildRootFilter9(plugin, fs);
             end
             
+            %todo: implement buildThirdFilter1, etc
+            if plugin.updateThirdFilter1
+                buildThirdFilter1(plugin,fs);
+            end
+            if plugin.updateThirdFilter2
+                buildThirdFilter2(plugin, fs);
+            end
+            if plugin.updateThirdFilter3
+                buildThirdFilter3(plugin, fs);
+            end
+            if plugin.updateThirdFilter4
+                buildThirdFilter4(plugin, fs);
+            end
+            if plugin.updateThirdFilter5
+                buildThirdFilter5(plugin, fs);
+            end
+            if plugin.updateThirdFilter6
+                buildThirdFilter6(plugin, fs);
+            end
+            if plugin.updateThirdFilter7
+                buildThirdFilter7(plugin, fs);
+            end
+            if plugin.updateThirdFilter8
+                buildThirdFilter8(plugin, fs);
+            end
+            if plugin.updateThirdFilter9
+                buildThirdFilter9(plugin, fs);
+            end
+            
             % update plugin.B and plugin.A coefficient matrices for
             % visualization
             updateFilterCoefficientsMatrix(plugin);
@@ -218,6 +337,27 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootCoeffa9, in, plugin.rootPrevState9);
             end
             
+            if plugin.thirdFiltersActive
+                [in, plugin.thirdPrevState1] = filter(plugin.thirdCoeffb1,...
+                    plugin.thirdCoeffa1, in, plugin.thirdPrevState1);
+                [in, plugin.thirdPrevState2] = filter(plugin.thirdCoeffb2,...
+                    plugin.thirdCoeffa2, in, plugin.thirdPrevState2);
+                [in, plugin.thirdPrevState3] = filter(plugin.thirdCoeffb3,...
+                    plugin.thirdCoeffa3, in, plugin.thirdPrevState3);
+                [in, plugin.thirdPrevState4] = filter(plugin.thirdCoeffb4,...
+                    plugin.thirdCoeffa4, in, plugin.thirdPrevState4);
+                [in, plugin.thirdPrevState5] = filter(plugin.thirdCoeffb5,...
+                    plugin.thirdCoeffa5, in, plugin.thirdPrevState5);
+                [in, plugin.thirdPrevState6] = filter(plugin.thirdCoeffb6,...
+                    plugin.thirdCoeffa6, in, plugin.thirdPrevState6);
+                [in, plugin.thirdPrevState7] = filter(plugin.thirdCoeffb7,...
+                    plugin.thirdCoeffa7, in, plugin.thirdPrevState7);
+                [in, plugin.thirdPrevState8] = filter(plugin.thirdCoeffb8,...
+                    plugin.thirdCoeffa8, in, plugin.thirdPrevState8);
+                [in, plugin.thirdPrevState9] = filter(plugin.thirdCoeffb9,...
+                    plugin.thirdCoeffa9, in, plugin.thirdPrevState9);
+            end
+            
             %TODO: output gain?
             %out = 10.^(plugin.outputGain/20) * in);
             out = in;
@@ -246,6 +386,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 buildRootFilter7(plugin, fs);
                 buildRootFilter8(plugin, fs);
                 buildRootFilter9(plugin, fs);
+            end
+            
+            if plugin.thirdFiltersActive
+                buildThirdFilter1(plugin, fs);
+                buildThirdFilter2(plugin, fs);
+                buildThirdFilter3(plugin, fs);
+                buildThirdFilter4(plugin, fs);
+                buildThirdFilter5(plugin, fs);
+                buildThirdFilter6(plugin, fs);
+                buildThirdFilter7(plugin, fs);
+                buildThirdFilter8(plugin, fs);
+                buildThirdFilter9(plugin, fs);
             end
             
         end
@@ -288,13 +440,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         
+        
+        
+        
         %------------------------------------------------------------------
         % SETTERS
         %------------------------------------------------------------------
+        
+        %----------------------------Root note-----------------------------
         function set.rootNote(plugin,val)
             validatestring(val, {'off','A','A# / Bb','B','C','C# / Db',...
                 'D','D# / Eb','E','F','F# / Gb','G','G# / Ab'},...
-                'set.rootNote', 'RootName');
+                'set.rootNote', 'RootNote');
             % This if statement will throw an error if using single quotes
             % 'off' instead of double quotes "off". Seems to have something
             % to do with type... This is true in the other instances as
@@ -304,6 +461,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.rootFiltersActive = false;
                 %TODO: If no root, deactivate all other peaks. This is
                 %really for down the road...
+                plugin.thirdInterval = 'off';
                 plugin.thirdFiltersActive = false;
                 plugin.fifthFiltersActive = false;
                 plugin.seventhFiltersActive = false;
@@ -311,12 +469,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.rootNote = val;
                 plugin.rootFiltersActive = true;
             end
-            updateRootFilters(plugin);
-            %plugin.updateThird1 = true;
-            %TODO: This is for later...
-%             if plugin.thirdFiltersStatus
-%                 updateThirdFilters(plugin);
-%             end
+            setUpdateRootFilters(plugin);
+            setUpdateThirdFilters(plugin);
+            %setUpdateFifthFilters(plugin); %todo: this is for later...
+            %setUpdateSeventhFilters(plugin); %todo: this is for later...
+            
             updateRootFrequencies(plugin,val);
             %todo: Necessary for state change control of visualizer:
             %plugin.stateChange = true;
@@ -337,7 +494,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain8 = val;
             plugin.rootGain9 = val;
             
-            updateRootFilters(plugin);
+            setUpdateRootFilters(plugin);
             % for visualization update control
             plugin.stateChange = true;
         end
@@ -356,9 +513,37 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootQFactor8 = val;
             plugin.rootQFactor9 = val;
             
-            updateRootFilters(plugin);
+            setUpdateRootFilters(plugin);
             % for visualization update control
             plugin.stateChange = true;
+            %BOOKMARK
+        end
+        
+        
+        %--------------------------Harmonic Third--------------------------
+        function set.thirdInterval(plugin,val)
+            validatestring(val, {'off','Sus2','Min3','Maj3','Sus4'},...
+                'set.thirdInterval','ThirdInterval');
+            plugin.thirdInterval = val;
+            if val == "off"
+                plugin.thirdFiltersActive = false;
+            else
+                switch val
+                    case 'Sus2'
+                        plugin.thirdIntervalDistance = 2;
+                    case 'Min3'
+                        plugin.thirdIntervalDistance = 3;
+                    case 'Maj3'
+                        plugin.thirdIntervalDistance = 4;
+                    case 'Sus4'
+                        plugin.thirdIntervalDistance = 5;
+                end
+                
+                %if plugin.rootNoteFiltersActive == true?
+                plugin.thirdFiltersActive = true;
+                updateThirdFrequencies(plugin);
+            end
+            
         end
         
     end
@@ -475,6 +660,87 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateRootFilter9 = false;
         end
         
+        function buildThirdFilter1(plugin, fs)
+            [plugin.thirdCoeffb1, plugin.thirdCoeffa1] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency1,...
+                plugin.thirdQFactor1,...
+                plugin.thirdGain1);
+            plugin.updateThirdFilter1 = false;
+        end
+        
+        function buildThirdFilter2(plugin, fs)
+            [plugin.thirdCoeffb2, plugin.thirdCoeffa2] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency2,...
+                plugin.thirdQFactor2,...
+                plugin.thirdGain2);
+            plugin.updateThirdFilter2 = false;
+        end
+        
+        function buildThirdFilter3(plugin, fs)
+            [plugin.thirdCoeffb3, plugin.thirdCoeffa3] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency3,...
+                plugin.thirdQFactor3,...
+                plugin.thirdGain3);
+            plugin.updateThirdFilter3 = false;
+        end
+        
+        function buildThirdFilter4(plugin, fs)
+            [plugin.thirdCoeffb4, plugin.thirdCoeffa4] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency4,...
+                plugin.thirdQFactor4,...
+                plugin.thirdGain4);
+            plugin.updateThirdFilter4 = false;
+        end
+        
+        function buildThirdFilter5(plugin, fs)
+            [plugin.thirdCoeffb5, plugin.thirdCoeffa5] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency5,...
+                plugin.thirdQFactor5,...
+                plugin.thirdGain5);
+            plugin.updateThirdFilter5 = false;
+        end
+        
+        function buildThirdFilter6(plugin, fs)
+            [plugin.thirdCoeffb6, plugin.thirdCoeffa6] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency6,...
+                plugin.thirdQFactor6,...
+                plugin.thirdGain6);
+            plugin.updateThirdFilter6 = false;
+        end
+        
+        function buildThirdFilter7(plugin, fs)
+            [plugin.thirdCoeffb7, plugin.thirdCoeffa7] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency7,...
+                plugin.thirdQFactor7,...
+                plugin.thirdGain7);
+            plugin.updateThirdFilter7 = false;
+        end
+        
+        function buildThirdFilter8(plugin, fs)
+            [plugin.thirdCoeffb8, plugin.thirdCoeffa8] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency8,...
+                plugin.thirdQFactor8,...
+                plugin.thirdGain8);
+            plugin.updateThirdFilter8 = false;
+        end
+        
+        function buildThirdFilter9(plugin, fs)
+            [plugin.thirdCoeffb9, plugin.thirdCoeffa9] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.thirdFrequency9,...
+                plugin.thirdQFactor9,...
+                plugin.thirdGain9);
+            plugin.updateThirdFilter9 = false;
+        end
+        
         
         
         %-----------------------------Updaters-----------------------------
@@ -483,28 +749,40 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 case "off"
                 case 'A'
                     rootFreq = 55;
+                    rootNoteNumber = 9;
                 case 'A# / Bb'
                     rootFreq = 58.27047;
+                    rootNoteNumber = 10;
                 case 'B'
                     rootFreq = 61.73541;
+                    rootNoteNumber = 11;
                 case 'C'
                     rootFreq = 32.70320;
+                    rootNoteNumber = 0;
                 case 'C# / Db'
                     rootFreq = 34.64783;
+                    rootNoteNumber = 1;
                 case 'D'
                     rootFreq = 36.70810;
+                    rootNoteNumber = 2;
                 case 'D# / Eb'
                     rootFreq = 38.89087;
+                    rootNoteNumber = 3;
                 case 'E'
                     rootFreq = 41.20344;
+                    rootNoteNumber = 4;
                 case 'F'
                     rootFreq = 43.65353;
+                    rootNoteNumber = 5;
                 case 'F# / Gb'
                     rootFreq = 46.24930;
+                    rootNoteNumber = 6;
                 case 'G'
                     rootFreq = 48.99943;
+                    rootNoteNumber = 7;
                 case 'G# / Ab'
                     rootFreq = 51.91309;
+                    rootNoteNumber = 8;
             end
             
             if val ~= "off"
@@ -517,13 +795,64 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.rootFrequency7 = 64 * rootFreq;
                 plugin.rootFrequency8 = 128 * rootFreq;
                 plugin.rootFrequency9 = 256 * rootFreq;
+                
+                plugin.rootNoteValue = rootNoteNumber;
             end
             
             %TEST
             disp(plugin.rootFrequency1);
         end
         
-        function updateRootFilters(plugin)
+        function updateThirdFrequencies(plugin)
+            %todo: This really need to know the root note and harmonic
+            %third interval
+            
+            thirdNoteNumber = mod(plugin.rootNoteValue + plugin.thirdIntervalDistance, 12);
+            
+             %TODO: Eventually create a getBaseFreq function for this...
+            switch thirdNoteNumber
+                case 9
+                    thirdFreq = 55;
+                case 10
+                    thirdFreq = 58.27047;
+                case 11
+                    thirdFreq = 61.73541;
+                case 0
+                    thirdFreq = 32.70320;
+                case 1
+                    thirdFreq = 34.64783;
+                case 2
+                    thirdFreq = 36.70810;
+                case 3
+                    thirdFreq = 38.89087;
+                case 4
+                    thirdFreq = 41.20344;
+                case 5
+                    thirdFreq = 43.65353;
+                case 6
+                    thirdFreq = 46.24930;
+                case 7
+                    thirdFreq = 48.99943;
+                case 8
+                    thirdFreq = 51.91309;
+            end
+            
+            plugin.thirdFrequency1 = thirdFreq;
+            plugin.thirdFrequency2 = 2 * thirdFreq;
+            plugin.thirdFrequency3 = 4 * thirdFreq;
+            plugin.thirdFrequency4 = 8 * thirdFreq;
+            plugin.thirdFrequency5 = 16 * thirdFreq;
+            plugin.thirdFrequency6 = 32 * thirdFreq;
+            plugin.thirdFrequency7 = 64 * thirdFreq;
+            plugin.thirdFrequency8 = 128 * thirdFreq;
+            plugin.thirdFrequency9 = 256 * thirdFreq;
+            
+            %TEST
+            disp('Harmonic third frequency:')
+            disp(plugin.thirdFrequency1);
+        end
+        
+        function setUpdateRootFilters(plugin)
             plugin.updateRootFilter1 = true;
             plugin.updateRootFilter2 = true;
             plugin.updateRootFilter3 = true;
@@ -536,12 +865,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.stateChange = true;
         end
         
+        function setUpdateThirdFilters(plugin)
+            plugin.updateThirdFilter1 = true;
+            plugin.updateThirdFilter2 = true;
+            plugin.updateThirdFilter3 = true;
+            plugin.updateThirdFilter4 = true;
+            plugin.updateThirdFilter5 = true;
+            plugin.updateThirdFilter6 = true;
+            plugin.updateThirdFilter7 = true;
+            plugin.updateThirdFilter8 = true;
+            plugin.updateThirdFilter9 = true;
+            plugin.stateChange = true;
+        end
+        
         function updateFilterCoefficientsMatrix(plugin)
-            %TEST
+            %TODO
             % If root filters are active, then add their coefficients to
             % the coefficient matrices
+            
             if plugin.rootFiltersActive
-                plugin.B = [plugin.rootCoeffb1;...
+                B1 = [plugin.rootCoeffb1;...
                     plugin.rootCoeffb2;...
                     plugin.rootCoeffb3;...
                     plugin.rootCoeffb4;...
@@ -550,7 +893,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootCoeffb7;...
                     plugin.rootCoeffb8;...
                     plugin.rootCoeffb9];
-                plugin.A = [plugin.rootCoeffa1;...
+                A1 = [plugin.rootCoeffa1;...
                     plugin.rootCoeffa2;...
                     plugin.rootCoeffa3;...
                     plugin.rootCoeffa4;...
@@ -559,6 +902,34 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootCoeffa7;...
                     plugin.rootCoeffa8;...
                     plugin.rootCoeffa9];
+            
+                if plugin.thirdFiltersActive
+                    B2 = [plugin.thirdCoeffb1;...
+                        plugin.thirdCoeffb2;...
+                        plugin.thirdCoeffb3;...
+                        plugin.thirdCoeffb4;...
+                        plugin.thirdCoeffb5;...
+                        plugin.thirdCoeffb6;...
+                        plugin.thirdCoeffb7;...
+                        plugin.thirdCoeffb8;...
+                        plugin.thirdCoeffb9];
+                    A2 = [plugin.thirdCoeffa1;...
+                        plugin.thirdCoeffa2;...
+                        plugin.thirdCoeffa3;...
+                        plugin.thirdCoeffa4;...
+                        plugin.thirdCoeffa5;...
+                        plugin.thirdCoeffa6;...
+                        plugin.thirdCoeffa7;...
+                        plugin.thirdCoeffa8;...
+                        plugin.thirdCoeffa9];
+                else
+                    B2 = [];
+                    A2 = [];
+                end
+                
+                plugin.B = [B1; B2];
+                plugin.A = [A1; A2];
+                
             else
                 % If not, set to an allpass filter
                 % TODO: This should just be for visualization, in the
