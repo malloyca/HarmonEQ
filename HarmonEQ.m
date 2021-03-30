@@ -481,9 +481,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %setUpdateSeventhFilters(plugin); %todo: this is for later...
             
             updateRootFrequencies(plugin,val);
+            updateThirdFrequencies(plugin);
             %todo: Necessary for state change control of visualizer:
             %plugin.stateChange = true;
-            disp(val);
         end
         
         function set.rootGain(plugin,val)
@@ -522,7 +522,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             setUpdateRootFilters(plugin);
             % for visualization update control
             plugin.stateChange = true;
-            %BOOKMARK
         end
         
         
@@ -548,6 +547,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 %if plugin.rootNoteFiltersActive == true?
                 plugin.thirdFiltersActive = true;
                 updateThirdFrequencies(plugin);
+                setUpdateThirdFilters(plugin);
             end
             
         end
@@ -571,6 +571,24 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.stateChange = true;
         end
         
+        function set.thirdQFactor(plugin,val)
+            plugin.thirdQFactor = val;
+            
+            %TODO: This is temporary until I implement controls by range
+            plugin.thirdQFactor1 = val;
+            plugin.thirdQFactor2 = val;
+            plugin.thirdQFactor3 = val;
+            plugin.thirdQFactor4 = val;
+            plugin.thirdQFactor5 = val;
+            plugin.thirdQFactor6 = val;
+            plugin.thirdQFactor7 = val;
+            plugin.thirdQFactor8 = val;
+            plugin.thirdQFactor9 = val;
+            
+            setUpdateThirdFilters(plugin);
+            % for visualization update control
+            plugin.stateChange = true;
+        end
     end
     
     
@@ -824,8 +842,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.rootNoteValue = rootNoteNumber;
             end
             
-            %TEST
-            disp(plugin.rootFrequency1);
         end
         
         function updateThirdFrequencies(plugin)
@@ -872,9 +888,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdFrequency8 = 128 * thirdFreq;
             plugin.thirdFrequency9 = 256 * thirdFreq;
             
-            %TEST
-            disp('Harmonic third frequency:')
-            disp(plugin.thirdFrequency1);
         end
         
         function setUpdateRootFilters(plugin)
