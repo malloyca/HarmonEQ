@@ -104,15 +104,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         thirdQFactor9 = 20;
         
         % Gain for third bands (dB)
-        thirdGain1 = 9;
-        thirdGain2 = 9;
-        thirdGain3 = 9;
-        thirdGain4 = 9;
-        thirdGain5 = 9;
-        thirdGain6 = 9;
-        thirdGain7 = 9;
-        thirdGain8 = 9;
-        thirdGain9 = 9;
+        thirdGain1 = 0;
+        thirdGain2 = 0;
+        thirdGain3 = 0;
+        thirdGain4 = 0;
+        thirdGain5 = 0;
+        thirdGain6 = 0;
+        thirdGain7 = 0;
+        thirdGain8 = 0;
+        thirdGain9 = 0;
         
         % Update status variables for third filters
         updateThirdFilter1 = false;
@@ -234,7 +234,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         % Active state variables
         rootFiltersActive = true;
-        thirdFiltersActive = true;
+        thirdFiltersActive = false;
         fifthFiltersActive = false;
         seventhFiltersActive = false
         
