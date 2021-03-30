@@ -54,4 +54,4 @@ TODO list:
 
 
 ## Bug List
-
+- Need to prevent enabling non-root filters if root filters are disabled
