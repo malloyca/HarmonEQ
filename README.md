@@ -44,14 +44,13 @@ This project is currently in active development.
 
 
 TODO list:
-- Implement filters for thirds
-  - This will need to update every time the root updates as well as when the quality of the third note is updated
+- Implement filters for fifths
+- Implement filters for sevenths
+- Implement controls by range
 - Test to see if the filter frequency jumps needs smoothing
 - Is there a way to display the current chord?
   - Yes. This can be accomlished by having a dropdown box with a getter function that does nothing, but a setter function that updates every time there is a harmonic change.
   - In order to implement this, maybe I should convert the chord information to matrix form?
-- Implement filters for fifths
-- Implement filters for sevenths
 
 
 ## Bug List
