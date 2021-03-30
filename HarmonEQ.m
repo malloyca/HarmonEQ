@@ -22,6 +22,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         thirdInterval = 'off';
         thirdIntervalDistance = 4;
         thirdNote = 'E';
+        thirdGain = 0;
+        thirdQFactor = 20;
         
         %TODO: these are placeholders until I implement these filters
         fifthNote = 'G';
@@ -147,7 +149,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
             ...
             audioPluginParameter('thirdInterval','DisplayName',...
             'Harmonic Third Interval',...
-            'Mapping',{'enum','off','Sus2','Min3','Maj3','Sus4'})...
+            'Mapping',{'enum','off','Sus2','Min3','Maj3','Sus4'}),...
+            audioPluginParameter('thirdGain','DisplayName','harmonic Third Gain',...
+            'Mapping',{'lin',-15,15}),...
+            audioPluginParameter('thirdQFactor','DisplayName','Harmonic Third Q Factor',...
+            'Mapping',{'pow', 2, 0.5, 100})...
             );
     end
     
@@ -544,6 +550,25 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 updateThirdFrequencies(plugin);
             end
             
+        end
+        
+        function set.thirdGain(plugin,val)
+            plugin.thirdGain = val;
+            
+            %TODO: This is temporary until I implement range gain controls
+            plugin.thirdGain1 = val;
+            plugin.thirdGain2 = val;
+            plugin.thirdGain3 = val;
+            plugin.thirdGain4 = val;
+            plugin.thirdGain5 = val;
+            plugin.thirdGain6 = val;
+            plugin.thirdGain7 = val;
+            plugin.thirdGain8 = val;
+            plugin.thirdGain9 = val;
+            
+            setUpdateThirdFilters(plugin);
+            % for visualization update control
+            plugin.stateChange = true;
         end
         
     end
