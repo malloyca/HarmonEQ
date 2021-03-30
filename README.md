@@ -51,4 +51,8 @@ TODO list:
   - Yes. This can be accomlished by having a dropdown box with a getter function that does nothing, but a setter function that updates every time there is a harmonic change.
   - In order to implement this, maybe I should convert the chord information to matrix form?
 - Implement filters for fifths
-- Implement filters for seveths
+- Implement filters for sevenths
+
+
+## Bug List
+- Although harmonic third setting initialize to 'off', the filters are on and being built.
