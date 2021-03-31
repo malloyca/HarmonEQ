@@ -28,13 +28,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         fifthInterval = 'off';
         fifthIntervalDistance = 7;
         fifthNote = 'G';
-        %todo: change to 0 when done testing
         fifthGain = 0;
         fifthQFactor = 20;
         
-        %TODO: these are placeholders until I implement these filters
+        seventhInterval = 'off';
+        seventhIntervalDistance = 11;
         seventhNote = 'B';
-        
+        %todo: change to 0 when done testing
+        seventhGain = 9;
+        seventhQFactor = 20;
         
                 
     end
@@ -178,6 +180,52 @@ classdef HarmonEQ < matlab.System & audioPlugin
         updateFifthFilter9 = false;
         
         
+        %------------------------Harmonic Seventh--------------------------
+        % Center frequencies for harmonic seventh bands
+        seventhFrequency1 = 61.73541;
+        seventhFrequency2 = 2 * 61.73541;
+        seventhFrequency3 = 4 * 61.73541;
+        seventhFrequency4 = 8 * 61.73541;
+        seventhFrequency5 = 16 * 61.73541;
+        seventhFrequency6 = 32 * 61.73541;
+        seventhFrequency7 = 64 * 61.73541;
+        seventhFrequency8 = 128 * 61.73541;
+        seventhFrequency9 = 256 * 61.73541;
+        
+        % Q factors for seventh bands
+        seventhQFactor1 = 20;
+        seventhQFactor2 = 20;
+        seventhQFactor3 = 20;
+        seventhQFactor4 = 20;
+        seventhQFactor5 = 20;
+        seventhQFactor6 = 20;
+        seventhQFactor7 = 20;
+        seventhQFactor8 = 20;
+        seventhQFactor9 = 20;
+        
+        % Gain for seventh bands (dB)
+        seventhGain1 = 9;
+        seventhGain2 = 9;
+        seventhGain3 = 9;
+        seventhGain4 = 9;
+        seventhGain5 = 9;
+        seventhGain6 = 9;
+        seventhGain7 = 9;
+        seventhGain8 = 9;
+        seventhGain9 = 9;
+        
+        % Update status variables for seventh filters
+        updateSeventhFilter1 = false;
+        updateSeventhFilter2 = false;
+        updateSeventhFilter3 = false;
+        updateSeventhFilter4 = false;
+        updateSeventhFilter5 = false;
+        updateSeventhFilter6 = false;
+        updateSeventhFilter7 = false;
+        updateSeventhFilter8 = false;
+        updateSeventhFilter9 = false;
+        
+        
         % General change of state variable to minimize visualizer updates
         stateChange = false;
         
@@ -219,7 +267,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'Mapping',{'lin',-15,15}),...
             audioPluginParameter('fifthQFactor',...
             'DisplayName','Harmonic Fifth Q Factor',...
-            'Mapping',{'pow', 2, 0.5, 100})...
+            'Mapping',{'pow', 2, 0.5, 100}),...
+            ...
+            audioPluginParameter('seventhInterval',...
+            'DisplayName','Harmonic Seventh Interval',...
+            'Mapping',{'enum','off','Dim7','Min7','Maj7'})...
             );
     end
     
@@ -328,11 +380,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         
         
+        %----------------Harmonic seventh band coefficients------------------
+        seventhCoeffb1;
+        seventhCoeffa1;
+        seventhPrevState1 = zeros(2);
+        seventhCoeffb2;
+        seventhCoeffa2;
+        seventhPrevState2 = zeros(2);
+        seventhCoeffb3;
+        seventhCoeffa3;
+        seventhPrevState3 = zeros(2);
+        seventhCoeffb4;
+        seventhCoeffa4;
+        seventhPrevState4 = zeros(2);
+        seventhCoeffb5;
+        seventhCoeffa5;
+        seventhPrevState5 = zeros(2);
+        seventhCoeffb6;
+        seventhCoeffa6;
+        seventhPrevState6 = zeros(2);
+        seventhCoeffb7;
+        seventhCoeffa7;
+        seventhPrevState7 = zeros(2);
+        seventhCoeffb8;
+        seventhCoeffa8;
+        seventhPrevState8 = zeros(2);
+        seventhCoeffb9;
+        seventhCoeffa9;
+        seventhPrevState9 = zeros(2);
+        
+        
+        
         % Active state variables
         rootFiltersActive = true;
         thirdFiltersActive = false;
         fifthFiltersActive = false;
-        seventhFiltersActive = false;
+        seventhFiltersActive = true;
         
         % For visalization
         visualizerObject;
@@ -349,6 +432,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             fs = getSampleRate(plugin);
             
             %-------------------Update filter parameters-------------------
+            %-----Update root filters
             if plugin.updateRootFilter1
                 buildRootFilter1(plugin,fs);
             end
@@ -376,7 +460,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             if plugin.updateRootFilter9
                 buildRootFilter9(plugin, fs);
             end
-            %----------
+            %-----Update harmonic third filters
             if plugin.updateThirdFilter1
                 buildThirdFilter1(plugin,fs);
             end
@@ -404,7 +488,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             if plugin.updateThirdFilter9
                 buildThirdFilter9(plugin, fs);
             end
-            %----------
+            %-----Update harmonic fifth filters
             if plugin.updateFifthFilter1
                 buildFifthFilter1(plugin,fs);
             end
@@ -431,6 +515,34 @@ classdef HarmonEQ < matlab.System & audioPlugin
             end
             if plugin.updateFifthFilter9
                 buildFifthFilter9(plugin, fs);
+            end
+            %-----Update harmonic seventh filters
+            if plugin.updateSeventhFilter1
+                buildSeventhFilter1(plugin,fs);
+            end
+            if plugin.updateSeventhFilter2
+                buildSeventhFilter2(plugin, fs);
+            end
+            if plugin.updateSeventhFilter3
+                buildSeventhFilter3(plugin, fs);
+            end
+            if plugin.updateSeventhFilter4
+                buildSeventhFilter4(plugin, fs);
+            end
+            if plugin.updateSeventhFilter5
+                buildSeventhFilter5(plugin, fs);
+            end
+            if plugin.updateSeventhFilter6
+                buildSeventhFilter6(plugin, fs);
+            end
+            if plugin.updateSeventhFilter7
+                buildSeventhFilter7(plugin, fs);
+            end
+            if plugin.updateSeventhFilter8
+                buildSeventhFilter8(plugin, fs);
+            end
+            if plugin.updateSeventhFilter9
+                buildSeventhFilter9(plugin, fs);
             end
             
             % update plugin.B and plugin.A coefficient matrices for
@@ -507,6 +619,27 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthCoeffa9, in, plugin.fifthPrevState9);
             end
             
+            if plugin.seventhFiltersActive
+                [in, plugin.seventhPrevState1] = filter(plugin.seventhCoeffb1,...
+                    plugin.seventhCoeffa1, in, plugin.seventhPrevState1);
+                [in, plugin.seventhPrevState2] = filter(plugin.seventhCoeffb2,...
+                    plugin.seventhCoeffa2, in, plugin.seventhPrevState2);
+                [in, plugin.seventhPrevState3] = filter(plugin.seventhCoeffb3,...
+                    plugin.seventhCoeffa3, in, plugin.seventhPrevState3);
+                [in, plugin.seventhPrevState4] = filter(plugin.seventhCoeffb4,...
+                    plugin.seventhCoeffa4, in, plugin.seventhPrevState4);
+                [in, plugin.seventhPrevState5] = filter(plugin.seventhCoeffb5,...
+                    plugin.seventhCoeffa5, in, plugin.seventhPrevState5);
+                [in, plugin.seventhPrevState6] = filter(plugin.seventhCoeffb6,...
+                    plugin.seventhCoeffa6, in, plugin.seventhPrevState6);
+                [in, plugin.seventhPrevState7] = filter(plugin.seventhCoeffb7,...
+                    plugin.seventhCoeffa7, in, plugin.seventhPrevState7);
+                [in, plugin.seventhPrevState8] = filter(plugin.seventhCoeffb8,...
+                    plugin.seventhCoeffa8, in, plugin.seventhPrevState8);
+                [in, plugin.seventhPrevState9] = filter(plugin.seventhCoeffb9,...
+                    plugin.seventhCoeffa9, in, plugin.seventhPrevState9);
+            end
+            
             %TODO: output gain?
             %out = 10.^(plugin.outputGain/20) * in);
             out = in;
@@ -559,6 +692,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 buildFifthFilter7(plugin, fs);
                 buildFifthFilter8(plugin, fs);
                 buildFifthFilter9(plugin, fs);
+            end
+            
+            if plugin.seventhFiltersActive
+                buildSeventhFilter1(plugin, fs);
+                buildSeventhFilter2(plugin, fs);
+                buildSeventhFilter3(plugin, fs);
+                buildSeventhFilter4(plugin, fs);
+                buildSeventhFilter5(plugin, fs);
+                buildSeventhFilter6(plugin, fs);
+                buildSeventhFilter7(plugin, fs);
+                buildSeventhFilter8(plugin, fs);
+                buildSeventhFilter9(plugin, fs);
             end
             
         end
@@ -633,12 +778,12 @@ classdef HarmonEQ < matlab.System & audioPlugin
             setUpdateRootFilters(plugin);
             setUpdateThirdFilters(plugin);
             setUpdateFifthFilters(plugin); %todo: this is for later...
-            %setUpdateSeventhFilters(plugin); %todo: this is for later...
+            setUpdateSeventhFilters(plugin); %todo: this is for later...
             
             updateRootFrequencies(plugin,val);
             updateThirdFrequencies(plugin);
             updateFifthFrequencies(plugin);
-            %updateSeventhFrequencies(plugin);
+            updateSeventhFrequencies(plugin);
             %todo: Necessary for state change control of visualizer:
             plugin.stateChange = true;
         end
@@ -806,6 +951,69 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthQFactor9 = val;
             
             setUpdateFifthFilters(plugin);
+            % for visualization update control
+            plugin.stateChange = true;
+        end
+        
+        
+        %--------------------------Harmonic Seventh--------------------------
+        function set.seventhInterval(plugin,val)
+            validatestring(val, {'off','Dim7','Min7','Maj7'},...
+                'set.seventhInterval','SeventhInterval');
+            plugin.seventhInterval = val;
+            if val == "off"
+                plugin.seventhFiltersActive = false;
+            else
+                switch val
+                    case 'Dim7'
+                        plugin.seventhIntervalDistance = 9;
+                    case 'Min7'
+                        plugin.seventhIntervalDistance = 10;
+                    case 'Maj7'
+                        plugin.seventhIntervalDistance = 11;
+                end
+                
+                %if plugin.rootNoteFiltersActive == true?
+                plugin.seventhFiltersActive = true;
+                updateSeventhFrequencies(plugin);
+                setUpdateSeventhFilters(plugin);
+            end 
+        end
+        
+        function set.seventhGain(plugin,val)
+            plugin.seventhGain = val;
+            
+            %TODO: This is temporary until I implement range gain controls
+            plugin.seventhGain1 = val;
+            plugin.seventhGain2 = val;
+            plugin.seventhGain3 = val;
+            plugin.seventhGain4 = val;
+            plugin.seventhGain5 = val;
+            plugin.seventhGain6 = val;
+            plugin.seventhGain7 = val;
+            plugin.seventhGain8 = val;
+            plugin.seventhGain9 = val;
+            
+            setUpdateSeventhFilters(plugin);
+            % for visualization update control
+            plugin.stateChange = true;
+        end
+        
+        function set.seventhQFactor(plugin,val)
+            plugin.seventhQFactor = val;
+            
+            %TODO: This is temporary until I implement controls by range
+            plugin.seventhQFactor1 = val;
+            plugin.seventhQFactor2 = val;
+            plugin.seventhQFactor3 = val;
+            plugin.seventhQFactor4 = val;
+            plugin.seventhQFactor5 = val;
+            plugin.seventhQFactor6 = val;
+            plugin.seventhQFactor7 = val;
+            plugin.seventhQFactor8 = val;
+            plugin.seventhQFactor9 = val;
+            
+            setUpdateSeventhFilters(plugin);
             % for visualization update control
             plugin.stateChange = true;
         end
@@ -1086,6 +1294,87 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateFifthFilter9 = false;
         end
         
+        function buildSeventhFilter1(plugin, fs)
+            [plugin.seventhCoeffb1, plugin.seventhCoeffa1] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency1,...
+                plugin.seventhQFactor1,...
+                plugin.seventhGain1);
+            plugin.updateSeventhFilter1 = false;
+        end
+        
+        function buildSeventhFilter2(plugin, fs)
+            [plugin.seventhCoeffb2, plugin.seventhCoeffa2] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency2,...
+                plugin.seventhQFactor2,...
+                plugin.seventhGain2);
+            plugin.updateSeventhFilter2 = false;
+        end
+        
+        function buildSeventhFilter3(plugin, fs)
+            [plugin.seventhCoeffb3, plugin.seventhCoeffa3] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency3,...
+                plugin.seventhQFactor3,...
+                plugin.seventhGain3);
+            plugin.updateSeventhFilter3 = false;
+        end
+        
+        function buildSeventhFilter4(plugin, fs)
+            [plugin.seventhCoeffb4, plugin.seventhCoeffa4] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency4,...
+                plugin.seventhQFactor4,...
+                plugin.seventhGain4);
+            plugin.updateSeventhFilter4 = false;
+        end
+        
+        function buildSeventhFilter5(plugin, fs)
+            [plugin.seventhCoeffb5, plugin.seventhCoeffa5] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency5,...
+                plugin.seventhQFactor5,...
+                plugin.seventhGain5);
+            plugin.updateSeventhFilter5 = false;
+        end
+        
+        function buildSeventhFilter6(plugin, fs)
+            [plugin.seventhCoeffb6, plugin.seventhCoeffa6] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency6,...
+                plugin.seventhQFactor6,...
+                plugin.seventhGain6);
+            plugin.updateSeventhFilter6 = false;
+        end
+        
+        function buildSeventhFilter7(plugin, fs)
+            [plugin.seventhCoeffb7, plugin.seventhCoeffa7] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency7,...
+                plugin.seventhQFactor7,...
+                plugin.seventhGain7);
+            plugin.updateSeventhFilter7 = false;
+        end
+        
+        function buildSeventhFilter8(plugin, fs)
+            [plugin.seventhCoeffb8, plugin.seventhCoeffa8] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency8,...
+                plugin.seventhQFactor8,...
+                plugin.seventhGain8);
+            plugin.updateSeventhFilter8 = false;
+        end
+        
+        function buildSeventhFilter9(plugin, fs)
+            [plugin.seventhCoeffb9, plugin.seventhCoeffa9] = peakNotchFilterCoeffs(...
+                plugin, fs, ...
+                plugin.seventhFrequency9,...
+                plugin.seventhQFactor9,...
+                plugin.seventhGain9);
+            plugin.updateSeventhFilter9 = false;
+        end
+        
         
         
         %-----------------------------Updaters-----------------------------
@@ -1238,6 +1527,49 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
+        function updateSeventhFrequencies(plugin)
+            seventhNoteNumber = mod(plugin.rootNoteValue + plugin.seventhIntervalDistance, 12);
+            
+             %TODO: Eventually create a getBaseFreq function for this...
+            switch seventhNoteNumber
+                case 9
+                    seventhFreq = 55;
+                case 10
+                    seventhFreq = 58.27047;
+                case 11
+                    seventhFreq = 61.73541;
+                case 0
+                    seventhFreq = 32.70320;
+                case 1
+                    seventhFreq = 34.64783;
+                case 2
+                    seventhFreq = 36.70810;
+                case 3
+                    seventhFreq = 38.89087;
+                case 4
+                    seventhFreq = 41.20344;
+                case 5
+                    seventhFreq = 43.65353;
+                case 6
+                    seventhFreq = 46.24930;
+                case 7
+                    seventhFreq = 48.99943;
+                case 8
+                    seventhFreq = 51.91309;
+            end
+            
+            plugin.seventhFrequency1 = seventhFreq;
+            plugin.seventhFrequency2 = 2 * seventhFreq;
+            plugin.seventhFrequency3 = 4 * seventhFreq;
+            plugin.seventhFrequency4 = 8 * seventhFreq;
+            plugin.seventhFrequency5 = 16 * seventhFreq;
+            plugin.seventhFrequency6 = 32 * seventhFreq;
+            plugin.seventhFrequency7 = 64 * seventhFreq;
+            plugin.seventhFrequency8 = 128 * seventhFreq;
+            plugin.seventhFrequency9 = 256 * seventhFreq;
+            
+        end
+        
         function setUpdateRootFilters(plugin)
             plugin.updateRootFilter1 = true;
             plugin.updateRootFilter2 = true;
@@ -1274,6 +1606,19 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateFifthFilter7 = true;
             plugin.updateFifthFilter8 = true;
             plugin.updateFifthFilter9 = true;
+            plugin.stateChange = true;
+        end
+        
+        function setUpdateSeventhFilters(plugin)
+            plugin.updateSeventhFilter1 = true;
+            plugin.updateSeventhFilter2 = true;
+            plugin.updateSeventhFilter3 = true;
+            plugin.updateSeventhFilter4 = true;
+            plugin.updateSeventhFilter5 = true;
+            plugin.updateSeventhFilter6 = true;
+            plugin.updateSeventhFilter7 = true;
+            plugin.updateSeventhFilter8 = true;
+            plugin.updateSeventhFilter9 = true;
             plugin.stateChange = true;
         end
         
@@ -1350,8 +1695,32 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     A_fifth = [];
                 end
                 
-                plugin.B = [B_root; B_third; B_fifth];
-                plugin.A = [A_root; A_third; A_fifth];
+                if plugin.seventhFiltersActive
+                    B_seventh = [plugin.seventhCoeffb1;...
+                        plugin.seventhCoeffb2;...
+                        plugin.seventhCoeffb3;...
+                        plugin.seventhCoeffb4;...
+                        plugin.seventhCoeffb5;...
+                        plugin.seventhCoeffb6;...
+                        plugin.seventhCoeffb7;...
+                        plugin.seventhCoeffb8;...
+                        plugin.seventhCoeffb9];
+                    A_seventh = [plugin.seventhCoeffa1;...
+                        plugin.seventhCoeffa2;...
+                        plugin.seventhCoeffa3;...
+                        plugin.seventhCoeffa4;...
+                        plugin.seventhCoeffa5;...
+                        plugin.seventhCoeffa6;...
+                        plugin.seventhCoeffa7;...
+                        plugin.seventhCoeffa8;...
+                        plugin.seventhCoeffa9];
+                else
+                    B_seventh = [];
+                    A_seventh = [];
+                end
+                
+                plugin.B = [B_root; B_third; B_fifth; B_seventh];
+                plugin.A = [A_root; A_third; A_fifth; A_seventh];
                 
             else
                 % If not, set to an allpass filter
