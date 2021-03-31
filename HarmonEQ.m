@@ -35,7 +35,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhIntervalDistance = 11;
         seventhNote = 'B';
         %todo: change to 0 when done testing
-        seventhGain = 9;
+        seventhGain = 0;
         seventhQFactor = 20;
         
                 
@@ -204,15 +204,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhQFactor9 = 20;
         
         % Gain for seventh bands (dB)
-        seventhGain1 = 9;
-        seventhGain2 = 9;
-        seventhGain3 = 9;
-        seventhGain4 = 9;
-        seventhGain5 = 9;
-        seventhGain6 = 9;
-        seventhGain7 = 9;
-        seventhGain8 = 9;
-        seventhGain9 = 9;
+        seventhGain1 = 0;
+        seventhGain2 = 0;
+        seventhGain3 = 0;
+        seventhGain4 = 0;
+        seventhGain5 = 0;
+        seventhGain6 = 0;
+        seventhGain7 = 0;
+        seventhGain8 = 0;
+        seventhGain9 = 0;
         
         % Update status variables for seventh filters
         updateSeventhFilter1 = false;
@@ -271,7 +271,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             ...
             audioPluginParameter('seventhInterval',...
             'DisplayName','Harmonic Seventh Interval',...
-            'Mapping',{'enum','off','Dim7','Min7','Maj7'})...
+            'Mapping',{'enum','off','Dim7','Min7','Maj7'}),...
+            audioPluginParameter('seventhGain',...
+            'DisplayName','Harmonic Seventh Gain',...
+            'Mapping',{'lin',-15,15})...
             );
     end
     
