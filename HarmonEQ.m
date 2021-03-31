@@ -56,15 +56,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootFrequency9 = 256 * 32.70320;
         
         % Q factors for root bands
-        rootQFactor1 = 20;
-        rootQFactor2 = 20;
-        rootQFactor3 = 20;
-        rootQFactor4 = 20;
-        rootQFactor5 = 20;
-        rootQFactor6 = 20;
-        rootQFactor7 = 20;
-        rootQFactor8 = 20;
-        rootQFactor9 = 20;
+        rootQFactor1 = 26;
+        rootQFactor2 = 26;
+        rootQFactor3 = 26;
+        rootQFactor4 = 26;
+        rootQFactor5 = 26;
+        rootQFactor6 = 26;
+        rootQFactor7 = 26;
+        rootQFactor8 = 26;
+        rootQFactor9 = 26;
         
         % Gain for root bands (dB)
         rootGain1 = 0;
@@ -101,15 +101,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         thirdFrequency9 = 256 * 41.20344;
         
         % Q factors for third bands
-        thirdQFactor1 = 20;
-        thirdQFactor2 = 20;
-        thirdQFactor3 = 20;
-        thirdQFactor4 = 20;
-        thirdQFactor5 = 20;
-        thirdQFactor6 = 20;
-        thirdQFactor7 = 20;
-        thirdQFactor8 = 20;
-        thirdQFactor9 = 20;
+        thirdQFactor1 = 26;
+        thirdQFactor2 = 26;
+        thirdQFactor3 = 26;
+        thirdQFactor4 = 26;
+        thirdQFactor5 = 26;
+        thirdQFactor6 = 26;
+        thirdQFactor7 = 26;
+        thirdQFactor8 = 26;
+        thirdQFactor9 = 26;
         
         % Gain for third bands (dB)
         thirdGain1 = 0;
@@ -147,15 +147,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         fifthFrequency9 = 256 * 48.99943;
         
         % Q factors for fifth bands
-        fifthQFactor1 = 20;
-        fifthQFactor2 = 20;
-        fifthQFactor3 = 20;
-        fifthQFactor4 = 20;
-        fifthQFactor5 = 20;
-        fifthQFactor6 = 20;
-        fifthQFactor7 = 20;
-        fifthQFactor8 = 20;
-        fifthQFactor9 = 20;
+        fifthQFactor1 = 26;
+        fifthQFactor2 = 26;
+        fifthQFactor3 = 26;
+        fifthQFactor4 = 26;
+        fifthQFactor5 = 26;
+        fifthQFactor6 = 26;
+        fifthQFactor7 = 26;
+        fifthQFactor8 = 26;
+        fifthQFactor9 = 26;
         
         % Gain for fifth bands (dB)
         fifthGain1 = 0;
@@ -193,15 +193,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFrequency9 = 256 * 61.73541;
         
         % Q factors for seventh bands
-        seventhQFactor1 = 20;
-        seventhQFactor2 = 20;
-        seventhQFactor3 = 20;
-        seventhQFactor4 = 20;
-        seventhQFactor5 = 20;
-        seventhQFactor6 = 20;
-        seventhQFactor7 = 20;
-        seventhQFactor8 = 20;
-        seventhQFactor9 = 20;
+        seventhQFactor1 = 26;
+        seventhQFactor2 = 26;
+        seventhQFactor3 = 26;
+        seventhQFactor4 = 26;
+        seventhQFactor5 = 26;
+        seventhQFactor6 = 26;
+        seventhQFactor7 = 26;
+        seventhQFactor8 = 26;
+        seventhQFactor9 = 26;
         
         % Gain for seventh bands (dB)
         seventhGain1 = 0;
