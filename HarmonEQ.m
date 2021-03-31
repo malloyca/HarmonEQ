@@ -17,26 +17,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootNote = 'C';
         rootNoteValue = 0;
         rootGain = 0;
-        rootQFactor = 20;
+        rootQFactor = 26;
         
         thirdInterval = 'off';
         thirdIntervalDistance = 4;
         thirdNote = 'E';
         thirdGain = 0;
-        thirdQFactor = 20;
+        thirdQFactor = 26;
         
         fifthInterval = 'off';
         fifthIntervalDistance = 7;
         fifthNote = 'G';
         fifthGain = 0;
-        fifthQFactor = 20;
+        fifthQFactor = 26;
         
         seventhInterval = 'off';
         seventhIntervalDistance = 11;
         seventhNote = 'B';
         %todo: change to 0 when done testing
         seventhGain = 0;
-        seventhQFactor = 20;
+        seventhQFactor = 26;
         
                 
     end
@@ -274,7 +274,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'Mapping',{'enum','off','Dim7','Min7','Maj7'}),...
             audioPluginParameter('seventhGain',...
             'DisplayName','Harmonic Seventh Gain',...
-            'Mapping',{'lin',-15,15})...
+            'Mapping',{'lin',-15,15}),...
+            audioPluginParameter('seventhQFactor',...
+            'DisplayName','Harmonic Seventh Q Factor',...
+            'Mapping',{'pow', 2, 0.5, 100})...
             );
     end
     
