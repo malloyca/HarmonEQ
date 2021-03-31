@@ -1,11 +1,19 @@
 classdef HarmonEQ < matlab.System & audioPlugin
 % HarmonEQ.m
+% Harmonic Equalizer plugin
+% Last updated: 31 March 2021
 %
 % This is a new test version for HarmonEQ to rebuild it froms scratch. I'm
 % finding using the Matlab example plugin as a base overwhelming due to
 % there being so much stuff that I don't understand. I want to start with
 % something very basic that hopefully I can understand.
 %
+% To run this with the visualizer in Matlab, run these commands:
+% eq = HarmonEQ;
+% Visualizer(eq);
+% audioTestBench(eq);
+
+
 % TODO:
 % - Look into State-variable filters vs biquads
 %
