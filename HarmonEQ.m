@@ -808,8 +808,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateThirdFrequencies(plugin);
             updateFifthFrequencies(plugin);
             updateSeventhFrequencies(plugin);
-            %todo: Necessary for state change control of visualizer:
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -828,8 +828,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain9 = val;
             
             setUpdateRootFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -848,8 +848,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootQFactor9 = val;
             
             setUpdateRootFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -898,8 +898,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdGain9 = val;
             
             setUpdateThirdFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -918,8 +918,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdQFactor9 = val;
             
             setUpdateThirdFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -966,8 +966,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthGain9 = val;
             
             setUpdateFifthFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -986,8 +986,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthQFactor9 = val;
             
             setUpdateFifthFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -1034,8 +1034,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain9 = val;
             
             setUpdateSeventhFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -1054,8 +1054,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhQFactor9 = val;
             
             setUpdateSeventhFilters(plugin);
-            % for visualization update control
-            %plugin.stateChange = true;
+            
+            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -1842,8 +1842,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.B, plugin.A);
                 plugin.visualizerObject.SampleRate = plugin.getSampleRate;
             end
-            %TODO: Test this method of minimizing updates to the visualizer
-            %plugin.stateChange = false;
+            
+            % set plugin.stateChange = false;
             updateStateChangeStatus(plugin,false);
         end
         
