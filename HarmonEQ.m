@@ -751,11 +751,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function Visualizer(plugin)
+            %Visualizer This is the visualizer function for HarmonEQ. This
+            % function only works inside of Matlab. To use this plugin,
+            % run:
+            % eq = HarmonEQ;
+            % Visualizer(eq);
+            % AudioTestBench(eq);
+            
             if isempty(plugin.visualizerObject)
                 fs = getSampleRate(plugin);
                 % TODO: design filters...
                 plugin.visualizerObject = dsp.DynamicFilterVisualizer(...
-                    512, fs, [20 20e3],...
+                    2048, fs, [20 20e3],...
                     'XScale','Log',...
                     'YLimits',[-20 20],...
                     'Title','HarmonEQ');
@@ -1843,7 +1850,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.visualizerObject.SampleRate = plugin.getSampleRate;
             end
             
-            % set plugin.stateChange = false;
+            % reset plugin.stateChange after updating visualizer
             updateStateChangeStatus(plugin,false);
         end
         
