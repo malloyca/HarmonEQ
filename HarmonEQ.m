@@ -42,9 +42,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhInterval = 'off';
         seventhIntervalDistance = 11;
         seventhNote = 'B';
-        %todo: change to 0 when done testing
         seventhGain = 0;
         seventhQFactor = 26;
+        
+        lowRegionGain = 0;
+        lowRegionQFactor = 26;
         
                 
     end
@@ -285,6 +287,13 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'Mapping',{'lin',-15,15}),...
             audioPluginParameter('seventhQFactor',...
             'DisplayName','Harmonic Seventh Q Factor',...
+            'Mapping',{'pow', 2, 0.5, 100}),...
+            ...
+            audioPluginParameter('lowRegionGain',...
+            'DisplayName','Low Region Gain',...
+            'Mapping',{'lin',-15,15}),...
+            audioPluginParameter('lowRegionQFactor',...
+            'DisplayName','Low Region Q Factor',...
             'Mapping',{'pow', 2, 0.5, 100})...
             );
     end
@@ -1030,6 +1039,35 @@ classdef HarmonEQ < matlab.System & audioPlugin
             setUpdateSeventhFilters(plugin);
             % for visualization update control
             plugin.stateChange = true;
+        end
+        
+        
+        %------------------------Low Region Controls-----------------------
+        function set.lowRegionGain(plugin,val)
+            plugin.lowRegionGain = val;
+            
+            %todo: For now this will only control the first two octaves of
+            %filters
+            %todo: Create updateLowRegionGain function to handle this
+            plugin.rootGain1 = val;
+            plugin.rootGain2 = val;
+            plugin.thirdGain1 = val;
+            plugin.thirdGain2 = val;
+            plugin.fifthGain1 = val;
+            plugin.fifthGain2 = val;
+            plugin.seventhGain1 = val;
+            plugin.seventhGain2 = val;
+            
+            
+            plugin.updateRootFilter1 = true;
+            plugin.updateRootFilter2 = true;
+            plugin.updateThirdFilter1 = true;
+            plugin.updateThirdFilter2 = true;
+            plugin.updateFifthFilter1 = true;
+            plugin.updateFifthFilter2 = true;
+            plugin.updateSeventhFilter1 = true;
+            plugin.updateSeventhFilter2 = true;
+            
         end
         
     end
