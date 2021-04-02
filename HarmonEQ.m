@@ -12,6 +12,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
 % eq = HarmonEQ;
 % Visualizer(eq);
 % audioTestBench(eq);
+%
+% To validate for generation:
+% 
+% To export as a VST, run:
+% 
 
 
 % TODO:
@@ -719,11 +724,12 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function setupImpl(plugin,~)
             fs = getSampleRate(plugin);
             
+            %todo: clean this up
             % Initialize filters
             %TODO: Putting the if statement here allows for only
             %initializing these if the plugin settings has the filters
             %active
-            if plugin.rootFiltersActive
+            %if plugin.rootFiltersActive
                 buildRootFilter1(plugin, fs);
                 buildRootFilter2(plugin, fs);
                 buildRootFilter3(plugin, fs);
@@ -733,9 +739,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 buildRootFilter7(plugin, fs);
                 buildRootFilter8(plugin, fs);
                 buildRootFilter9(plugin, fs);
-            end
+            %end
             
-            if plugin.thirdFiltersActive
+            %if plugin.thirdFiltersActive
                 buildThirdFilter1(plugin, fs);
                 buildThirdFilter2(plugin, fs);
                 buildThirdFilter3(plugin, fs);
@@ -745,9 +751,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 buildThirdFilter7(plugin, fs);
                 buildThirdFilter8(plugin, fs);
                 buildThirdFilter9(plugin, fs);
-            end
+            %end
             
-            if plugin.fifthFiltersActive
+            %if plugin.fifthFiltersActive
                 buildFifthFilter1(plugin, fs);
                 buildFifthFilter2(plugin, fs);
                 buildFifthFilter3(plugin, fs);
@@ -757,9 +763,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 buildFifthFilter7(plugin, fs);
                 buildFifthFilter8(plugin, fs);
                 buildFifthFilter9(plugin, fs);
-            end
+            %end
             
-            if plugin.seventhFiltersActive
+            %if plugin.seventhFiltersActive
                 buildSeventhFilter1(plugin, fs);
                 buildSeventhFilter2(plugin, fs);
                 buildSeventhFilter3(plugin, fs);
@@ -769,7 +775,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 buildSeventhFilter7(plugin, fs);
                 buildSeventhFilter8(plugin, fs);
                 buildSeventhFilter9(plugin, fs);
-            end
+            %end
             
         end
         
@@ -839,7 +845,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.rootFiltersActive = false;
                 %TODO: If no root, deactivate all other peaks. This is
                 %really for down the road...
-                plugin.thirdInterval = 'off';
+                %plugin.thirdInterval = 'off'; %todo: this throws an error
+                %in validation
                 plugin.thirdFiltersActive = false;
                 plugin.fifthFiltersActive = false;
                 plugin.seventhFiltersActive = false;
@@ -1743,6 +1750,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %-----------------------------Updaters-----------------------------
         function updateRootFrequencies(plugin, val)
+            
+            rootNoteNumber = plugin.rootNoteValue; % todo: Declaring this here to pass validation
+            rootFreq = plugin.rootFrequency1; % todo: Declaring this here to pass validation
+            
             switch val %TODO: Eventually create a getBaseFreq function for this...
                 case "off"
                 case 'A'
@@ -1803,6 +1814,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: This really need to know the root note and harmonic
             %third interval
             
+            thirdFreq = plugin.thirdFrequency1; % todo: Declaring this here to pass validation
             thirdNoteNumber = mod(plugin.rootNoteValue + plugin.thirdIntervalDistance, 12);
             
              %TODO: Eventually create a getBaseFreq function for this...
@@ -1849,6 +1861,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: This really need to know the root note and harmonic
             %third interval
             
+            fifthFreq = plugin.fifthFrequency1; % todo: Declaring this here to pass validation
             fifthNoteNumber = mod(plugin.rootNoteValue + plugin.fifthIntervalDistance, 12);
             
              %TODO: Eventually create a getBaseFreq function for this...
@@ -1892,6 +1905,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhFrequencies(plugin)
+            
+            seventhFreq = plugin.seventhFrequency1; % todo: Declaring this here to pass validation
             seventhNoteNumber = mod(plugin.rootNoteValue + plugin.seventhIntervalDistance, 12);
             
              %TODO: Eventually create a getBaseFreq function for this...
