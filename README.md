@@ -5,17 +5,32 @@ HarmonEQ differs from other equalizers in its control scheme. It is a parametric
 Rather than having precise control over filter frequencies, the user tunes HarmonEQ to a specific musical note or chord.
 The user can then define gain and Q values for five different ranges: low, low-mid, mid, high-mid, high.
 
-In the current iteration, there are gain and Q factor controls for each chord tone. The five region control scheme is currently under development.
+In the current iteration, there two sets of controls for testing while it is still being developed. The first set of controls apply to each chord tone across the entire frequency spectrum. The second set splits the controls into five bands with one gain control and one Q control affecting all filters within that band.
 
+## Compiled plugins
+Pre-compiled versions of the plugin are available:
+- macOS
+  - [VST](https://github.com/malloyca/HarmonEQ/releases/download/v0.1-alpha/HarmonEQ.vst.zip)
+  - [AU](https://github.com/malloyca/HarmonEQ/releases/download/v0.1-alpha/HarmonEQ.component.zip)
+- Windows
+  - Coming soon. I need a Windows installation to compile for Windows...
 
-## Prereqs
+### Installation instrucitons
+- macOS
+  - Download and unzip the VST and AU plugins.
+  - Open Finder and go to the Home folder.
+  - Navigate to `/Library/Audio/Plug-Ins/`.
+  - Move `HarmonEQ.vst` to the `/VST/` folder and `HarmonEQ.component` to the `/components/` folder.
+
+## Prereqs for compiling
 - MATLAB
   - DSP Toolbox
   - Audio Toolbox
+  - MATLAB Coder (for exporting to JUCE)
 
 
 ## Development Roadmap
-This project is currently in active development.
+This project is currently in active development. The primary DSP functionality is implemented. I am currently working on designing the UI.
 
 ### Features intended for April 6 deadline:
 - Harmonic controls:
@@ -46,7 +61,6 @@ This project is currently in active development.
 
 
 TODO list:
-- Implement controls by range.
 - Test to see if the filter frequency jumps needs smoothing.
   - Due the nature of the controls, the filter bands get adjusted instantaneously instead of gradually like on a regular EQ. This seems to cause some quite apparent audio artifacts.
   - There are a few ways smoothing could be applied.
