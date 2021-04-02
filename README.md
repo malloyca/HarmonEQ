@@ -10,8 +10,8 @@ In the current iteration, there two sets of controls for testing while it is sti
 ## Compiled plugins
 Pre-compiled versions of the plugin are available:
 - macOS
-  - [VST](https://github.com/malloyca/HarmonEQ/releases/download/v0.1-alpha/HarmonEQ.vst.zip)
-  - [AU](https://github.com/malloyca/HarmonEQ/releases/download/v0.1-alpha/HarmonEQ.component.zip)
+  - [VST](https://github.com/malloyca/HarmonEQ/releases/download/v0.1-alpha/HarmonEQ.vst.zip) (stereo only)
+  - [AU](https://github.com/malloyca/HarmonEQ/releases/download/v0.1-alpha/HarmonEQ.component.zip) (stereo only)
 - Windows
   - Coming soon. I need a Windows installation to compile for Windows...
 
