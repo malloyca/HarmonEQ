@@ -45,9 +45,13 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhGain = 0;
         seventhQFactor = 26;
         
+        %----------
+        midRegionGain = 0;
+        midRegionQFactor = 26;
         
         lowMidRegionGain = 0;
         lowMidRegionQFactor = 26;
+        
         lowRegionGain = 0;
         lowRegionQFactor = 26;
         
@@ -290,6 +294,13 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'Mapping',{'lin',-15,15}),...
             audioPluginParameter('seventhQFactor',...
             'DisplayName','Harmonic Seventh Q Factor',...
+            'Mapping',{'pow', 2, 0.5, 100}),...
+            ...
+            audioPluginParameter('midRegionGain',...
+            'DisplayName','Mid Region Gain',...
+            'Mapping',{'lin',-15,15}),...
+            audioPluginParameter('midRegionQFactor',...
+            'DisplayName','Mid Region Q Factor',...
             'Mapping',{'pow', 2, 0.5, 100}),...
             ...
             audioPluginParameter('lowMidRegionGain',...
@@ -1073,6 +1084,64 @@ classdef HarmonEQ < matlab.System & audioPlugin
             setUpdateSeventhFilters(plugin);
             
             % Update visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        %------------------------Mid Region Controls-----------------------
+        function set.midRegionGain(plugin,val)
+            plugin.midRegionGain = val;
+            
+            %todo: For now this will only control the first two octaves of
+            %filters
+            %todo: Create updateLowRegionGain function to handle this
+            plugin.rootGain5 = val;
+            plugin.rootGain6 = val;
+            plugin.thirdGain5 = val;
+            plugin.thirdGain6 = val;
+            plugin.fifthGain5 = val;
+            plugin.fifthGain6 = val;
+            plugin.seventhGain5 = val;
+            plugin.seventhGain6 = val;
+            
+            
+            plugin.updateRootFilter5 = true;
+            plugin.updateRootFilter6 = true;
+            plugin.updateThirdFilter5 = true;
+            plugin.updateThirdFilter6 = true;
+            plugin.updateFifthFilter5 = true;
+            plugin.updateFifthFilter6 = true;
+            plugin.updateSeventhFilter5 = true;
+            plugin.updateSeventhFilter6 = true;
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+            
+        end
+        
+        function set.midRegionQFactor(plugin,val)
+            plugin.midRegionQFactor = val;
+            
+            %todo: also create helper functions for this...
+            plugin.rootQFactor5 = val;
+            plugin.rootQFactor6 = val;
+            plugin.thirdQFactor5 = val;
+            plugin.thirdQFactor6 = val;
+            plugin.fifthQFactor5 = val;
+            plugin.fifthQFactor6 = val;
+            plugin.seventhQFactor5 = val;
+            plugin.seventhQFactor6 = val;
+            
+            
+            plugin.updateRootFilter5 = true;
+            plugin.updateRootFilter6 = true;
+            plugin.updateThirdFilter5 = true;
+            plugin.updateThirdFilter6 = true;
+            plugin.updateFifthFilter5 = true;
+            plugin.updateFifthFilter6 = true;
+            plugin.updateSeventhFilter5 = true;
+            plugin.updateSeventhFilter6 = true;
+            
+            % State change update for visualizer
             updateStateChangeStatus(plugin,true);
         end
         
