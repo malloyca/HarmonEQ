@@ -14,8 +14,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
 % audioTestBench(eq);
 %
 % To validate for generation:
-% 
+% validateAudioPlugin HarmonEQ;
 % To export as a VST, run:
+% generateAudioPlugin -outdir plugins HarmonEQ
+% To export as an AU (on macOS):
 % 
 
 
