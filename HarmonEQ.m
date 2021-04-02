@@ -727,57 +727,47 @@ classdef HarmonEQ < matlab.System & audioPlugin
             fs = getSampleRate(plugin);
             
             %todo: clean this up
-            % Initialize filters
-            %TODO: Putting the if statement here allows for only
-            %initializing these if the plugin settings has the filters
-            %active
-            %if plugin.rootFiltersActive
-                buildRootFilter1(plugin, fs);
-                buildRootFilter2(plugin, fs);
-                buildRootFilter3(plugin, fs);
-                buildRootFilter4(plugin, fs);
-                buildRootFilter5(plugin, fs);
-                buildRootFilter6(plugin, fs);
-                buildRootFilter7(plugin, fs);
-                buildRootFilter8(plugin, fs);
-                buildRootFilter9(plugin, fs);
-            %end
-            
-            %if plugin.thirdFiltersActive
-                buildThirdFilter1(plugin, fs);
-                buildThirdFilter2(plugin, fs);
-                buildThirdFilter3(plugin, fs);
-                buildThirdFilter4(plugin, fs);
-                buildThirdFilter5(plugin, fs);
-                buildThirdFilter6(plugin, fs);
-                buildThirdFilter7(plugin, fs);
-                buildThirdFilter8(plugin, fs);
-                buildThirdFilter9(plugin, fs);
-            %end
-            
-            %if plugin.fifthFiltersActive
-                buildFifthFilter1(plugin, fs);
-                buildFifthFilter2(plugin, fs);
-                buildFifthFilter3(plugin, fs);
-                buildFifthFilter4(plugin, fs);
-                buildFifthFilter5(plugin, fs);
-                buildFifthFilter6(plugin, fs);
-                buildFifthFilter7(plugin, fs);
-                buildFifthFilter8(plugin, fs);
-                buildFifthFilter9(plugin, fs);
-            %end
-            
-            %if plugin.seventhFiltersActive
-                buildSeventhFilter1(plugin, fs);
-                buildSeventhFilter2(plugin, fs);
-                buildSeventhFilter3(plugin, fs);
-                buildSeventhFilter4(plugin, fs);
-                buildSeventhFilter5(plugin, fs);
-                buildSeventhFilter6(plugin, fs);
-                buildSeventhFilter7(plugin, fs);
-                buildSeventhFilter8(plugin, fs);
-                buildSeventhFilter9(plugin, fs);
-            %end
+            %----------------------Initialize filters----------------------
+            %-----Root filters
+            buildRootFilter1(plugin, fs);
+            buildRootFilter2(plugin, fs);
+            buildRootFilter3(plugin, fs);
+            buildRootFilter4(plugin, fs);
+            buildRootFilter5(plugin, fs);
+            buildRootFilter6(plugin, fs);
+            buildRootFilter7(plugin, fs);
+            buildRootFilter8(plugin, fs);
+            buildRootFilter9(plugin, fs);
+            %-----Harmonic third filters
+            buildThirdFilter1(plugin, fs);
+            buildThirdFilter2(plugin, fs);
+            buildThirdFilter3(plugin, fs);
+            buildThirdFilter4(plugin, fs);
+            buildThirdFilter5(plugin, fs);
+            buildThirdFilter6(plugin, fs);
+            buildThirdFilter7(plugin, fs);
+            buildThirdFilter8(plugin, fs);
+            buildThirdFilter9(plugin, fs);
+            %-----Harmonic fifth filters
+            buildFifthFilter1(plugin, fs);
+            buildFifthFilter2(plugin, fs);
+            buildFifthFilter3(plugin, fs);
+            buildFifthFilter4(plugin, fs);
+            buildFifthFilter5(plugin, fs);
+            buildFifthFilter6(plugin, fs);
+            buildFifthFilter7(plugin, fs);
+            buildFifthFilter8(plugin, fs);
+            buildFifthFilter9(plugin, fs);
+            %-----Harmonic seventh filters
+            buildSeventhFilter1(plugin, fs);
+            buildSeventhFilter2(plugin, fs);
+            buildSeventhFilter3(plugin, fs);
+            buildSeventhFilter4(plugin, fs);
+            buildSeventhFilter5(plugin, fs);
+            buildSeventhFilter6(plugin, fs);
+            buildSeventhFilter7(plugin, fs);
+            buildSeventhFilter8(plugin, fs);
+            buildSeventhFilter9(plugin, fs);
             
         end
         
