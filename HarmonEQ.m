@@ -1149,15 +1149,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain = val;
             
             %TODO: This is temporary until I implement range gain controls
-            plugin.seventhGain1 = val;
-            plugin.seventhGain2 = val;
-            plugin.seventhGain3 = val;
-            plugin.seventhGain4 = val;
-            plugin.seventhGain5 = val;
-            plugin.seventhGain6 = val;
-            plugin.seventhGain7 = val;
-            plugin.seventhGain8 = val;
-            plugin.seventhGain9 = val;
+            updateSeventhGain1(plugin,val);
+            updateSeventhGain2(plugin,val);
+            updateSeventhGain3(plugin,val);
+            updateSeventhGain4(plugin,val);
+            updateSeventhGain5(plugin,val);
+            updateSeventhGain6(plugin,val);
+            updateSeventhGain7(plugin,val);
+            updateSeventhGain8(plugin,val);
+            updateSeventhGain9(plugin,val);
             
             setUpdateSeventhFilters(plugin);
             
@@ -2107,6 +2107,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthGain9 = val;
         end
         
+        
+        %----------------------Seventh filter updaters---------------------
         function updateSeventhFrequencies(plugin)
             
             seventhFreq = plugin.seventhFrequency1; % todo: Declaring this here to pass validation
@@ -2149,7 +2151,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhFrequency7 = 64 * seventhFreq;
             plugin.seventhFrequency8 = 128 * seventhFreq;
             plugin.seventhFrequency9 = 256 * seventhFreq;
-            
+        end
+        
+        function updateSeventhGain1(plugin,val)
+            plugin.seventhGain1 = val;
+        end
+        
+        function updateSeventhGain2(plugin,val)
+            plugin.seventhGain2 = val;
+        end
+        
+        function updateSeventhGain3(plugin,val)
+            plugin.seventhGain3 = val;
+        end
+        
+        function updateSeventhGain4(plugin,val)
+            plugin.seventhGain4 = val;
+        end
+        
+        function updateSeventhGain5(plugin,val)
+            plugin.seventhGain5 = val;
+        end
+        
+        function updateSeventhGain6(plugin,val)
+            plugin.seventhGain6 = val;
+        end
+        
+        function updateSeventhGain7(plugin,val)
+            plugin.seventhGain7 = val;
+        end
+        
+        function updateSeventhGain8(plugin,val)
+            plugin.seventhGain8 = val;
+        end
+        
+        function updateSeventhGain9(plugin,val)
+            plugin.seventhGain9 = val;
         end
         
         function setUpdateRootFilters(plugin)
