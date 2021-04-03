@@ -919,6 +919,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin,true);
         end
         
+        %todo: this function is no longer necessary
         function set.rootGain(plugin,val)
             plugin.rootGain = val;
             
@@ -939,6 +940,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin,true);
         end
         
+        %todo: this function is no longer necessary
         function set.rootQFactor(plugin,val)
             plugin.rootQFactor = val;
             
@@ -959,14 +961,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin,true);
         end
         
-        
         %--------------------------Harmonic Third--------------------------
         function set.thirdInterval(plugin,val)
             validatestring(val, {'off','Sus2','Min3','Maj3','Sus4'},...
                 'set.thirdInterval','ThirdInterval');
             plugin.thirdInterval = val;
             if val == "off"
-                plugin.thirdFiltersActive = false;
+                %plugin.thirdFiltersActive = false;
+                deactivateThirdFilters(plugin);
             else
                 switch val
                     case 'Sus2'
@@ -979,7 +981,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         plugin.thirdIntervalDistance = 5;
                 end
                 
-                plugin.thirdFiltersActive = true;
+                %plugin.thirdFiltersActive = true;
+                activateThirdFilters(plugin);
                 updateThirdFrequencies(plugin);
                 setUpdateThirdFilters(plugin);
             end
@@ -2065,12 +2068,24 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdFiltersActive = false;
         end
         
+        function activateThirdFilters(plugin)
+            plugin.thirdFiltersActive = true;
+        end
+        
         function deactivateFifthFilters(plugin)
             plugin.fifthFiltersActive = false;
         end
         
+        function activateFifthFilters(plugin)
+            plugin.fifthFiltersActive = true;
+        end
+        
         function deactivateSeventhFilters(plugin)
             plugin.seventhFiltersActive = false;
+        end
+        
+        function activateSeventhFilters(plugin)
+            plugin.seventhFiltersActive = true;
         end
         
         
