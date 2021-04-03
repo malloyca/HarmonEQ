@@ -1203,7 +1203,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: Create updateLowRegionGain function to handle this
             %plugin.rootGain9 = val;
             updateRootGain9(plugin,val);
-            plugin.thirdGain9 = val;
+            %plugin.thirdGain9 = val;
+            updateThirdGain9(plugin,val);
             plugin.fifthGain9 = val;
             plugin.seventhGain9 = val;
             
@@ -1248,8 +1249,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.rootGain8 = val;
             updateRootGain7(plugin,val);
             updateRootGain8(plugin,val);
-            plugin.thirdGain7 = val;
-            plugin.thirdGain8 = val;
+            %plugin.thirdGain7 = val;
+            %plugin.thirdGain8 = val;
+            updateThirdGain7(plugin,val);
+            updateThirdGain8(plugin,val);
             plugin.fifthGain7 = val;
             plugin.fifthGain8 = val;
             plugin.seventhGain7 = val;
@@ -1308,8 +1311,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.rootGain6 = val;
             updateRootGain5(plugin,val);
             updateRootGain6(plugin,val);
-            plugin.thirdGain5 = val;
-            plugin.thirdGain6 = val;
+            %plugin.thirdGain5 = val;
+            %plugin.thirdGain6 = val;
+            updateThirdGain5(plugin,val);
+            updateThirdGain6(plugin,val);
             plugin.fifthGain5 = val;
             plugin.fifthGain6 = val;
             plugin.seventhGain5 = val;
@@ -1368,8 +1373,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.rootGain4 = val;
             updateRootGain3(plugin,val);
             updateRootGain4(plugin,val);
-            plugin.thirdGain3 = val;
-            plugin.thirdGain4 = val;
+            %plugin.thirdGain3 = val;
+            %plugin.thirdGain4 = val;
+            updateThirdGain3(plugin,val);
+            updateThirdGain4(plugin,val);
             plugin.fifthGain3 = val;
             plugin.fifthGain4 = val;
             plugin.seventhGain3 = val;
@@ -1429,8 +1436,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.rootGain2 = val;
             updateRootGain1(plugin,val);
             updateRootGain2(plugin,val);
-            plugin.thirdGain1 = val;
-            plugin.thirdGain2 = val;
+            %plugin.thirdGain1 = val;
+            %plugin.thirdGain2 = val;
+            updateThirdGain1(plugin,val);
+            updateThirdGain2(plugin,val);
             plugin.fifthGain1 = val;
             plugin.fifthGain2 = val;
             plugin.seventhGain1 = val;
@@ -1836,10 +1845,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         
+        %------------------------------------------------------------------
+        % UPDATERS
+        %------------------------------------------------------------------
         
-        %-----------------------------Updaters-----------------------------
-        
-        %----------Root filter updaters
+        %-----------------------Root filter updaters-----------------------
         function updateRootFrequencies(plugin, val)
             
             rootNoteNumber = plugin.rootNoteValue; % todo: Declaring this here to pass validation
@@ -1937,6 +1947,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain9 = val;
         end
         
+        
+        %-----------------------Third filter updaters----------------------
         function updateThirdFrequencies(plugin)
             %todo: This really need to know the root note and harmonic
             %third interval
@@ -1984,6 +1996,43 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
+        function updateThirdGain1(plugin,val)
+            plugin.thirdGain1 = val;
+        end
+        
+        function updateThirdGain2(plugin,val)
+            plugin.thirdGain2 = val;
+        end
+        
+        function updateThirdGain3(plugin,val)
+            plugin.thirdGain3 = val;
+        end
+        
+        function updateThirdGain4(plugin,val)
+            plugin.thirdGain4 = val;
+        end
+        
+        function updateThirdGain5(plugin,val)
+            plugin.thirdGain5 = val;
+        end
+        
+        function updateThirdGain6(plugin,val)
+            plugin.thirdGain6 = val;
+        end
+        
+        function updateThirdGain7(plugin,val)
+            plugin.thirdGain7 = val;
+        end
+        
+        function updateThirdGain8(plugin,val)
+            plugin.thirdGain8 = val;
+        end
+        
+        function updateThirdGain9(plugin,val)
+            plugin.thirdGain9 = val;
+        end
+        
+        %-----------------------Fifth filter updaters----------------------
         function updateFifthFrequencies(plugin)
             %todo: This really need to know the root note and harmonic
             %third interval
