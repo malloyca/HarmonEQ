@@ -545,7 +545,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootFiltersActive = true;
         thirdFiltersActive = false;
         fifthFiltersActive = false;
-        seventhFiltersActive = true;
+        seventhFiltersActive = false;
         
         % For visalization
         visualizerObject;
@@ -1129,7 +1129,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhInterval = val;
             if val == "off"
                 %plugin.seventhFiltersActive = false;
-                deactivateSeventhFilters
+                deactivateSeventhFilters(plugin);
             else
                 switch val
                     case 'Dim7'
