@@ -892,17 +892,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % well.
             if val == "off"
                 plugin.rootNote = val;
-                plugin.rootFiltersActive = false;
+                deactivateRootFilters(plugin);
+                %plugin.rootFiltersActive = false;
                 %TODO: If no root, deactivate all other peaks. This is
                 %really for down the road...
                 %plugin.thirdInterval = 'off'; %todo: this throws an error
                 %in validation
-                plugin.thirdFiltersActive = false;
-                plugin.fifthFiltersActive = false;
-                plugin.seventhFiltersActive = false;
+                deactivateThirdFilters(plugin);
+                deactivateFifthFilters(plugin);
+                deactivateSeventhFilters(plugin);
             else
                 plugin.rootNote = val;
-                plugin.rootFiltersActive = true;
+                activateRootFilters(plugin);
             end
             setUpdateRootFilters(plugin);
             setUpdateThirdFilters(plugin);
@@ -2051,11 +2052,34 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.stateChange = true;
         end
         
+        %--------------Filter (de)activation helper functions--------------
+        function deactivateRootFilters(plugin)
+            plugin.rootFiltersActive = false;
+        end
+        
+        function activateRootFilters(plugin)
+            plugin.rootFiltersActive = true;
+        end
+        
+        function deactivateThirdFilters(plugin)
+            plugin.thirdFiltersActive = false;
+        end
+        
+        function deactivateFifthFilters(plugin)
+            plugin.fifthFiltersActive = false;
+        end
+        
+        function deactivateSeventhFilters(plugin)
+            plugin.seventhFiltersActive = false;
+        end
+        
+        
+        %-------------------Filter coefficients updater--------------------
         function updateFilterCoefficientsMatrix(plugin)
+            
             %TODO
             % If root filters are active, then add their coefficients to
             % the coefficient matrices
-            
             if plugin.rootFiltersActive
                 B_root = [plugin.rootCoeffb1;...
                     plugin.rootCoeffb2;...
