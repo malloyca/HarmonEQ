@@ -32,26 +32,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
     properties
         rootNote = 'C';
         rootNoteValue = 0;
-        rootGain = 0;
-        rootQFactor = 26;
+        rootGain = 0; %deprecated
+        rootQFactor = 26; %deprecated
         
         thirdInterval = 'off';
         thirdIntervalDistance = 4;
         thirdNote = 'E';
-        thirdGain = 0;
-        thirdQFactor = 26;
+        thirdGain = 0; %deprecated
+        thirdQFactor = 26; %deprecated
         
         fifthInterval = 'off';
         fifthIntervalDistance = 7;
         fifthNote = 'G';
-        fifthGain = 0;
-        fifthQFactor = 26;
+        fifthGain = 0; %deprecated
+        fifthQFactor = 26; %deprecated
         
         seventhInterval = 'off';
         seventhIntervalDistance = 11;
         seventhNote = 'B';
-        seventhGain = 0;
-        seventhQFactor = 26;
+        seventhGain = 0; %deprecated
+        seventhQFactor = 26; %deprecated
         
         %----------
         highRegionGain = 0;
@@ -924,15 +924,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain = val;
             
             %TODO: This is temporary until I implement range gain controls
-            %plugin.rootGain1 = val;
-            %plugin.rootGain2 = val;
-            %plugin.rootGain3 = val;
-            %plugin.rootGain4 = val;
-            %plugin.rootGain5 = val;
-            %plugin.rootGain6 = val;
-            %plugin.rootGain7 = val;
-            %plugin.rootGain8 = val;
-            %plugin.rootGain9 = val;
             updateRootGain1(plugin,val);
             updateRootGain2(plugin,val);
             updateRootGain3(plugin,val);
@@ -1010,15 +1001,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdGain = val;
             
             %TODO: This is temporary until I implement range gain controls
-            plugin.thirdGain1 = val;
-            plugin.thirdGain2 = val;
-            plugin.thirdGain3 = val;
-            plugin.thirdGain4 = val;
-            plugin.thirdGain5 = val;
-            plugin.thirdGain6 = val;
-            plugin.thirdGain7 = val;
-            plugin.thirdGain8 = val;
-            plugin.thirdGain9 = val;
+            updateThirdGain1(plugin,val);
+            updateThirdGain2(plugin,val);
+            updateThirdGain3(plugin,val);
+            updateThirdGain4(plugin,val);
+            updateThirdGain5(plugin,val);
+            updateThirdGain6(plugin,val);
+            updateThirdGain7(plugin,val);
+            updateThirdGain8(plugin,val);
+            updateThirdGain9(plugin,val);
             
             setUpdateThirdFilters(plugin);
             
@@ -1085,15 +1076,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthGain = val;
             
             %TODO: This is temporary until I implement range gain controls
-            plugin.fifthGain1 = val;
-            plugin.fifthGain2 = val;
-            plugin.fifthGain3 = val;
-            plugin.fifthGain4 = val;
-            plugin.fifthGain5 = val;
-            plugin.fifthGain6 = val;
-            plugin.fifthGain7 = val;
-            plugin.fifthGain8 = val;
-            plugin.fifthGain9 = val;
+            updateFifthGain1(plugin,val);
+            updateFifthGain2(plugin,val);
+            updateFifthGain3(plugin,val);
+            updateFifthGain4(plugin,val);
+            updateFifthGain5(plugin,val);
+            updateFifthGain6(plugin,val);
+            updateFifthGain7(plugin,val);
+            updateFifthGain8(plugin,val);
+            updateFifthGain9(plugin,val);
             
             setUpdateFifthFilters(plugin);
             
@@ -2078,6 +2069,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthFrequency8 = 128 * fifthFreq;
             plugin.fifthFrequency9 = 256 * fifthFreq;
             
+        end
+        
+        function updateFifthGain1(plugin,val)
+            plugin.fifthGain1 = val;
+        end
+        
+        function updateFifthGain2(plugin,val)
+            plugin.fifthGain2 = val;
+        end
+        
+        function updateFifthGain3(plugin,val)
+            plugin.fifthGain3 = val;
+        end
+        
+        function updateFifthGain4(plugin,val)
+            plugin.fifthGain4 = val;
+        end
+        
+        function updateFifthGain5(plugin,val)
+            plugin.fifthGain5 = val;
+        end
+        
+        function updateFifthGain6(plugin,val)
+            plugin.fifthGain6 = val;
+        end
+        
+        function updateFifthGain7(plugin,val)
+            plugin.fifthGain7 = val;
+        end
+        
+        function updateFifthGain8(plugin,val)
+            plugin.fifthGain8 = val;
+        end
+        
+        function updateFifthGain9(plugin,val)
+            plugin.fifthGain9 = val;
         end
         
         function updateSeventhFrequencies(plugin)
