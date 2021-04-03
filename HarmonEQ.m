@@ -970,15 +970,20 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 %plugin.thirdFiltersActive = false;
                 deactivateThirdFilters(plugin);
             else
+                %todo: clean up
                 switch val
                     case 'Sus2'
-                        plugin.thirdIntervalDistance = 2;
+                        %plugin.thirdIntervalDistance = 2;
+                        plugin.setThirdIntervalDistance(plugin,2);
                     case 'Min3'
-                        plugin.thirdIntervalDistance = 3;
+                        %plugin.thirdIntervalDistance = 3;
+                        plugin.setThirdIntervalDistance(plugin,3);
                     case 'Maj3'
-                        plugin.thirdIntervalDistance = 4;
+                        %plugin.thirdIntervalDistance = 4;
+                        plugin.setThirdIntervalDistance(plugin,4);
                     case 'Sus4'
-                        plugin.thirdIntervalDistance = 5;
+                        %plugin.thirdIntervalDistance = 5;
+                        plugin.setThirdIntervalDistance(plugin,5);
                 end
                 
                 %plugin.thirdFiltersActive = true;
@@ -1038,20 +1043,27 @@ classdef HarmonEQ < matlab.System & audioPlugin
             validatestring(val, {'off','Dim5','Perf5','Aug5'},...
                 'set.fifthInterval','FifthInterval');
             plugin.fifthInterval = val;
+            
+            %todo: clean up
             if val == "off"
-                plugin.fifthFiltersActive = false;
+                %plugin.fifthFiltersActive = false;
+                deactivateFifthFilters(plugin);
             else
                 switch val
                     case 'Dim5'
-                        plugin.fifthIntervalDistance = 6;
+                        %plugin.fifthIntervalDistance = 6;
+                        setFifthIntervalDistance(plugin,6);
                     case 'Perf5'
-                        plugin.fifthIntervalDistance = 7;
+                        %plugin.fifthIntervalDistance = 7;
+                        setFifthIntervalDistance(plugin,7);
                     case 'Aug5'
-                        plugin.fifthIntervalDistance = 8;
+                        %plugin.fifthIntervalDistance = 8;
+                        setFifthIntervalDistance(plugin,8);
                 end
                 
                 %if plugin.rootNoteFiltersActive == true?
-                plugin.fifthFiltersActive = true;
+                %plugin.fifthFiltersActive = true;
+                activateFifthFilters;
                 updateFifthFrequencies(plugin);
                 setUpdateFifthFilters(plugin);
             end
@@ -1107,19 +1119,24 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 'set.seventhInterval','SeventhInterval');
             plugin.seventhInterval = val;
             if val == "off"
-                plugin.seventhFiltersActive = false;
+                %plugin.seventhFiltersActive = false;
+                deactivateSeventhFilters
             else
                 switch val
                     case 'Dim7'
-                        plugin.seventhIntervalDistance = 9;
+                        %plugin.seventhIntervalDistance = 9;
+                        setSeventhIntervalDistance(plugin,9);
                     case 'Min7'
-                        plugin.seventhIntervalDistance = 10;
+                        %plugin.seventhIntervalDistance = 10;
+                        setSeventhIntervalDistance(plugin,10);
                     case 'Maj7'
-                        plugin.seventhIntervalDistance = 11;
+                        %plugin.seventhIntervalDistance = 11;
+                        setSeventhIntervalDistance(plugin,11);
                 end
                 
                 %if plugin.rootNoteFiltersActive == true?
-                plugin.seventhFiltersActive = true;
+                %plugin.seventhFiltersActive = true;
+                activateSeventhFilters(plugin);
                 updateSeventhFrequencies(plugin);
                 setUpdateSeventhFilters(plugin);
             end 
