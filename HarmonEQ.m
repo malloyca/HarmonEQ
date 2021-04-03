@@ -1072,7 +1072,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 
                 %if plugin.rootNoteFiltersActive == true?
                 %plugin.fifthFiltersActive = true;
-                activateFifthFilters;
+                activateFifthFilters(plugin);
                 updateFifthFrequencies(plugin);
                 setUpdateFifthFilters(plugin);
             end
