@@ -1185,7 +1185,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin,true);
         end
         
-        %----------------------High-Mid Region Controls--------------------
+        %------------------------High Region Controls----------------------
         function set.highRegionGain(plugin,val)
             plugin.highRegionGain = val;
             
@@ -1200,10 +1200,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain9 = val;
             
             
-            plugin.updateRootFilter9 = true;
-            plugin.updateThirdFilter9 = true;
-            plugin.updateFifthFilter9 = true;
-            plugin.updateSeventhFilter9 = true;
+            %plugin.updateRootFilter9 = true;
+            %plugin.updateThirdFilter9 = true;
+            %plugin.updateFifthFilter9 = true;
+            %plugin.updateSeventhFilter9 = true;
+            setUpdateRootFilter9(plugin);
+            setUpdateThirdFilter9(plugin);
+            setUpdateFifthFilter9(plugin);
+            setUpdateSeventhFilter9(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1220,10 +1224,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhQFactor9 = val;
             
             
-            plugin.updateRootFilter9 = true;
-            plugin.updateThirdFilter9 = true;
-            plugin.updateFifthFilter9 = true;
-            plugin.updateSeventhFilter9 = true;
+            %plugin.updateRootFilter9 = true;
+            %plugin.updateThirdFilter9 = true;
+            %plugin.updateFifthFilter9 = true;
+            %plugin.updateSeventhFilter9 = true;
+            setUpdateRootFilter9(plugin);
+            setUpdateThirdFilter9(plugin);
+            setUpdateFifthFilter9(plugin);
+            setUpdateSeventhFilter9(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1250,14 +1258,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain8 = val;
             
             
-            plugin.updateRootFilter7 = true;
-            plugin.updateRootFilter8 = true;
-            plugin.updateThirdFilter7 = true;
-            plugin.updateThirdFilter8 = true;
-            plugin.updateFifthFilter7 = true;
-            plugin.updateFifthFilter8 = true;
-            plugin.updateSeventhFilter7 = true;
-            plugin.updateSeventhFilter8 = true;
+            %plugin.updateRootFilter7 = true;
+            %plugin.updateRootFilter8 = true;
+            %plugin.updateThirdFilter7 = true;
+            %plugin.updateThirdFilter8 = true;
+            %plugin.updateFifthFilter7 = true;
+            %plugin.updateFifthFilter8 = true;
+            %plugin.updateSeventhFilter7 = true;
+            %plugin.updateSeventhFilter8 = true;
+            setUpdateRootFilter7(plugin);
+            setUpdateRootFilter8(plugin);
+            setUpdateThirdFilter7(plugin);
+            setUpdateThirdFilter8(plugin);
+            setUpdateFifthFilter7(plugin);
+            setUpdateFifthFilter8(plugin);
+            setUpdateSeventhFilter7(plugin);
+            setUpdateSeventhFilter8(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1278,14 +1294,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhQFactor8 = val;
             
             
-            plugin.updateRootFilter7 = true;
-            plugin.updateRootFilter8 = true;
-            plugin.updateThirdFilter7 = true;
-            plugin.updateThirdFilter8 = true;
-            plugin.updateFifthFilter7 = true;
-            plugin.updateFifthFilter8 = true;
-            plugin.updateSeventhFilter7 = true;
-            plugin.updateSeventhFilter8 = true;
+            %plugin.updateRootFilter7 = true;
+            %plugin.updateRootFilter8 = true;
+            %plugin.updateThirdFilter7 = true;
+            %plugin.updateThirdFilter8 = true;
+            %plugin.updateFifthFilter7 = true;
+            %plugin.updateFifthFilter8 = true;
+            %plugin.updateSeventhFilter7 = true;
+            %plugin.updateSeventhFilter8 = true;
+            setUpdateRootFilter7(plugin);
+            setUpdateRootFilter8(plugin);
+            setUpdateThirdFilter7(plugin);
+            setUpdateThirdFilter8(plugin);
+            setUpdateFifthFilter7(plugin);
+            setUpdateFifthFilter8(plugin);
+            setUpdateSeventhFilter7(plugin);
+            setUpdateSeventhFilter8(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1312,14 +1336,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain6 = val;
             
             
-            plugin.updateRootFilter5 = true;
-            plugin.updateRootFilter6 = true;
-            plugin.updateThirdFilter5 = true;
-            plugin.updateThirdFilter6 = true;
-            plugin.updateFifthFilter5 = true;
-            plugin.updateFifthFilter6 = true;
-            plugin.updateSeventhFilter5 = true;
-            plugin.updateSeventhFilter6 = true;
+            %plugin.updateRootFilter5 = true;
+            %plugin.updateRootFilter6 = true;
+            %plugin.updateThirdFilter5 = true;
+            %plugin.updateThirdFilter6 = true;
+            %plugin.updateFifthFilter5 = true;
+            %plugin.updateFifthFilter6 = true;
+            %plugin.updateSeventhFilter5 = true;
+            %plugin.updateSeventhFilter6 = true;
+            setUpdateRootFilter5(plugin);
+            setUpdateRootFilter6(plugin);
+            setUpdateThirdFilter5(plugin);
+            setUpdateThirdFilter6(plugin);
+            setUpdateFifthFilter5(plugin);
+            setUpdateFifthFilter6(plugin);
+            setUpdateSeventhFilter5(plugin);
+            setUpdateSeventhFilter6(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1340,14 +1372,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhQFactor6 = val;
             
             
-            plugin.updateRootFilter5 = true;
-            plugin.updateRootFilter6 = true;
-            plugin.updateThirdFilter5 = true;
-            plugin.updateThirdFilter6 = true;
-            plugin.updateFifthFilter5 = true;
-            plugin.updateFifthFilter6 = true;
-            plugin.updateSeventhFilter5 = true;
-            plugin.updateSeventhFilter6 = true;
+            %plugin.updateRootFilter5 = true;
+            %plugin.updateRootFilter6 = true;
+            %plugin.updateThirdFilter5 = true;
+            %plugin.updateThirdFilter6 = true;
+            %plugin.updateFifthFilter5 = true;
+            %plugin.updateFifthFilter6 = true;
+            %plugin.updateSeventhFilter5 = true;
+            %plugin.updateSeventhFilter6 = true;
+            setUpdateRootFilter5(plugin);
+            setUpdateRootFilter6(plugin);
+            setUpdateThirdFilter5(plugin);
+            setUpdateThirdFilter6(plugin);
+            setUpdateFifthFilter5(plugin);
+            setUpdateFifthFilter6(plugin);
+            setUpdateSeventhFilter5(plugin);
+            setUpdateSeventhFilter6(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1374,14 +1414,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain4 = val;
             
             
-            plugin.updateRootFilter3 = true;
-            plugin.updateRootFilter4 = true;
-            plugin.updateThirdFilter3 = true;
-            plugin.updateThirdFilter4 = true;
-            plugin.updateFifthFilter3 = true;
-            plugin.updateFifthFilter4 = true;
-            plugin.updateSeventhFilter3 = true;
-            plugin.updateSeventhFilter4 = true;
+            %plugin.updateRootFilter3 = true;
+            %plugin.updateRootFilter4 = true;
+            %plugin.updateThirdFilter3 = true;
+            %plugin.updateThirdFilter4 = true;
+            %plugin.updateFifthFilter3 = true;
+            %plugin.updateFifthFilter4 = true;
+            %plugin.updateSeventhFilter3 = true;
+            %plugin.updateSeventhFilter4 = true;
+            setUpdateRootFilter3(plugin);
+            setUpdateRootFilter4(plugin);
+            setUpdateThirdFilter3(plugin);
+            setUpdateThirdFilter4(plugin);
+            setUpdateFifthFilter3(plugin);
+            setUpdateFifthFilter4(plugin);
+            setUpdateSeventhFilter3(plugin);
+            setUpdateSeventhFilter4(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1402,14 +1450,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhQFactor4 = val;
             
             
-            plugin.updateRootFilter3 = true;
-            plugin.updateRootFilter4 = true;
-            plugin.updateThirdFilter3 = true;
-            plugin.updateThirdFilter4 = true;
-            plugin.updateFifthFilter3 = true;
-            plugin.updateFifthFilter4 = true;
-            plugin.updateSeventhFilter3 = true;
-            plugin.updateSeventhFilter4 = true;
+            %plugin.updateRootFilter3 = true;
+            %plugin.updateRootFilter4 = true;
+            %plugin.updateThirdFilter3 = true;
+            %plugin.updateThirdFilter4 = true;
+            %plugin.updateFifthFilter3 = true;
+            %plugin.updateFifthFilter4 = true;
+            %plugin.updateSeventhFilter3 = true;
+            %plugin.updateSeventhFilter4 = true;
+            setUpdateRootFilter3(plugin);
+            setUpdateRootFilter4(plugin);
+            setUpdateThirdFilter3(plugin);
+            setUpdateThirdFilter4(plugin);
+            setUpdateFifthFilter3(plugin);
+            setUpdateFifthFilter4(plugin);
+            setUpdateSeventhFilter3(plugin);
+            setUpdateSeventhFilter4(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1437,14 +1493,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain2 = val;
             
             
-            plugin.updateRootFilter1 = true;
-            plugin.updateRootFilter2 = true;
-            plugin.updateThirdFilter1 = true;
-            plugin.updateThirdFilter2 = true;
-            plugin.updateFifthFilter1 = true;
-            plugin.updateFifthFilter2 = true;
-            plugin.updateSeventhFilter1 = true;
-            plugin.updateSeventhFilter2 = true;
+            %plugin.updateRootFilter1 = true;
+            %plugin.updateRootFilter2 = true;
+            %plugin.updateThirdFilter1 = true;
+            %plugin.updateThirdFilter2 = true;
+            %plugin.updateFifthFilter1 = true;
+            %plugin.updateFifthFilter2 = true;
+            %plugin.updateSeventhFilter1 = true;
+            %plugin.updateSeventhFilter2 = true;
+            setUpdateRootFilter1(plugin);
+            setUpdateRootFilter2(plugin);
+            setUpdateThirdFilter1(plugin);
+            setUpdateThirdFilter2(plugin);
+            setUpdateFifthFilter1(plugin);
+            setUpdateFifthFilter2(plugin);
+            setUpdateSeventhFilter1(plugin);
+            setUpdateSeventhFilter2(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1465,14 +1529,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhQFactor2 = val;
             
             
-            plugin.updateRootFilter1 = true;
-            plugin.updateRootFilter2 = true;
-            plugin.updateThirdFilter1 = true;
-            plugin.updateThirdFilter2 = true;
-            plugin.updateFifthFilter1 = true;
-            plugin.updateFifthFilter2 = true;
-            plugin.updateSeventhFilter1 = true;
-            plugin.updateSeventhFilter2 = true;
+            %plugin.updateRootFilter1 = true;
+            %plugin.updateRootFilter2 = true;
+            %plugin.updateThirdFilter1 = true;
+            %plugin.updateThirdFilter2 = true;
+            %plugin.updateFifthFilter1 = true;
+            %plugin.updateFifthFilter2 = true;
+            %plugin.updateSeventhFilter1 = true;
+            %plugin.updateSeventhFilter2 = true;
+            setUpdateRootFilter1(plugin);
+            setUpdateRootFilter2(plugin);
+            setUpdateThirdFilter1(plugin);
+            setUpdateThirdFilter2(plugin);
+            setUpdateFifthFilter1(plugin);
+            setUpdateFifthFilter2(plugin);
+            setUpdateSeventhFilter1(plugin);
+            setUpdateSeventhFilter2(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1938,6 +2010,55 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain9 = val;
         end
         
+        function setUpdateRootFilter1(plugin)
+            plugin.updateRootFilter1 = true;
+        end
+        
+        function setUpdateRootFilter2(plugin)
+            plugin.updateRootFilter2 = true;
+        end
+        
+        function setUpdateRootFilter3(plugin)
+            plugin.updateRootFilter3 = true;
+        end
+        
+        function setUpdateRootFilter4(plugin)
+            plugin.updateRootFilter4 = true;
+        end
+        
+        function setUpdateRootFilter5(plugin)
+            plugin.updateRootFilter5 = true;
+        end
+        
+        function setUpdateRootFilter6(plugin)
+            plugin.updateRootFilter6 = true;
+        end
+        
+        function setUpdateRootFilter7(plugin)
+            plugin.updateRootFilter7 = true;
+        end
+        
+        function setUpdateRootFilter8(plugin)
+            plugin.updateRootFilter8 = true;
+        end
+        
+        function setUpdateRootFilter9(plugin)
+            plugin.updateRootFilter9 = true;
+        end
+        
+        function setUpdateRootFilters(plugin)
+            plugin.updateRootFilter1 = true;
+            plugin.updateRootFilter2 = true;
+            plugin.updateRootFilter3 = true;
+            plugin.updateRootFilter4 = true;
+            plugin.updateRootFilter5 = true;
+            plugin.updateRootFilter6 = true;
+            plugin.updateRootFilter7 = true;
+            plugin.updateRootFilter8 = true;
+            plugin.updateRootFilter9 = true;
+            plugin.stateChange = true;
+        end
+        
         
         %-----------------------Third filter updaters----------------------
         function updateThirdFrequencies(plugin)
@@ -2023,6 +2144,60 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdGain9 = val;
         end
         
+        function setUpdateThirdFilter1(plugin)
+            plugin.updateThirdFilter1 = true;
+        end
+        
+        function setUpdateThirdFilter2(plugin)
+            plugin.updateThirdFilter2 = true;
+        end
+        
+        function setUpdateThirdFilter3(plugin)
+            plugin.updateThirdFilter3 = true;
+        end
+        
+        function setUpdateThirdFilter4(plugin)
+            plugin.updateThirdFilter4 = true;
+        end
+        
+        function setUpdateThirdFilter5(plugin)
+            plugin.updateThirdFilter5 = true;
+        end
+        
+        function setUpdateThirdFilter6(plugin)
+            plugin.updateThirdFilter6 = true;
+        end
+        
+        function setUpdateThirdFilter7(plugin)
+            plugin.updateThirdFilter7 = true;
+        end
+        
+        function setUpdateThirdFilter8(plugin)
+            plugin.updateThirdFilter8 = true;
+        end
+        
+        function setUpdateThirdFilter9(plugin)
+            plugin.updateThirdFilter9 = true;
+        end
+        
+        function setUpdateThirdFilters(plugin)
+            plugin.updateThirdFilter1 = true;
+            plugin.updateThirdFilter2 = true;
+            plugin.updateThirdFilter3 = true;
+            plugin.updateThirdFilter4 = true;
+            plugin.updateThirdFilter5 = true;
+            plugin.updateThirdFilter6 = true;
+            plugin.updateThirdFilter7 = true;
+            plugin.updateThirdFilter8 = true;
+            plugin.updateThirdFilter9 = true;
+            plugin.stateChange = true;
+        end
+        
+        function setThirdIntervalDistance(plugin,val)
+            plugin.thirdIntervalDistance = val;
+        end
+        
+        
         %-----------------------Fifth filter updaters----------------------
         function updateFifthFrequencies(plugin)
             %todo: This really need to know the root note and harmonic
@@ -2107,6 +2282,59 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthGain9 = val;
         end
         
+        function setUpdateFifthFilter1(plugin)
+            plugin.updateFifthFilter1 = true;
+        end
+        
+        function setUpdateFifthFilter2(plugin)
+            plugin.updateFifthFilter2 = true;
+        end
+        
+        function setUpdateFifthFilter3(plugin)
+            plugin.updateFifthFilter3 = true;
+        end
+        
+        function setUpdateFifthFilter4(plugin)
+            plugin.updateFifthFilter4 = true;
+        end
+        
+        function setUpdateFifthFilter5(plugin)
+            plugin.updateFifthFilter5 = true;
+        end
+        
+        function setUpdateFifthFilter6(plugin)
+            plugin.updateFifthFilter6 = true;
+        end
+        
+        function setUpdateFifthFilter7(plugin)
+            plugin.updateFifthFilter7 = true;
+        end
+        
+        function setUpdateFifthFilter8(plugin)
+            plugin.updateFifthFilter8 = true;
+        end
+        
+        function setUpdateFifthFilter9(plugin)
+            plugin.updateFifthFilter9 = true;
+        end
+        
+        function setUpdateFifthFilters(plugin)
+            plugin.updateFifthFilter1 = true;
+            plugin.updateFifthFilter2 = true;
+            plugin.updateFifthFilter3 = true;
+            plugin.updateFifthFilter4 = true;
+            plugin.updateFifthFilter5 = true;
+            plugin.updateFifthFilter6 = true;
+            plugin.updateFifthFilter7 = true;
+            plugin.updateFifthFilter8 = true;
+            plugin.updateFifthFilter9 = true;
+            plugin.stateChange = true;
+        end
+        
+        function setFifthIntervalDistance(plugin,val)
+            plugin.fifthIntervalDistance = val;
+        end
+        
         
         %----------------------Seventh filter updaters---------------------
         function updateSeventhFrequencies(plugin)
@@ -2189,43 +2417,40 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain9 = val;
         end
         
-        function setUpdateRootFilters(plugin)
-            plugin.updateRootFilter1 = true;
-            plugin.updateRootFilter2 = true;
-            plugin.updateRootFilter3 = true;
-            plugin.updateRootFilter4 = true;
-            plugin.updateRootFilter5 = true;
-            plugin.updateRootFilter6 = true;
-            plugin.updateRootFilter7 = true;
-            plugin.updateRootFilter8 = true;
-            plugin.updateRootFilter9 = true;
-            plugin.stateChange = true;
+        function setUpdateSeventhFilter1(plugin)
+            plugin.updateSeventhFilter1 = true;
         end
         
-        function setUpdateThirdFilters(plugin)
-            plugin.updateThirdFilter1 = true;
-            plugin.updateThirdFilter2 = true;
-            plugin.updateThirdFilter3 = true;
-            plugin.updateThirdFilter4 = true;
-            plugin.updateThirdFilter5 = true;
-            plugin.updateThirdFilter6 = true;
-            plugin.updateThirdFilter7 = true;
-            plugin.updateThirdFilter8 = true;
-            plugin.updateThirdFilter9 = true;
-            plugin.stateChange = true;
+        function setUpdateSeventhFilter2(plugin)
+            plugin.updateSeventhFilter2 = true;
         end
         
-        function setUpdateFifthFilters(plugin)
-            plugin.updateFifthFilter1 = true;
-            plugin.updateFifthFilter2 = true;
-            plugin.updateFifthFilter3 = true;
-            plugin.updateFifthFilter4 = true;
-            plugin.updateFifthFilter5 = true;
-            plugin.updateFifthFilter6 = true;
-            plugin.updateFifthFilter7 = true;
-            plugin.updateFifthFilter8 = true;
-            plugin.updateFifthFilter9 = true;
-            plugin.stateChange = true;
+        function setUpdateSeventhFilter3(plugin)
+            plugin.updateSeventhFilter3 = true;
+        end
+        
+        function setUpdateSeventhFilter4(plugin)
+            plugin.updateSeventhFilter4 = true;
+        end
+        
+        function setUpdateSeventhFilter5(plugin)
+            plugin.updateSeventhFilter5 = true;
+        end
+        
+        function setUpdateSeventhFilter6(plugin)
+            plugin.updateSeventhFilter6 = true;
+        end
+        
+        function setUpdateSeventhFilter7(plugin)
+            plugin.updateSeventhFilter7 = true;
+        end
+        
+        function setUpdateSeventhFilter8(plugin)
+            plugin.updateSeventhFilter8 = true;
+        end
+        
+        function setUpdateSeventhFilter9(plugin)
+            plugin.updateSeventhFilter9 = true;
         end
         
         function setUpdateSeventhFilters(plugin)
@@ -2241,18 +2466,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.stateChange = true;
         end
         
-        
-        function setThirdIntervalDistance(plugin,val)
-            plugin.thirdIntervalDistance = val;
-        end
-        
-        function setFifthIntervalDistance(plugin,val)
-            plugin.fifthIntervalDistance = val;
-        end
-        
         function setSeventhIntervalDistance(plugin,val)
             plugin.seventhIntervalDistance = val;
         end
+        
         
         %--------------Filter (de)activation helper functions--------------
         function deactivateRootFilters(plugin)
