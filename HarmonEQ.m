@@ -924,15 +924,24 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain = val;
             
             %TODO: This is temporary until I implement range gain controls
-            plugin.rootGain1 = val;
-            plugin.rootGain2 = val;
-            plugin.rootGain3 = val;
-            plugin.rootGain4 = val;
-            plugin.rootGain5 = val;
-            plugin.rootGain6 = val;
-            plugin.rootGain7 = val;
-            plugin.rootGain8 = val;
-            plugin.rootGain9 = val;
+            %plugin.rootGain1 = val;
+            %plugin.rootGain2 = val;
+            %plugin.rootGain3 = val;
+            %plugin.rootGain4 = val;
+            %plugin.rootGain5 = val;
+            %plugin.rootGain6 = val;
+            %plugin.rootGain7 = val;
+            %plugin.rootGain8 = val;
+            %plugin.rootGain9 = val;
+            updateRootGain1(plugin,val);
+            updateRootGain2(plugin,val);
+            updateRootGain3(plugin,val);
+            updateRootGain4(plugin,val);
+            updateRootGain5(plugin,val);
+            updateRootGain6(plugin,val);
+            updateRootGain7(plugin,val);
+            updateRootGain8(plugin,val);
+            updateRootGain9(plugin,val);
             
             setUpdateRootFilters(plugin);
             
@@ -1192,7 +1201,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: For now this will only control the first two octaves of
             %filters
             %todo: Create updateLowRegionGain function to handle this
-            plugin.rootGain9 = val;
+            %plugin.rootGain9 = val;
+            updateRootGain9(plugin,val);
             plugin.thirdGain9 = val;
             plugin.fifthGain9 = val;
             plugin.seventhGain9 = val;
@@ -1234,8 +1244,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: For now this will only control the first two octaves of
             %filters
             %todo: Create updateLowRegionGain function to handle this
-            plugin.rootGain7 = val;
-            plugin.rootGain8 = val;
+            %plugin.rootGain7 = val;
+            %plugin.rootGain8 = val;
+            updateRootGain7(plugin,val);
+            updateRootGain8(plugin,val);
             plugin.thirdGain7 = val;
             plugin.thirdGain8 = val;
             plugin.fifthGain7 = val;
@@ -1292,8 +1304,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: For now this will only control the first two octaves of
             %filters
             %todo: Create updateLowRegionGain function to handle this
-            plugin.rootGain5 = val;
-            plugin.rootGain6 = val;
+            %plugin.rootGain5 = val;
+            %plugin.rootGain6 = val;
+            updateRootGain5(plugin,val);
+            updateRootGain6(plugin,val);
             plugin.thirdGain5 = val;
             plugin.thirdGain6 = val;
             plugin.fifthGain5 = val;
@@ -1350,8 +1364,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: For now this will only control the first two octaves of
             %filters
             %todo: Create updateLowRegionGain function to handle this
-            plugin.rootGain3 = val;
-            plugin.rootGain4 = val;
+            %plugin.rootGain3 = val;
+            %plugin.rootGain4 = val;
+            updateRootGain3(plugin,val);
+            updateRootGain4(plugin,val);
             plugin.thirdGain3 = val;
             plugin.thirdGain4 = val;
             plugin.fifthGain3 = val;
@@ -1409,8 +1425,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %todo: For now this will only control the first two octaves of
             %filters
             %todo: Create updateLowRegionGain function to handle this
-            plugin.rootGain1 = val;
-            plugin.rootGain2 = val;
+            %plugin.rootGain1 = val;
+            %plugin.rootGain2 = val;
+            updateRootGain1(plugin,val);
+            updateRootGain2(plugin,val);
             plugin.thirdGain1 = val;
             plugin.thirdGain2 = val;
             plugin.fifthGain1 = val;
@@ -1820,6 +1838,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         
         %-----------------------------Updaters-----------------------------
+        
+        %----------Root filter updaters
         function updateRootFrequencies(plugin, val)
             
             rootNoteNumber = plugin.rootNoteValue; % todo: Declaring this here to pass validation
@@ -1879,6 +1899,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.rootNoteValue = rootNoteNumber;
             end
             
+        end
+        
+        function updateRootGain1(plugin,val)
+            plugin.rootGain1 = val;
+        end
+        
+        function updateRootGain2(plugin,val)
+            plugin.rootGain2 = val;
+        end
+        
+        function updateRootGain3(plugin,val)
+            plugin.rootGain3 = val;
+        end
+        
+        function updateRootGain4(plugin,val)
+            plugin.rootGain4 = val;
+        end
+        
+        function updateRootGain5(plugin,val)
+            plugin.rootGain5 = val;
+        end
+        
+        function updateRootGain6(plugin,val)
+            plugin.rootGain6 = val;
+        end
+        
+        function updateRootGain7(plugin,val)
+            plugin.rootGain7 = val;
+        end
+        
+        function updateRootGain8(plugin,val)
+            plugin.rootGain8 = val;
+        end
+        
+        function updateRootGain9(plugin,val)
+            plugin.rootGain9 = val;
         end
         
         function updateThirdFrequencies(plugin)
