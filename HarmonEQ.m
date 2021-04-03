@@ -2055,6 +2055,19 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.stateChange = true;
         end
         
+        
+        function setThirdIntervalDistance(plugin,val)
+            plugin.thirdIntervalDistance = val;
+        end
+        
+        function setFifthIntervalDistance(plugin,val)
+            plugin.fifthIntervalDistance = val;
+        end
+        
+        function setSeventhIntervalDistance(plugin,val)
+            plugin.seventhIntervalDistance = val;
+        end
+        
         %--------------Filter (de)activation helper functions--------------
         function deactivateRootFilters(plugin)
             plugin.rootFiltersActive = false;
