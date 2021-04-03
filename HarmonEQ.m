@@ -983,16 +983,16 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 switch val
                     case 'Sus2'
                         %plugin.thirdIntervalDistance = 2;
-                        plugin.setThirdIntervalDistance(plugin,2);
+                        setThirdIntervalDistance(plugin,2);
                     case 'Min3'
                         %plugin.thirdIntervalDistance = 3;
-                        plugin.setThirdIntervalDistance(plugin,3);
+                        setThirdIntervalDistance(plugin,3);
                     case 'Maj3'
                         %plugin.thirdIntervalDistance = 4;
-                        plugin.setThirdIntervalDistance(plugin,4);
+                        setThirdIntervalDistance(plugin,4);
                     case 'Sus4'
                         %plugin.thirdIntervalDistance = 5;
-                        plugin.setThirdIntervalDistance(plugin,5);
+                        setThirdIntervalDistance(plugin,5);
                 end
                 
                 %plugin.thirdFiltersActive = true;
