@@ -1614,12 +1614,12 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %--------------------Design Filter Coefficients--------------------
         function [b, a] = peakNotchFilterCoeffs(~, fs, frequency, Q, gain)
             % prep
-            A = 10.^(gain/40);
+            Amp = 10.^(gain/40);
             omega0 = 2 * pi * frequency / fs;
             cos_omega = -2 * cos(omega0);
             alpha = sin(omega0) / (2  * Q);
-            alpha_A = alpha * A;
-            alpha_div_A = alpha / A;
+            alpha_A = alpha * Amp;
+            alpha_div_A = alpha / Amp;
             
             % Coefficients
             b0 = 1 + alpha_A;
