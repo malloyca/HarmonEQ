@@ -945,15 +945,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootQFactor = val;
             
             %TODO: This is temporary until I implement controls by range
-            plugin.rootQFactor1 = val;
-            plugin.rootQFactor2 = val;
-            plugin.rootQFactor3 = val;
-            plugin.rootQFactor4 = val;
-            plugin.rootQFactor5 = val;
-            plugin.rootQFactor6 = val;
-            plugin.rootQFactor7 = val;
-            plugin.rootQFactor8 = val;
-            plugin.rootQFactor9 = val;
+            updateRootQFactor1(plugin,val);
+            updateRootQFactor2(plugin,val)
+            updateRootQFactor3(plugin,val)
+            updateRootQFactor4(plugin,val)
+            updateRootQFactor5(plugin,val)
+            updateRootQFactor6(plugin,val)
+            updateRootQFactor7(plugin,val)
+            updateRootQFactor8(plugin,val)
+            updateRootQFactor9(plugin,val)
             
             setUpdateRootFilters(plugin);
             
@@ -1021,15 +1021,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdQFactor = val;
             
             %TODO: This is temporary until I implement controls by range
-            plugin.thirdQFactor1 = val;
-            plugin.thirdQFactor2 = val;
-            plugin.thirdQFactor3 = val;
-            plugin.thirdQFactor4 = val;
-            plugin.thirdQFactor5 = val;
-            plugin.thirdQFactor6 = val;
-            plugin.thirdQFactor7 = val;
-            plugin.thirdQFactor8 = val;
-            plugin.thirdQFactor9 = val;
+            updateThirdQFactor1(plugin,val);
+            updateThirdQFactor2(plugin,val);
+            updateThirdQFactor3(plugin,val);
+            updateThirdQFactor4(plugin,val);
+            updateThirdQFactor5(plugin,val);
+            updateThirdQFactor6(plugin,val);
+            updateThirdQFactor7(plugin,val);
+            updateThirdQFactor8(plugin,val);
+            updateThirdQFactor9(plugin,val);
             
             setUpdateThirdFilters(plugin);
             
@@ -1096,15 +1096,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthQFactor = val;
             
             %TODO: This is temporary until I implement controls by range
-            plugin.fifthQFactor1 = val;
-            plugin.fifthQFactor2 = val;
-            plugin.fifthQFactor3 = val;
-            plugin.fifthQFactor4 = val;
-            plugin.fifthQFactor5 = val;
-            plugin.fifthQFactor6 = val;
-            plugin.fifthQFactor7 = val;
-            plugin.fifthQFactor8 = val;
-            plugin.fifthQFactor9 = val;
+            updateFifthQFactor1(plugin,val);
+            updateFifthQFactor2(plugin,val);
+            updateFifthQFactor3(plugin,val);
+            updateFifthQFactor4(plugin,val);
+            updateFifthQFactor5(plugin,val);
+            updateFifthQFactor6(plugin,val);
+            updateFifthQFactor7(plugin,val);
+            updateFifthQFactor8(plugin,val);
+            updateFifthQFactor9(plugin,val);
             
             setUpdateFifthFilters(plugin);
             
@@ -1169,15 +1169,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhQFactor = val;
             
             %TODO: This is temporary until I implement controls by range
-            plugin.seventhQFactor1 = val;
-            plugin.seventhQFactor2 = val;
-            plugin.seventhQFactor3 = val;
-            plugin.seventhQFactor4 = val;
-            plugin.seventhQFactor5 = val;
-            plugin.seventhQFactor6 = val;
-            plugin.seventhQFactor7 = val;
-            plugin.seventhQFactor8 = val;
-            plugin.seventhQFactor9 = val;
+            updateSeventhQFactor1(plugin,val);
+            updateSeventhQFactor2(plugin,val);
+            updateSeventhQFactor3(plugin,val);
+            updateSeventhQFactor4(plugin,val);
+            updateSeventhQFactor5(plugin,val);
+            updateSeventhQFactor6(plugin,val);
+            updateSeventhQFactor7(plugin,val);
+            updateSeventhQFactor8(plugin,val);
+            updateSeventhQFactor9(plugin,val);
             
             setUpdateSeventhFilters(plugin);
             
@@ -1196,8 +1196,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateRootGain9(plugin,val);
             %plugin.thirdGain9 = val;
             updateThirdGain9(plugin,val);
-            plugin.fifthGain9 = val;
-            plugin.seventhGain9 = val;
+            %plugin.fifthGain9 = val;
+            updateFifthGain9(plugin,val);
+            %plugin.seventhGain9 = val;
+            updateSeventhGain9(plugin,val);
             
             
             %plugin.updateRootFilter9 = true;
@@ -2010,6 +2012,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.rootGain9 = val;
         end
         
+        function updateRootQFactor1(plugin,val)
+            plugin.rootQFactor1 = val;
+        end
+        
+        function updateRootQFactor2(plugin,val)
+            plugin.rootQFactor2 = val;
+        end
+        
+        function updateRootQFactor3(plugin,val)
+            plugin.rootQFactor3 = val;
+        end
+        
+        function updateRootQFactor4(plugin,val)
+            plugin.rootQFactor4 = val;
+        end
+        
+        function updateRootQFactor5(plugin,val)
+            plugin.rootQFactor5 = val;
+        end
+        
+        function updateRootQFactor6(plugin,val)
+            plugin.rootQFactor6 = val;
+        end
+        
+        function updateRootQFactor7(plugin,val)
+            plugin.rootQFactor7 = val;
+        end
+        
+        function updateRootQFactor8(plugin,val)
+            plugin.rootQFactor8 = val;
+        end
+        
+        function updateRootQFactor9(plugin,val)
+            plugin.rootQFactor9 = val;
+        end
+        
         function setUpdateRootFilter1(plugin)
             plugin.updateRootFilter1 = true;
         end
@@ -2057,6 +2095,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateRootFilter8 = true;
             plugin.updateRootFilter9 = true;
             plugin.stateChange = true;
+        end
+        
+        function deactivateRootFilters(plugin)
+            plugin.rootFiltersActive = false;
+        end
+        
+        function activateRootFilters(plugin)
+            plugin.rootFiltersActive = true;
         end
         
         
@@ -2144,6 +2190,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdGain9 = val;
         end
         
+        function updateThirdQFactor1(plugin,val)
+            plugin.thirdQFactor1 = val;
+        end
+        
+        function updateThirdQFactor2(plugin,val)
+            plugin.thirdQFactor2 = val;
+        end
+        
+        function updateThirdQFactor3(plugin,val)
+            plugin.thirdQFactor3 = val;
+        end
+        
+        function updateThirdQFactor4(plugin,val)
+            plugin.thirdQFactor4 = val;
+        end
+        
+        function updateThirdQFactor5(plugin,val)
+            plugin.thirdQFactor5 = val;
+        end
+        
+        function updateThirdQFactor6(plugin,val)
+            plugin.thirdQFactor6 = val;
+        end
+        
+        function updateThirdQFactor7(plugin,val)
+            plugin.thirdQFactor7 = val;
+        end
+        
+        function updateThirdQFactor8(plugin,val)
+            plugin.thirdQFactor8 = val;
+        end
+        
+        function updateThirdQFactor9(plugin,val)
+            plugin.thirdQFactor9 = val;
+        end
+        
         function setUpdateThirdFilter1(plugin)
             plugin.updateThirdFilter1 = true;
         end
@@ -2195,6 +2277,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function setThirdIntervalDistance(plugin,val)
             plugin.thirdIntervalDistance = val;
+        end
+        
+        function deactivateThirdFilters(plugin)
+            plugin.thirdFiltersActive = false;
+        end
+        
+        function activateThirdFilters(plugin)
+            plugin.thirdFiltersActive = true;
         end
         
         
@@ -2282,6 +2372,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthGain9 = val;
         end
         
+        function updateFifthQFactor1(plugin,val)
+            plugin.fifthQFactor1 = val;
+        end
+        
+        function updateFifthQFactor2(plugin,val)
+            plugin.fifthQFactor2 = val;
+        end
+        
+        function updateFifthQFactor3(plugin,val)
+            plugin.fifthQFactor3 = val;
+        end
+        
+        function updateFifthQFactor4(plugin,val)
+            plugin.fifthQFactor4 = val;
+        end
+        
+        function updateFifthQFactor5(plugin,val)
+            plugin.fifthQFactor5 = val;
+        end
+        
+        function updateFifthQFactor6(plugin,val)
+            plugin.fifthQFactor6 = val;
+        end
+        
+        function updateFifthQFactor7(plugin,val)
+            plugin.fifthQFactor7 = val;
+        end
+        
+        function updateFifthQFactor8(plugin,val)
+            plugin.fifthQFactor8 = val;
+        end
+        
+        function updateFifthQFactor9(plugin,val)
+            plugin.fifthQFactor9 = val;
+        end
+        
         function setUpdateFifthFilter1(plugin)
             plugin.updateFifthFilter1 = true;
         end
@@ -2333,6 +2459,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function setFifthIntervalDistance(plugin,val)
             plugin.fifthIntervalDistance = val;
+        end
+        
+        function deactivateFifthFilters(plugin)
+            plugin.fifthFiltersActive = false;
+        end
+        
+        function activateFifthFilters(plugin)
+            plugin.fifthFiltersActive = true;
         end
         
         
@@ -2417,6 +2551,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhGain9 = val;
         end
         
+        function updateSeventhQFactor1(plugin,val)
+            plugin.seventhQFactor1 = val;
+        end
+        
+        function updateSeventhQFactor2(plugin,val)
+            plugin.seventhQFactor2 = val;
+        end
+        
+        function updateSeventhQFactor3(plugin,val)
+            plugin.seventhQFactor3 = val;
+        end
+        
+        function updateSeventhQFactor4(plugin,val)
+            plugin.seventhQFactor4 = val;
+        end
+        
+        function updateSeventhQFactor5(plugin,val)
+            plugin.seventhQFactor5 = val;
+        end
+        
+        function updateSeventhQFactor6(plugin,val)
+            plugin.seventhQFactor6 = val;
+        end
+        
+        function updateSeventhQFactor7(plugin,val)
+            plugin.seventhQFactor7 = val;
+        end
+        
+        function updateSeventhQFactor8(plugin,val)
+            plugin.seventhQFactor8 = val;
+        end
+        
+        function updateSeventhQFactor9(plugin,val)
+            plugin.seventhQFactor9 = val;
+        end
+        
         function setUpdateSeventhFilter1(plugin)
             plugin.updateSeventhFilter1 = true;
         end
@@ -2468,32 +2638,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function setSeventhIntervalDistance(plugin,val)
             plugin.seventhIntervalDistance = val;
-        end
-        
-        
-        %--------------Filter (de)activation helper functions--------------
-        function deactivateRootFilters(plugin)
-            plugin.rootFiltersActive = false;
-        end
-        
-        function activateRootFilters(plugin)
-            plugin.rootFiltersActive = true;
-        end
-        
-        function deactivateThirdFilters(plugin)
-            plugin.thirdFiltersActive = false;
-        end
-        
-        function activateThirdFilters(plugin)
-            plugin.thirdFiltersActive = true;
-        end
-        
-        function deactivateFifthFilters(plugin)
-            plugin.fifthFiltersActive = false;
-        end
-        
-        function activateFifthFilters(plugin)
-            plugin.fifthFiltersActive = true;
         end
         
         function deactivateSeventhFilters(plugin)
