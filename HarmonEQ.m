@@ -1258,10 +1258,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.thirdGain8 = val;
             updateThirdGain7(plugin,val);
             updateThirdGain8(plugin,val);
-            plugin.fifthGain7 = val;
-            plugin.fifthGain8 = val;
-            plugin.seventhGain7 = val;
-            plugin.seventhGain8 = val;
+            %plugin.fifthGain7 = val;
+            %plugin.fifthGain8 = val;
+            %plugin.seventhGain7 = val;
+            %plugin.seventhGain8 = val;
+            updateFifthGain7(plugin,val);
+            updateFifthGain8(plugin,val);
+            updateSeventhGain7(plugin,val);
+            updateSeventhGain8(plugin,val);
             
             
             %plugin.updateRootFilter7 = true;
