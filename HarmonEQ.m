@@ -1294,15 +1294,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.highMidRegionQFactor = val;
             
             %todo: also create helper functions for this...
-            plugin.rootQFactor7 = val;
-            plugin.rootQFactor8 = val;
-            plugin.thirdQFactor7 = val;
-            plugin.thirdQFactor8 = val;
-            plugin.fifthQFactor7 = val;
-            plugin.fifthQFactor8 = val;
-            plugin.seventhQFactor7 = val;
-            plugin.seventhQFactor8 = val;
-            
+            %plugin.rootQFactor7 = val;
+            %plugin.rootQFactor8 = val;
+            %plugin.thirdQFactor7 = val;
+            %plugin.thirdQFactor8 = val;
+            %plugin.fifthQFactor7 = val;
+            %plugin.fifthQFactor8 = val;
+            %plugin.seventhQFactor7 = val;
+            %plugin.seventhQFactor8 = val;
+            updateRootQFactor7(plugin,val);
+            updateRootQFactor8(plugin,val);
+            updateThirdQFactor7(plugin,val);
+            updateThirdQFactor8(plugin,val);
+            updateFifthQFactor7(plugin,val);
+            updateFifthQFactor8(plugin,val);
+            updateSeventhQFactor7(plugin,val);
+            updateSeventhQFactor8(plugin,val);
             
             %plugin.updateRootFilter7 = true;
             %plugin.updateRootFilter8 = true;
