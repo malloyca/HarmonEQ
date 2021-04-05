@@ -1706,14 +1706,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.fifthQFactor6 = val;
             %plugin.seventhQFactor5 = val;
             %plugin.seventhQFactor6 = val;
-            updateRootQFactor5(plugin,val);
-            updateRootQFactor6(plugin,val);
-            updateThirdQFactor5(plugin,val);
-            updateThirdQFactor6(plugin,val);
-            updateFifthQFactor5(plugin,val);
-            updateFifthQFactor6(plugin,val);
-            updateSeventhQFactor5(plugin,val);
-            updateSeventhQFactor6(plugin,val);
+            %updateRootQFactor5(plugin,val);
+            %updateRootQFactor6(plugin,val);
+            %updateThirdQFactor5(plugin,val);
+            %updateThirdQFactor6(plugin,val);
+            %updateFifthQFactor5(plugin,val);
+            %updateFifthQFactor6(plugin,val);
+            %updateSeventhQFactor5(plugin,val);
+            %updateSeventhQFactor6(plugin,val);
             
             
             %plugin.updateRootFilter5 = true;
@@ -1724,14 +1724,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.updateFifthFilter6 = true;
             %plugin.updateSeventhFilter5 = true;
             %plugin.updateSeventhFilter6 = true;
-            setUpdateRootFilter5(plugin);
-            setUpdateRootFilter6(plugin);
-            setUpdateThirdFilter5(plugin);
-            setUpdateThirdFilter6(plugin);
-            setUpdateFifthFilter5(plugin);
-            setUpdateFifthFilter6(plugin);
-            setUpdateSeventhFilter5(plugin);
-            setUpdateSeventhFilter6(plugin);
+            %setUpdateRootFilter5(plugin);
+            %setUpdateRootFilter6(plugin);
+            %setUpdateThirdFilter5(plugin);
+            %setUpdateThirdFilter6(plugin);
+            %setUpdateFifthFilter5(plugin);
+            %setUpdateFifthFilter6(plugin);
+            %setUpdateSeventhFilter5(plugin);
+            %setUpdateSeventhFilter6(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
