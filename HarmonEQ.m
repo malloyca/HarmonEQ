@@ -1223,27 +1223,60 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.highRegionGain(plugin,val)
             plugin.highRegionGain = val;
             
-            %todo: For now this will only control the first two octaves of
-            %filters
-            %todo: Create updateLowRegionGain function to handle this
-            %plugin.rootGain9 = val;
-            updateRootGain9(plugin,val);
-            %plugin.thirdGain9 = val;
-            updateThirdGain9(plugin,val);
+            % This currently always controls the high octave of filters and
+            % can be configured to control the 8th octave as well
+            
+            if (plugin.rootFrequency9 > plugin.highCrossoverFreq)
+                updateRootGain9(plugin,val);
+                setUpdateRootFilter9(plugin);
+            end
+            if (plugin.rootFrequency8 > plugin.highCrossoverFreq)
+                updateRootGain8(plugin,val);
+                setUpdateRootFilter8(plugin);
+            end
+            
+            if (plugin.thirdFrequency9 > plugin.highCrossoverFreq)
+                updateThirdGain9(plugin,val);
+                setUpdateThirdFilter9(plugin);
+            end
+            if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
+                updateThirdGain8(plugin,val);
+                setUpdateThirdFilter8(plugin);
+            end
+            
+            if (plugin.fifthFrequency9 > plugin.highCrossoverFreq)
+                updateFifthGain9(plugin,val);
+                setUpdateFifthFilter9(plugin);
+            end
+            if (plugin.fifthFrequency8 > plugin.highCrossoverFreq)
+                updateFifthGain8(plugin,val);
+                setUpdateFifthFilter8(plugin);
+            end
+            
+            if (plugin.seventhFrequency9 > plugin.highCrossoverFreq)
+                updateSeventhGain9(plugin,val);
+                setUpdateSeventhFilter9(plugin);
+            end
+            if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
+                updateSeventhGain8(plugin,val);
+                setUpdateSeventhFilter8(plugin);
+            end
+            
+            %updateThirdGain9(plugin,val);
             %plugin.fifthGain9 = val;
-            updateFifthGain9(plugin,val);
+            %updateFifthGain9(plugin,val);
             %plugin.seventhGain9 = val;
-            updateSeventhGain9(plugin,val);
+            %updateSeventhGain9(plugin,val);
             
             
             %plugin.updateRootFilter9 = true;
             %plugin.updateThirdFilter9 = true;
             %plugin.updateFifthFilter9 = true;
             %plugin.updateSeventhFilter9 = true;
-            setUpdateRootFilter9(plugin);
-            setUpdateThirdFilter9(plugin);
-            setUpdateFifthFilter9(plugin);
-            setUpdateSeventhFilter9(plugin);
+            %setUpdateRootFilter9(plugin);
+            %setUpdateThirdFilter9(plugin);
+            %setUpdateFifthFilter9(plugin);
+            %setUpdateSeventhFilter9(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1635,6 +1668,23 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
+        end
+        
+        %------------------------Crossover controls------------------------
+        function set.highCrossoverFreq(plugin,val)
+            plugin.highCrossoverFreq = val;
+        end
+        
+        function set.midHighCrossoverFreq(plugin,val)
+            plugin.midHighCrossoverFreq = val;
+        end
+        
+        function set.lowMidCrossoverFreq(plugin,val)
+            plugin.lowMidCrossoverFreq = val;
+        end
+        
+        function set.lowCrossoverFreq(plugin,val)
+            plugin.lowCrossoverFreq = val;
         end
         
     end
