@@ -1354,7 +1354,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.highMidRegionGain(plugin,val)
             plugin.highMidRegionGain = val;
             
-            %bookmark
+            % todo: Maybe I should update the setUpdate... filter plugins
+            % to check the freq and Q when the update rather than doing it
+            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
+            % within that. Then I don't have to manage gain and Q
+            % directly...
             if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
                 updateRootGain8(plugin,val);
                 setUpdateRootFilter8(plugin);
@@ -1447,6 +1451,58 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.highMidRegionQFactor(plugin,val)
             plugin.highMidRegionQFactor = val;
             
+            % todo: Maybe I should update the setUpdate... filter plugins
+            % to check the freq and Q when the update rather than doing it
+            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
+            % within that. Then I don't have to manage gain and Q
+            % directly...
+            if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
+                updateRootQFactor8(plugin,val);
+                setUpdateRootFilter8(plugin);
+            end
+            updateRootQFactor7(plugin,val);
+            setUpdateRootFilter7(plugin);
+            if (plugin.rootFrequency6 > plugin.midHighCrossoverFreq)
+                updateRootQFactor6(plugin,val);
+                setUpdateRootFilter6(plugin);
+            end
+            
+            if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
+                updateThirdQFactor8(plugin,val);
+                setUpdateThirdFilter8(plugin);
+            end
+            updateThirdQFactor7(plugin,val);
+            setUpdateThirdFilter7(plugin);
+            if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
+                updateThirdQFactor6(plugin,val);
+                setUpdateThirdFilter6(plugin);
+            end
+            
+            if (plugin.fifthFrequency8 < plugin.highCrossoverFreq)
+                updateFifthQFactor8(plugin,val);
+                setUpdateFifthFilter8(plugin);
+            end
+            updateFifthQFactor7(plugin,val);
+            setUpdateFifthFilter7(plugin);
+            if (plugin.fifthFrequency6 > plugin.midHighCrossoverFreq)
+                updateFifthQFactor6(plugin,val);
+                setUpdateFifthFilter6(plugin);
+            end
+            
+            if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
+                updateSeventhQFactor8(plugin,val);
+                setUpdateSeventhFilter8(plugin);
+            end
+            updateSeventhQFactor7(plugin,val);
+            setUpdateSeventhFilter7(plugin);
+            if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
+                updateSeventhQFactor6(plugin,val);
+                setUpdateSeventhFilter6(plugin);
+            end
+            
+            
+            
+            
             %todo: also create helper functions for this...
             %plugin.rootQFactor7 = val;
             %plugin.rootQFactor8 = val;
@@ -1456,14 +1512,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.fifthQFactor8 = val;
             %plugin.seventhQFactor7 = val;
             %plugin.seventhQFactor8 = val;
-            updateRootQFactor7(plugin,val);
-            updateRootQFactor8(plugin,val);
-            updateThirdQFactor7(plugin,val);
-            updateThirdQFactor8(plugin,val);
-            updateFifthQFactor7(plugin,val);
-            updateFifthQFactor8(plugin,val);
-            updateSeventhQFactor7(plugin,val);
-            updateSeventhQFactor8(plugin,val);
+            %updateRootQFactor7(plugin,val);
+            %updateRootQFactor8(plugin,val);
+            %updateThirdQFactor7(plugin,val);
+            %updateThirdQFactor8(plugin,val);
+            %updateFifthQFactor7(plugin,val);
+            %updateFifthQFactor8(plugin,val);
+            %updateSeventhQFactor7(plugin,val);
+            %updateSeventhQFactor8(plugin,val);
             
             %plugin.updateRootFilter7 = true;
             %plugin.updateRootFilter8 = true;
@@ -1473,14 +1529,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.updateFifthFilter8 = true;
             %plugin.updateSeventhFilter7 = true;
             %plugin.updateSeventhFilter8 = true;
-            setUpdateRootFilter7(plugin);
-            setUpdateRootFilter8(plugin);
-            setUpdateThirdFilter7(plugin);
-            setUpdateThirdFilter8(plugin);
-            setUpdateFifthFilter7(plugin);
-            setUpdateFifthFilter8(plugin);
-            setUpdateSeventhFilter7(plugin);
-            setUpdateSeventhFilter8(plugin);
+            %setUpdateRootFilter7(plugin);
+            %setUpdateRootFilter8(plugin);
+            %setUpdateThirdFilter7(plugin);
+            %setUpdateThirdFilter8(plugin);
+            %setUpdateFifthFilter7(plugin);
+            %setUpdateFifthFilter8(plugin);
+            %setUpdateSeventhFilter7(plugin);
+            %setUpdateSeventhFilter8(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1490,25 +1546,78 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.midRegionGain(plugin,val)
             plugin.midRegionGain = val;
             
+            % todo: Maybe I should update the setUpdate... filter plugins
+            % to check the freq and Q when the update rather than doing it
+            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
+            % within that. Then I don't have to manage gain and Q
+            % directly...
+            if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
+                updateRootGain6(plugin,val);
+                setUpdateRootFilter6(plugin);
+            end
+            updateRootGain5(plugin,val);
+            setUpdateRootFilter5(plugin);
+            if (plugin.rootFrequency4 > plugin.lowMidCrossoverFreq)
+                updateRootGain4(plugin,val);
+                setUpdateRootFilter4(plugin);
+            end
+            
+            if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
+                updateThirdGain6(plugin,val);
+                setUpdateThirdFilter6(plugin);
+            end
+            updateThirdGain5(plugin,val);
+            setUpdateThirdFilter5(plugin);
+            if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
+                updateThirdGain4(plugin,val);
+                setUpdateThirdFilter4(plugin);
+            end
+            
+            if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
+                updateFifthGain6(plugin,val);
+                setUpdateFifthFilter6(plugin);
+            end
+            updateFifthGain5(plugin,val);
+            setUpdateFifthFilter5(plugin);
+            if (plugin.fifthFrequency4 > plugin.lowMidCrossoverFreq)
+                updateFifthGain4(plugin,val);
+                setUpdateFifthFilter4(plugin);
+            end
+            
+            if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
+                updateSeventhGain6(plugin,val);
+                setUpdateSeventhFilter6(plugin);
+            end
+            updateSeventhGain5(plugin,val);
+            setUpdateSeventhFilter5(plugin);
+            if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
+                updateSeventhGain4(plugin,val);
+                setUpdateSeventhFilter4(plugin);
+            end
+            
+            
+            
+            
+            
             %todo: For now this will only control the first two octaves of
             %filters
             %todo: Create updateLowRegionGain function to handle this
             %plugin.rootGain5 = val;
             %plugin.rootGain6 = val;
-            updateRootGain5(plugin,val);
-            updateRootGain6(plugin,val);
+            %updateRootGain5(plugin,val);
+            %updateRootGain6(plugin,val);
             %plugin.thirdGain5 = val;
             %plugin.thirdGain6 = val;
-            updateThirdGain5(plugin,val);
-            updateThirdGain6(plugin,val);
+            %updateThirdGain5(plugin,val);
+            %updateThirdGain6(plugin,val);
             %plugin.fifthGain5 = val;
             %plugin.fifthGain6 = val;
             %plugin.seventhGain5 = val;
             %plugin.seventhGain6 = val;
-            updateFifthGain5(plugin,val);
-            updateFifthGain6(plugin,val);
-            updateSeventhGain5(plugin,val);
-            updateSeventhGain6(plugin,val);
+            %updateFifthGain5(plugin,val);
+            %updateFifthGain6(plugin,val);
+            %updateSeventhGain5(plugin,val);
+            %updateSeventhGain6(plugin,val);
             
             
             %plugin.updateRootFilter5 = true;
@@ -1519,14 +1628,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %plugin.updateFifthFilter6 = true;
             %plugin.updateSeventhFilter5 = true;
             %plugin.updateSeventhFilter6 = true;
-            setUpdateRootFilter5(plugin);
-            setUpdateRootFilter6(plugin);
-            setUpdateThirdFilter5(plugin);
-            setUpdateThirdFilter6(plugin);
-            setUpdateFifthFilter5(plugin);
-            setUpdateFifthFilter6(plugin);
-            setUpdateSeventhFilter5(plugin);
-            setUpdateSeventhFilter6(plugin);
+            %setUpdateRootFilter5(plugin);
+            %setUpdateRootFilter6(plugin);
+            %setUpdateThirdFilter5(plugin);
+            %setUpdateThirdFilter6(plugin);
+            %setUpdateFifthFilter5(plugin);
+            %setUpdateFifthFilter6(plugin);
+            %setUpdateSeventhFilter5(plugin);
+            %setUpdateSeventhFilter6(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
