@@ -73,3 +73,4 @@ This project is currently in active development. The primary DSP functionality i
 
 
 ## Bug List
+- Currently, changing a crossover frequency does not update the gain/Q for a filter being passed from one control region to another. Changing the chord also does not update this. I think the solution is to implement gain and Q updating in the `setUpdateRootFilter1`, etc functions instead of doing it directly in the setter functions. This should not be difficult to implement, but will require a lot of code revision.
