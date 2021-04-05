@@ -1286,25 +1286,61 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.highRegionQFactor(plugin,val)
             plugin.highRegionQFactor = val;
             
-            %todo: also create helper functions for this...
+            if (plugin.rootFrequency9 > plugin.highCrossoverFreq)
+                updateRootQFactor9(plugin,val);
+                setUpdateRootFilter9(plugin);
+            end
+            if (plugin.rootFrequency8 > plugin.highCrossoverFreq)
+                updateRootQFactor8(plugin,val);
+                setUpdateRootFilter8(plugin);
+            end
+            
+            if (plugin.thirdFrequency9 > plugin.highCrossoverFreq)
+                updateThirdQFactor9(plugin,val);
+                setUpdateThirdFilter9(plugin);
+            end
+            if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
+                updateThirdQFactor8(plugin,val);
+                setUpdateThirdFilter8(plugin);
+            end
+            
+            if (plugin.fifthFrequency9 > plugin.highCrossoverFreq)
+                updateFifthQFactor9(plugin,val);
+                setUpdateFifthFilter9(plugin);
+            end
+            if (plugin.fifthFrequency8 > plugin.highCrossoverFreq)
+                updateFifthQFactor8(plugin,val);
+                setUpdateFifthFilter8(plugin);
+            end
+            
+            if (plugin.seventhFrequency9 > plugin.highCrossoverFreq)
+                updateSeventhQFactor9(plugin,val);
+                setUpdateSeventhFilter9(plugin);
+            end
+            if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
+                updateSeventhQFactor8(plugin,val);
+                setUpdateSeventhFilter8(plugin);
+            end
+            
+            
             %plugin.rootQFactor9 = val;
             %plugin.thirdQFactor9 = val;
             %plugin.fifthQFactor9 = val;
             %plugin.seventhQFactor9 = val;
-            updateRootQFactor9(plugin,val);
-            updateThirdQFactor9(plugin,val);
-            updateFifthQFactor9(plugin,val);
-            updateSeventhQFactor9(plugin,val);
+            %updateRootQFactor9(plugin,val);
+            %updateThirdQFactor9(plugin,val);
+            %updateFifthQFactor9(plugin,val);
+            %updateSeventhQFactor9(plugin,val);
             
             
             %plugin.updateRootFilter9 = true;
             %plugin.updateThirdFilter9 = true;
             %plugin.updateFifthFilter9 = true;
             %plugin.updateSeventhFilter9 = true;
-            setUpdateRootFilter9(plugin);
-            setUpdateThirdFilter9(plugin);
-            setUpdateFifthFilter9(plugin);
-            setUpdateSeventhFilter9(plugin);
+            %setUpdateRootFilter9(plugin);
+            %setUpdateThirdFilter9(plugin);
+            %setUpdateFifthFilter9(plugin);
+            %setUpdateSeventhFilter9(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
