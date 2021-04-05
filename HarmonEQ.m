@@ -1645,6 +1645,58 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.midRegionQFactor(plugin,val)
             plugin.midRegionQFactor = val;
             
+            % todo: Maybe I should update the setUpdate... filter plugins
+            % to check the freq and Q when the update rather than doing it
+            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
+            % within that. Then I don't have to manage gain and Q
+            % directly...
+            if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
+                updateRootQFactor6(plugin,val);
+                setUpdateRootFilter6(plugin);
+            end
+            updateRootQFactor5(plugin,val);
+            setUpdateRootFilter5(plugin);
+            if (plugin.rootFrequency4 > plugin.lowMidCrossoverFreq)
+                updateRootQFactor4(plugin,val);
+                setUpdateRootFilter4(plugin);
+            end
+            
+            if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
+                updateThirdQFactor6(plugin,val);
+                setUpdateThirdFilter6(plugin);
+            end
+            updateThirdQFactor5(plugin,val);
+            setUpdateThirdFilter5(plugin);
+            if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
+                updateThirdQFactor4(plugin,val);
+                setUpdateThirdFilter4(plugin);
+            end
+            
+            if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
+                updateFifthQFactor6(plugin,val);
+                setUpdateFifthFilter6(plugin);
+            end
+            updateFifthQFactor5(plugin,val);
+            setUpdateFifthFilter5(plugin);
+            if (plugin.fifthFrequency4 > plugin.lowMidCrossoverFreq)
+                updateFifthQFactor4(plugin,val);
+                setUpdateFifthFilter4(plugin);
+            end
+            
+            if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
+                updateSeventhQFactor6(plugin,val);
+                setUpdateSeventhFilter6(plugin);
+            end
+            updateSeventhQFactor5(plugin,val);
+            setUpdateSeventhFilter5(plugin);
+            if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
+                updateSeventhQFactor4(plugin,val);
+                setUpdateSeventhFilter4(plugin);
+            end
+            
+            
+            
+            
             %todo: also create helper functions for this...
             %plugin.rootQFactor5 = val;
             %plugin.rootQFactor6 = val;
