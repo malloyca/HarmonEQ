@@ -4,10 +4,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
 % v0.2-alpha
 % Last updated: 31 March 2021
 %
-% This is a new test version for HarmonEQ to rebuild it froms scratch. I'm
-% finding using the Matlab example plugin as a base overwhelming due to
-% there being so much stuff that I don't understand. I want to start with
-% something very basic that hopefully I can understand.
+% This plugin presents a new control scheme for the traditional equalizer.
+% Most people are familiar with the various types of EQs out there
+% (graphics EQs, parametric and semi-parametric EQs, etc). These tools work
+% well for many jobs, but sometimes certain situations would benefit from
+% an EQ that is defined in a more musically-informed way. HarmonEQ is a
+% plugin designed to showcase a new control paradigm for the standard
+% parametric EQ that is based on harmony instead of direct frequency
+% control by the user. This allows the user to target the EQ more finely
+% based on the current harmony of a track.
 %
 % To run this with the visualizer in Matlab, run these commands:
 % eq = HarmonEQ;
@@ -19,7 +24,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
 % To export as a VST, run:
 % generateAudioPlugin -outdir plugins HarmonEQ
 % To export as an AU (on macOS):
-% 
+% generateAudioPlugin -au -outdir plugins HarmonEQ
 
 
 % TODO:
@@ -32,26 +37,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
     properties
         rootNote = 'C';
         rootNoteValue = 0;
-        rootGain = 0; %deprecated
-        rootQFactor = 26; %deprecated
+        rootGain = 0; %deprecated %todo: remove
+        rootQFactor = 26; %deprecated %todo: remove
         
         thirdInterval = 'off';
         thirdIntervalDistance = 4;
         thirdNote = 'E';
-        thirdGain = 0; %deprecated
-        thirdQFactor = 26; %deprecated
+        thirdGain = 0; %deprecated %todo: remove
+        thirdQFactor = 26; %deprecated %todo: remove
         
         fifthInterval = 'off';
         fifthIntervalDistance = 7;
         fifthNote = 'G';
-        fifthGain = 0; %deprecated
-        fifthQFactor = 26; %deprecated
+        fifthGain = 0; %deprecated %todo: remove
+        fifthQFactor = 26; %deprecated %todo: remove
         
         seventhInterval = 'off';
         seventhIntervalDistance = 11;
         seventhNote = 'B';
-        seventhGain = 0; %deprecated
-        seventhQFactor = 26; %deprecated
+        seventhGain = 0; %deprecated %todo: remove
+        seventhQFactor = 26; %deprecated %todo: remove
         
         %----------
         highRegionGain = 0;
@@ -271,12 +276,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     % CONSTANT PROPERTIES (INTERFACE)
     %----------------------------------------------------------------------
-    
-    %TODO: This is currently working, but is ugly. Need to do:
-    % - Add more rows so that the drop down menus in the right column
-    % aren't so tall
-    % - Add extra rows so that there is room for labels
-    % - Eventually... Add extra columns for crossover knobs
     
     properties (Constant, Hidden)
         PluginInterface = audioPluginInterface(...
