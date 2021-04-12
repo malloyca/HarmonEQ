@@ -36,29 +36,21 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     properties
         rootNote = 'C';
-        rootNoteValue = 0;
-        rootGain = 0; %deprecated %todo: remove
-        rootQFactor = 26; %deprecated %todo: remove
+        rootNoteValue = 0; %todo: move this to private
         
         thirdInterval = 'off';
-        thirdIntervalDistance = 4;
-        thirdNote = 'E';
-        thirdGain = 0; %deprecated %todo: remove
-        thirdQFactor = 26; %deprecated %todo: remove
+        thirdIntervalDistance = 4; %todo: move this to private
+        thirdNote = 'E'; %todo: move this to private
         
         fifthInterval = 'off';
-        fifthIntervalDistance = 7;
-        fifthNote = 'G';
-        fifthGain = 0; %deprecated %todo: remove
-        fifthQFactor = 26; %deprecated %todo: remove
+        fifthIntervalDistance = 7; %todo: move this to private
+        fifthNote = 'G'; %todo: move this to private
         
         seventhInterval = 'off';
-        seventhIntervalDistance = 11;
-        seventhNote = 'B';
-        seventhGain = 0; %deprecated %todo: remove
-        seventhQFactor = 26; %deprecated %todo: remove
+        seventhIntervalDistance = 11; %todo: move this to private
+        seventhNote = 'B'; %todo: move this to private
         
-        %----------
+        %---------------------Region Gain and Q Values---------------------
         highRegionGain = 0;
         highRegionQFactor = 26;
         
@@ -952,47 +944,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin,true);
         end
         
-        %todo: this function is no longer necessary
-        function set.rootGain(plugin,val)
-            plugin.rootGain = val;
-            
-            %TODO: This is temporary until I implement range gain controls
-            updateRootGain1(plugin,val);
-            updateRootGain2(plugin,val);
-            updateRootGain3(plugin,val);
-            updateRootGain4(plugin,val);
-            updateRootGain5(plugin,val);
-            updateRootGain6(plugin,val);
-            updateRootGain7(plugin,val);
-            updateRootGain8(plugin,val);
-            updateRootGain9(plugin,val);
-            
-            setUpdateRootFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        %todo: this function is no longer necessary
-        function set.rootQFactor(plugin,val)
-            plugin.rootQFactor = val;
-            
-            %TODO: This is temporary until I implement controls by range
-            updateRootQFactor1(plugin,val);
-            updateRootQFactor2(plugin,val)
-            updateRootQFactor3(plugin,val)
-            updateRootQFactor4(plugin,val)
-            updateRootQFactor5(plugin,val)
-            updateRootQFactor6(plugin,val)
-            updateRootQFactor7(plugin,val)
-            updateRootQFactor8(plugin,val)
-            updateRootQFactor9(plugin,val)
-            
-            setUpdateRootFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
         
         %--------------------------Harmonic Third--------------------------
         function set.thirdInterval(plugin,val)
@@ -1030,46 +981,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
-        function set.thirdGain(plugin,val)
-            plugin.thirdGain = val;
-            
-            %TODO: This is temporary until I implement range gain controls
-            updateThirdGain1(plugin,val);
-            updateThirdGain2(plugin,val);
-            updateThirdGain3(plugin,val);
-            updateThirdGain4(plugin,val);
-            updateThirdGain5(plugin,val);
-            updateThirdGain6(plugin,val);
-            updateThirdGain7(plugin,val);
-            updateThirdGain8(plugin,val);
-            updateThirdGain9(plugin,val);
-            
-            setUpdateThirdFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        function set.thirdQFactor(plugin,val)
-            plugin.thirdQFactor = val;
-            
-            %TODO: This is temporary until I implement controls by range
-            updateThirdQFactor1(plugin,val);
-            updateThirdQFactor2(plugin,val);
-            updateThirdQFactor3(plugin,val);
-            updateThirdQFactor4(plugin,val);
-            updateThirdQFactor5(plugin,val);
-            updateThirdQFactor6(plugin,val);
-            updateThirdQFactor7(plugin,val);
-            updateThirdQFactor8(plugin,val);
-            updateThirdQFactor9(plugin,val);
-            
-            setUpdateThirdFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
         
         %--------------------------Harmonic Fifth--------------------------
         function set.fifthInterval(plugin,val)
@@ -1102,46 +1013,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             end
             
             % update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        function set.fifthGain(plugin,val)
-            plugin.fifthGain = val;
-            
-            %TODO: This is temporary until I implement range gain controls
-            updateFifthGain1(plugin,val);
-            updateFifthGain2(plugin,val);
-            updateFifthGain3(plugin,val);
-            updateFifthGain4(plugin,val);
-            updateFifthGain5(plugin,val);
-            updateFifthGain6(plugin,val);
-            updateFifthGain7(plugin,val);
-            updateFifthGain8(plugin,val);
-            updateFifthGain9(plugin,val);
-            
-            setUpdateFifthFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        function set.fifthQFactor(plugin,val)
-            plugin.fifthQFactor = val;
-            
-            %TODO: This is temporary until I implement controls by range
-            updateFifthQFactor1(plugin,val);
-            updateFifthQFactor2(plugin,val);
-            updateFifthQFactor3(plugin,val);
-            updateFifthQFactor4(plugin,val);
-            updateFifthQFactor5(plugin,val);
-            updateFifthQFactor6(plugin,val);
-            updateFifthQFactor7(plugin,val);
-            updateFifthQFactor8(plugin,val);
-            updateFifthQFactor9(plugin,val);
-            
-            setUpdateFifthFilters(plugin);
-            
-            % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -1178,45 +1049,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin,true);
         end
         
-        function set.seventhGain(plugin,val)
-            plugin.seventhGain = val;
-            
-            %TODO: This is temporary until I implement range gain controls
-            updateSeventhGain1(plugin,val);
-            updateSeventhGain2(plugin,val);
-            updateSeventhGain3(plugin,val);
-            updateSeventhGain4(plugin,val);
-            updateSeventhGain5(plugin,val);
-            updateSeventhGain6(plugin,val);
-            updateSeventhGain7(plugin,val);
-            updateSeventhGain8(plugin,val);
-            updateSeventhGain9(plugin,val);
-            
-            setUpdateSeventhFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        function set.seventhQFactor(plugin,val)
-            plugin.seventhQFactor = val;
-            
-            %TODO: This is temporary until I implement controls by range
-            updateSeventhQFactor1(plugin,val);
-            updateSeventhQFactor2(plugin,val);
-            updateSeventhQFactor3(plugin,val);
-            updateSeventhQFactor4(plugin,val);
-            updateSeventhQFactor5(plugin,val);
-            updateSeventhQFactor6(plugin,val);
-            updateSeventhQFactor7(plugin,val);
-            updateSeventhQFactor8(plugin,val);
-            updateSeventhQFactor9(plugin,val);
-            
-            setUpdateSeventhFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
         
         %------------------------High Region Controls----------------------
         function set.highRegionGain(plugin,val)
@@ -3441,7 +3273,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %-------------------Filter coefficients updater--------------------
         function updateFilterCoefficientsMatrix(plugin)
             
-            %TODO
             % If root filters are active, then add their coefficients to
             % the coefficient matrices
             if plugin.rootFiltersActive
