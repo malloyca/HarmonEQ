@@ -282,8 +282,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'InputChannels',2,...
             'OutputChannels',2,...
             'PluginName','HarmonEQ',...
+            'VendorName','Colin Malloy',...
             'VendorVersion','0.2',...
-            ... %TEST - Working on implementing new test UI
+            ...
             audioPluginParameter('rootNote','DisplayName','Root Note',...
             'Mapping',{'enum','off','A','A# / Bb','B','C','C# / Db','D',...
             'D# / Eb','E','F','F# / Gb','G','G# / Ab'},...
@@ -809,7 +810,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             %TODO: updating visualizer too often? Really only need to
             %update it if the values change. Can track those.
-            %TEST
             if ~isempty(plugin.visualizerObject) && plugin.stateChange
                 updateVisualizer(plugin);
             end
@@ -2019,10 +2019,12 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.lowRegionQFactor = val;
             
             % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
+            % to check the freq and Q when thet update rather than doing it
             % here. Or have setUpdateRootFilter8 call updateRootGain8 from
             % within that. Then I don't have to manage gain and Q
             % directly...
+            
+            %TEST - I'm going to test creating new update functions
             if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
                 updateRootQFactor2(plugin,val);
                 setUpdateRootFilter2(plugin);
@@ -2097,18 +2099,27 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %------------------------Crossover controls------------------------
         function set.highCrossoverFreq(plugin,val)
             plugin.highCrossoverFreq = val;
+            
+            updateRootFilter8Params(plugin);
         end
         
         function set.midHighCrossoverFreq(plugin,val)
             plugin.midHighCrossoverFreq = val;
+            
+            updateRootFilter6Params(plugin);
         end
         
         function set.lowMidCrossoverFreq(plugin,val)
             plugin.lowMidCrossoverFreq = val;
+            
+            updateRootFilter4Params(plugin);
         end
         
         function set.lowCrossoverFreq(plugin,val)
             plugin.lowCrossoverFreq = val;
+            
+            %TEST: update root filter 2 parameters this way...
+            updateRootFilter2Params(plugin);
         end
         
     end
@@ -2534,6 +2545,63 @@ classdef HarmonEQ < matlab.System & audioPlugin
             end
             
         end
+        
+        %TEST - This is a test to create a centralized update filter
+        % helper function
+        function updateRootFilter2Params(plugin)
+            if plugin.rootFrequency2 < plugin.lowCrossoverFreq
+                plugin.rootGain2 = plugin.lowRegionGain;
+                plugin.rootQFactor2 = plugin.lowRegionQFactor;
+            else
+                plugin.rootGain2 = plugin.lowMidRegionGain;
+                plugin.rootQFactor2 = plugin.lowMidRegionQFactor;
+            end
+            
+            setUpdateRootFilter2(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateRootFilter4Params(plugin)
+            if plugin.rootFrequency4 < plugin.lowMidCrossoverFreq
+                plugin.rootGain4 = plugin.lowMidRegionGain;
+                plugin.rootQFactor4 = plugin.lowMidRegionQFactor;
+            else
+                plugin.rootGain4 = plugin.midRegionGain;
+                plugin.rootQFactor4 = plugin.midRegionQFactor;
+            end
+            
+            setUpdateRootFilter4(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateRootFilter6Params(plugin)
+            if plugin.rootFrequency6 < plugin.midHighCrossoverFreq
+                plugin.rootGain6 = plugin.midRegionGain;
+                plugin.rootQFactor6 = plugin.midRegionQFactor;
+            else
+                plugin.rootGain6 = plugin.highMidRegionGain;
+                plugin.rootQFactor6 = plugin.highMidRegionQFactor;
+            end
+            
+            setUpdateRootFilter6(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateRootFilter8Params(plugin)
+            if plugin.rootFrequency8 < plugin.highCrossoverFreq
+                plugin.rootGain8 = plugin.highMidRegionGain;
+                plugin.rootQFactor8 = plugin.highMidRegionQFactor;
+            else
+                plugin.rootGain8 = plugin.highRegionGain;
+                plugin.rootQFactor8 = plugin.highRegionQFactor;
+            end
+            
+            setUpdateRootFilter8(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        
+        
         
         function updateRootGain1(plugin,val)
             plugin.rootGain1 = val;
