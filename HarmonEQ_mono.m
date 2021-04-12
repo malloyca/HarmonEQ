@@ -20,11 +20,11 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
 % audioTestBench(eq);
 %
 % To validate for generation:
-% validateAudioPlugin HarmonEQ;
+% validateAudioPlugin HarmonEQ_mono;
 % To export as a VST, run:
-% generateAudioPlugin -outdir plugins HarmonEQ
+% generateAudioPlugin -outdir plugins HarmonEQ_mono;
 % To export as an AU (on macOS):
-% generateAudioPlugin -au -outdir plugins HarmonEQ
+% generateAudioPlugin -au -outdir plugins HarmonEQ_mono;
 
 
 % TODO:
@@ -448,122 +448,122 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
         %----------------------Root band coefficients----------------------
         rootCoeffb1;
         rootCoeffa1;
-        rootPrevState1 = zeros(1,2);
+        rootPrevState1 = zeros(2,1);
         rootCoeffb2;
         rootCoeffa2;
-        rootPrevState2 = zeros(1,2);
+        rootPrevState2 = zeros(2,1);
         rootCoeffb3;
         rootCoeffa3;
-        rootPrevState3 = zeros(1,2);
+        rootPrevState3 = zeros(2,1);
         rootCoeffb4;
         rootCoeffa4;
-        rootPrevState4 = zeros(1,2);
+        rootPrevState4 = zeros(2,1);
         rootCoeffb5;
         rootCoeffa5;
-        rootPrevState5 = zeros(1,2);
+        rootPrevState5 = zeros(2,1);
         rootCoeffb6;
         rootCoeffa6;
-        rootPrevState6 = zeros(1,2);
+        rootPrevState6 = zeros(2,1);
         rootCoeffb7;
         rootCoeffa7;
-        rootPrevState7 = zeros(1,2);
+        rootPrevState7 = zeros(2,1);
         rootCoeffb8;
         rootCoeffa8;
-        rootPrevState8 = zeros(1,2);
+        rootPrevState8 = zeros(2,1);
         rootCoeffb9;
         rootCoeffa9;
-        rootPrevState9 = zeros(1,2);
+        rootPrevState9 = zeros(2,1);
         
         
         %----------------Harmonic third band coefficients------------------
         thirdCoeffb1;
         thirdCoeffa1;
-        thirdPrevState1 = zeros(1,2);
+        thirdPrevState1 = zeros(2,1);
         thirdCoeffb2;
         thirdCoeffa2;
-        thirdPrevState2 = zeros(1,2);
+        thirdPrevState2 = zeros(2,1);
         thirdCoeffb3;
         thirdCoeffa3;
-        thirdPrevState3 = zeros(1,2);
+        thirdPrevState3 = zeros(2,1);
         thirdCoeffb4;
         thirdCoeffa4;
-        thirdPrevState4 = zeros(1,2);
+        thirdPrevState4 = zeros(2,1);
         thirdCoeffb5;
         thirdCoeffa5;
-        thirdPrevState5 = zeros(1,2);
+        thirdPrevState5 = zeros(2,1);
         thirdCoeffb6;
         thirdCoeffa6;
-        thirdPrevState6 = zeros(1,2);
+        thirdPrevState6 = zeros(2,1);
         thirdCoeffb7;
         thirdCoeffa7;
-        thirdPrevState7 = zeros(1,2);
+        thirdPrevState7 = zeros(2,1);
         thirdCoeffb8;
         thirdCoeffa8;
-        thirdPrevState8 = zeros(1,2);
+        thirdPrevState8 = zeros(2,1);
         thirdCoeffb9;
         thirdCoeffa9;
-        thirdPrevState9 = zeros(1,2);
+        thirdPrevState9 = zeros(2,1);
         
         
         %----------------Harmonic fifth band coefficients------------------
         fifthCoeffb1;
         fifthCoeffa1;
-        fifthPrevState1 = zeros(1,2);
+        fifthPrevState1 = zeros(2,1);
         fifthCoeffb2;
         fifthCoeffa2;
-        fifthPrevState2 = zeros(1,2);
+        fifthPrevState2 = zeros(2,1);
         fifthCoeffb3;
         fifthCoeffa3;
-        fifthPrevState3 = zeros(1,2);
+        fifthPrevState3 = zeros(2,1);
         fifthCoeffb4;
         fifthCoeffa4;
-        fifthPrevState4 = zeros(1,2);
+        fifthPrevState4 = zeros(2,1);
         fifthCoeffb5;
         fifthCoeffa5;
-        fifthPrevState5 = zeros(1,2);
+        fifthPrevState5 = zeros(2,1);
         fifthCoeffb6;
         fifthCoeffa6;
-        fifthPrevState6 = zeros(1,2);
+        fifthPrevState6 = zeros(2,1);
         fifthCoeffb7;
         fifthCoeffa7;
-        fifthPrevState7 = zeros(1,2);
+        fifthPrevState7 = zeros(2,1);
         fifthCoeffb8;
         fifthCoeffa8;
-        fifthPrevState8 = zeros(1,2);
+        fifthPrevState8 = zeros(2,1);
         fifthCoeffb9;
         fifthCoeffa9;
-        fifthPrevState9 = zeros(1,2);
+        fifthPrevState9 = zeros(2,1);
         
         
         
         %----------------Harmonic seventh band coefficients------------------
         seventhCoeffb1;
         seventhCoeffa1;
-        seventhPrevState1 = zeros(1,2);
+        seventhPrevState1 = zeros(2,1);
         seventhCoeffb2;
         seventhCoeffa2;
-        seventhPrevState2 = zeros(1,2);
+        seventhPrevState2 = zeros(2,1);
         seventhCoeffb3;
         seventhCoeffa3;
-        seventhPrevState3 = zeros(1,2);
+        seventhPrevState3 = zeros(2,1);
         seventhCoeffb4;
         seventhCoeffa4;
-        seventhPrevState4 = zeros(1,2);
+        seventhPrevState4 = zeros(2,1);
         seventhCoeffb5;
         seventhCoeffa5;
-        seventhPrevState5 = zeros(1,2);
+        seventhPrevState5 = zeros(2,1);
         seventhCoeffb6;
         seventhCoeffa6;
-        seventhPrevState6 = zeros(1,2);
+        seventhPrevState6 = zeros(2,1);
         seventhCoeffb7;
         seventhCoeffa7;
-        seventhPrevState7 = zeros(1,2);
+        seventhPrevState7 = zeros(2,1);
         seventhCoeffb8;
         seventhCoeffa8;
-        seventhPrevState8 = zeros(1,2);
+        seventhPrevState8 = zeros(2,1);
         seventhCoeffb9;
         seventhCoeffa9;
-        seventhPrevState9 = zeros(1,2);
+        seventhPrevState9 = zeros(2,1);
         
         
         
