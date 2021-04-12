@@ -2024,7 +2024,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % within that. Then I don't have to manage gain and Q
             % directly...
             
-            %TEST - I'm going to test creating new update functions
+            %todo - can probably call updateRootFilter2Params here
             if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
                 updateRootQFactor2(plugin,val);
                 setUpdateRootFilter2(plugin);
@@ -2099,27 +2099,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %------------------------Crossover controls------------------------
         function set.highCrossoverFreq(plugin,val)
             plugin.highCrossoverFreq = val;
-            
             updateRootFilter8Params(plugin);
+            updateThirdFilter8Params(plugin);
         end
         
         function set.midHighCrossoverFreq(plugin,val)
             plugin.midHighCrossoverFreq = val;
-            
             updateRootFilter6Params(plugin);
+            updateThirdFilter6Params(plugin);
         end
         
         function set.lowMidCrossoverFreq(plugin,val)
             plugin.lowMidCrossoverFreq = val;
-            
             updateRootFilter4Params(plugin);
+            updateThirdFilter4Params(plugin);
         end
         
         function set.lowCrossoverFreq(plugin,val)
             plugin.lowCrossoverFreq = val;
-            
-            %TEST: update root filter 2 parameters this way...
             updateRootFilter2Params(plugin);
+            updateThirdFilter2Params(plugin);
         end
         
     end
@@ -2546,8 +2545,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
-        %TEST - This is a test to create a centralized update filter
-        % helper function
+        
         function updateRootFilter2Params(plugin)
             if plugin.rootFrequency2 < plugin.lowCrossoverFreq
                 plugin.rootGain2 = plugin.lowRegionGain;
@@ -2779,6 +2777,58 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdFrequency8 = 128 * thirdFreq;
             plugin.thirdFrequency9 = 256 * thirdFreq;
             
+        end
+        
+        function updateThirdFilter2Params(plugin)
+            if plugin.thirdFrequency2 < plugin.lowCrossoverFreq
+                plugin.thirdGain2 = plugin.lowRegionGain;
+                plugin.thirdQFactor2 = plugin.lowRegionQFactor;
+            else
+                plugin.thirdGain2 = plugin.lowMidRegionGain;
+                plugin.thirdQFactor2 = plugin.lowMidRegionQFactor;
+            end
+            
+            setUpdateThirdFilter2(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateThirdFilter4Params(plugin)
+            if plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq
+                plugin.thirdGain4 = plugin.lowMidRegionGain;
+                plugin.thirdQFactor4 = plugin.lowMidRegionQFactor;
+            else
+                plugin.thirdGain4 = plugin.midRegionGain;
+                plugin.thirdQFactor4 = plugin.midRegionQFactor;
+            end
+            
+            setUpdateThirdFilter4(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateThirdFilter6Params(plugin)
+            if plugin.thirdFrequency6 < plugin.midHighCrossoverFreq
+                plugin.thirdGain6 = plugin.midRegionGain;
+                plugin.thirdQFactor6 = plugin.midRegionQFactor;
+            else
+                plugin.thirdGain6 = plugin.highMidRegionGain;
+                plugin.thirdQFactor6 = plugin.highMidRegionQFactor;
+            end
+            
+            setUpdateThirdFilter6(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateThirdFilter8Params(plugin)
+            if plugin.thirdFrequency8 < plugin.highCrossoverFreq
+                plugin.thirdGain8 = plugin.highMidRegionGain;
+                plugin.thirdQFactor8 = plugin.highMidRegionQFactor;
+            else
+                plugin.thirdGain8 = plugin.highRegionGain;
+                plugin.thirdQFactor8 = plugin.highRegionQFactor;
+            end
+            
+            setUpdateThirdFilter8(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateThirdGain1(plugin,val)
