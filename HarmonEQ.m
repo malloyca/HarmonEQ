@@ -2102,7 +2102,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateRootFilter8Params(plugin);
             updateThirdFilter8Params(plugin);
             updateFifthFilter8Params(plugin);
-            %updateSeventhFilter8Params(plugin);
+            updateSeventhFilter8Params(plugin);
         end
         
         function set.midHighCrossoverFreq(plugin,val)
@@ -2110,7 +2110,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateRootFilter6Params(plugin);
             updateThirdFilter6Params(plugin);
             updateFifthFilter6Params(plugin);
-            %updateSeventhFilter6Params(plugin);
+            updateSeventhFilter6Params(plugin);
         end
         
         function set.lowMidCrossoverFreq(plugin,val)
@@ -2118,7 +2118,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateRootFilter4Params(plugin);
             updateThirdFilter4Params(plugin);
             updateFifthFilter4Params(plugin);
-            %updateSeventhFilter4Params(plugin);
+            updateSeventhFilter4Params(plugin);
         end
         
         function set.lowCrossoverFreq(plugin,val)
@@ -2126,7 +2126,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateRootFilter2Params(plugin);
             updateThirdFilter2Params(plugin);
             updateFifthFilter2Params(plugin);
-            %updateSeventhFilter2Params(plugin);
+            updateSeventhFilter2Params(plugin);
         end
         
     end
@@ -3250,6 +3250,58 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.seventhFrequency7 = 64 * seventhFreq;
             plugin.seventhFrequency8 = 128 * seventhFreq;
             plugin.seventhFrequency9 = 256 * seventhFreq;
+        end
+        
+        function updateSeventhFilter2Params(plugin)
+            if plugin.seventhFrequency2 < plugin.lowCrossoverFreq
+                plugin.seventhGain2 = plugin.lowRegionGain;
+                plugin.seventhQFactor2 = plugin.lowRegionQFactor;
+            else
+                plugin.seventhGain2 = plugin.lowMidRegionGain;
+                plugin.seventhQFactor2 = plugin.lowMidRegionQFactor;
+            end
+            
+            setUpdateSeventhFilter2(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateSeventhFilter4Params(plugin)
+            if plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq
+                plugin.seventhGain4 = plugin.lowMidRegionGain;
+                plugin.seventhQFactor4 = plugin.lowMidRegionQFactor;
+            else
+                plugin.seventhGain4 = plugin.midRegionGain;
+                plugin.seventhQFactor4 = plugin.midRegionQFactor;
+            end
+            
+            setUpdateSeventhFilter4(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateSeventhFilter6Params(plugin)
+            if plugin.seventhFrequency6 < plugin.midHighCrossoverFreq
+                plugin.seventhGain6 = plugin.midRegionGain;
+                plugin.seventhQFactor6 = plugin.midRegionQFactor;
+            else
+                plugin.seventhGain6 = plugin.highMidRegionGain;
+                plugin.seventhQFactor6 = plugin.highMidRegionQFactor;
+            end
+            
+            setUpdateSeventhFilter6(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateSeventhFilter8Params(plugin)
+            if plugin.seventhFrequency8 < plugin.highCrossoverFreq
+                plugin.seventhGain8 = plugin.highMidRegionGain;
+                plugin.seventhQFactor8 = plugin.highMidRegionQFactor;
+            else
+                plugin.seventhGain8 = plugin.highRegionGain;
+                plugin.seventhQFactor8 = plugin.highRegionQFactor;
+            end
+            
+            setUpdateSeventhFilter8(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateSeventhGain1(plugin,val)
