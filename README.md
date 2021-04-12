@@ -10,10 +10,14 @@ In the current iteration, there two sets of controls for testing while it is sti
 ## Compiled plugins
 Pre-compiled versions of the plugin are available:
 - macOS
-  - [VST](https://github.com/malloyca/HarmonEQ/releases/download/v0.2-alpha/HarmonEQ.vst.zip) (stereo only)
-  - [AU](https://github.com/malloyca/HarmonEQ/releases/download/v0.2-alpha/HarmonEQ.component.zip) (stereo only)
+  - VST:
+    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ_mono.vst.zip)
+    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ.vst.zip)
+  - AU:
+    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ_mono.component.zip)
+    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ.component.zip)
 - Windows
-  - Coming soon. I need a Windows installation to compile for Windows...
+  - Coming soon. I need a Windows installation in order to be able to compile for Windows...
 
 ### Installation instrucitons
 - macOS
@@ -21,6 +25,7 @@ Pre-compiled versions of the plugin are available:
   - Open Finder and go to the Home folder.
   - Navigate to `/Library/Audio/Plug-Ins/`.
   - Move `HarmonEQ.vst` to the `/VST/` folder and `HarmonEQ.component` to the `/components/` folder.
+  - On newer versions of macOS (10.14 or 10.15 and later) you will need to remove the plugins from quarantine. Instructions for that will be posted soon.
 
 ## Prereqs for compiling
 - MATLAB
@@ -73,6 +78,7 @@ This project is currently in active development. The primary DSP functionality i
 - Smooth gain / Q value updates
   - This isn't really a problem when changing the controls because that will do it more gradually. However when a peak updates due to changing a crossover frequency, then it could be a big, sudden jump. Need to smooth that.
     - Possiblities: timed ramps, traditional one pole parameter smoothing
+- Post instructions for removing plugins from quarantine on macOS
 
 
 ## Bug List
