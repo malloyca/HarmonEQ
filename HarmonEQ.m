@@ -1025,7 +1025,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateThirdFilters(plugin);
             end
             
-            %todo: stateChange
+            % update visualizer
             updateStateChangeStatus(plugin,true);
             
         end
@@ -1101,7 +1101,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateFifthFilters(plugin);
             end
             
-            %todo: stateChange
+            % update visualizer
             updateStateChangeStatus(plugin,true);
         end
         
@@ -2727,7 +2727,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateRootFilter7 = true;
             plugin.updateRootFilter8 = true;
             plugin.updateRootFilter9 = true;
-            plugin.stateChange = true;
+            updateStateChangeStatus(plugin, true)
         end
         
         function deactivateRootFilters(plugin)
@@ -2957,7 +2957,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateThirdFilter7 = true;
             plugin.updateThirdFilter8 = true;
             plugin.updateThirdFilter9 = true;
-            plugin.stateChange = true;
+            updateStateChangeStatus(plugin,true);
         end
         
         function setThirdIntervalDistance(plugin,val)
@@ -3191,7 +3191,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateFifthFilter7 = true;
             plugin.updateFifthFilter8 = true;
             plugin.updateFifthFilter9 = true;
-            plugin.stateChange = true;
+            updateStateChangeStatus(plugin, true);
         end
         
         function setFifthIntervalDistance(plugin,val)
@@ -3422,7 +3422,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateSeventhFilter7 = true;
             plugin.updateSeventhFilter8 = true;
             plugin.updateSeventhFilter9 = true;
-            plugin.stateChange = true;
+            updateStateChangeStatus(plugin, true);
         end
         
         function setSeventhIntervalDistance(plugin,val)
