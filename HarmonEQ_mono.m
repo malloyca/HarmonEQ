@@ -1,5 +1,5 @@
-classdef HarmonEQ < matlab.System & audioPlugin
-% HarmonEQ.m
+classdef HarmonEQ_mono < matlab.System & audioPlugin
+% HarmonEQ_mono.m
 % Harmonic Equalizer plugin
 % v0.3-alpha
 % Last updated: 12 April 2021
@@ -15,7 +15,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
 % based on the current harmony of a track.
 %
 % To run this with the visualizer in Matlab, run these commands:
-% eq = HarmonEQ;
+% eq = HarmonEQ_mono;
 % Visualizer(eq);
 % audioTestBench(eq);
 %
@@ -271,8 +271,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
     
     properties (Constant, Hidden)
         PluginInterface = audioPluginInterface(...
-            'InputChannels',2,...
-            'OutputChannels',2,...
+            'InputChannels',1,...
+            'OutputChannels',1,...
             'PluginName','HarmonEQ',...
             'VendorName','Colin Malloy',...
             'VendorVersion','0.2',...
@@ -448,122 +448,122 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %----------------------Root band coefficients----------------------
         rootCoeffb1;
         rootCoeffa1;
-        rootPrevState1 = zeros(2);
+        rootPrevState1 = zeros(1,2);
         rootCoeffb2;
         rootCoeffa2;
-        rootPrevState2 = zeros(2);
+        rootPrevState2 = zeros(1,2);
         rootCoeffb3;
         rootCoeffa3;
-        rootPrevState3 = zeros(2);
+        rootPrevState3 = zeros(1,2);
         rootCoeffb4;
         rootCoeffa4;
-        rootPrevState4 = zeros(2);
+        rootPrevState4 = zeros(1,2);
         rootCoeffb5;
         rootCoeffa5;
-        rootPrevState5 = zeros(2);
+        rootPrevState5 = zeros(1,2);
         rootCoeffb6;
         rootCoeffa6;
-        rootPrevState6 = zeros(2);
+        rootPrevState6 = zeros(1,2);
         rootCoeffb7;
         rootCoeffa7;
-        rootPrevState7 = zeros(2);
+        rootPrevState7 = zeros(1,2);
         rootCoeffb8;
         rootCoeffa8;
-        rootPrevState8 = zeros(2);
+        rootPrevState8 = zeros(1,2);
         rootCoeffb9;
         rootCoeffa9;
-        rootPrevState9 = zeros(2);
+        rootPrevState9 = zeros(1,2);
         
         
         %----------------Harmonic third band coefficients------------------
         thirdCoeffb1;
         thirdCoeffa1;
-        thirdPrevState1 = zeros(2);
+        thirdPrevState1 = zeros(1,2);
         thirdCoeffb2;
         thirdCoeffa2;
-        thirdPrevState2 = zeros(2);
+        thirdPrevState2 = zeros(1,2);
         thirdCoeffb3;
         thirdCoeffa3;
-        thirdPrevState3 = zeros(2);
+        thirdPrevState3 = zeros(1,2);
         thirdCoeffb4;
         thirdCoeffa4;
-        thirdPrevState4 = zeros(2);
+        thirdPrevState4 = zeros(1,2);
         thirdCoeffb5;
         thirdCoeffa5;
-        thirdPrevState5 = zeros(2);
+        thirdPrevState5 = zeros(1,2);
         thirdCoeffb6;
         thirdCoeffa6;
-        thirdPrevState6 = zeros(2);
+        thirdPrevState6 = zeros(1,2);
         thirdCoeffb7;
         thirdCoeffa7;
-        thirdPrevState7 = zeros(2);
+        thirdPrevState7 = zeros(1,2);
         thirdCoeffb8;
         thirdCoeffa8;
-        thirdPrevState8 = zeros(2);
+        thirdPrevState8 = zeros(1,2);
         thirdCoeffb9;
         thirdCoeffa9;
-        thirdPrevState9 = zeros(2);
+        thirdPrevState9 = zeros(1,2);
         
         
         %----------------Harmonic fifth band coefficients------------------
         fifthCoeffb1;
         fifthCoeffa1;
-        fifthPrevState1 = zeros(2);
+        fifthPrevState1 = zeros(1,2);
         fifthCoeffb2;
         fifthCoeffa2;
-        fifthPrevState2 = zeros(2);
+        fifthPrevState2 = zeros(1,2);
         fifthCoeffb3;
         fifthCoeffa3;
-        fifthPrevState3 = zeros(2);
+        fifthPrevState3 = zeros(1,2);
         fifthCoeffb4;
         fifthCoeffa4;
-        fifthPrevState4 = zeros(2);
+        fifthPrevState4 = zeros(1,2);
         fifthCoeffb5;
         fifthCoeffa5;
-        fifthPrevState5 = zeros(2);
+        fifthPrevState5 = zeros(1,2);
         fifthCoeffb6;
         fifthCoeffa6;
-        fifthPrevState6 = zeros(2);
+        fifthPrevState6 = zeros(1,2);
         fifthCoeffb7;
         fifthCoeffa7;
-        fifthPrevState7 = zeros(2);
+        fifthPrevState7 = zeros(1,2);
         fifthCoeffb8;
         fifthCoeffa8;
-        fifthPrevState8 = zeros(2);
+        fifthPrevState8 = zeros(1,2);
         fifthCoeffb9;
         fifthCoeffa9;
-        fifthPrevState9 = zeros(2);
+        fifthPrevState9 = zeros(1,2);
         
         
         
         %----------------Harmonic seventh band coefficients------------------
         seventhCoeffb1;
         seventhCoeffa1;
-        seventhPrevState1 = zeros(2);
+        seventhPrevState1 = zeros(1,2);
         seventhCoeffb2;
         seventhCoeffa2;
-        seventhPrevState2 = zeros(2);
+        seventhPrevState2 = zeros(1,2);
         seventhCoeffb3;
         seventhCoeffa3;
-        seventhPrevState3 = zeros(2);
+        seventhPrevState3 = zeros(1,2);
         seventhCoeffb4;
         seventhCoeffa4;
-        seventhPrevState4 = zeros(2);
+        seventhPrevState4 = zeros(1,2);
         seventhCoeffb5;
         seventhCoeffa5;
-        seventhPrevState5 = zeros(2);
+        seventhPrevState5 = zeros(1,2);
         seventhCoeffb6;
         seventhCoeffa6;
-        seventhPrevState6 = zeros(2);
+        seventhPrevState6 = zeros(1,2);
         seventhCoeffb7;
         seventhCoeffa7;
-        seventhPrevState7 = zeros(2);
+        seventhPrevState7 = zeros(1,2);
         seventhCoeffb8;
         seventhCoeffa8;
-        seventhPrevState8 = zeros(2);
+        seventhPrevState8 = zeros(1,2);
         seventhCoeffb9;
         seventhCoeffa9;
-        seventhPrevState9 = zeros(2);
+        seventhPrevState9 = zeros(1,2);
         
         
         
@@ -867,7 +867,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     methods
         
-        function plugin = HarmonEQ()
+        function plugin = HarmonEQ_mono()
             plugin.B = [1 0 0];
             plugin.A = [0 0 1];
         end
