@@ -2101,24 +2101,32 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.highCrossoverFreq = val;
             updateRootFilter8Params(plugin);
             updateThirdFilter8Params(plugin);
+            updateFifthFilter8Params(plugin);
+            %updateSeventhFilter8Params(plugin);
         end
         
         function set.midHighCrossoverFreq(plugin,val)
             plugin.midHighCrossoverFreq = val;
             updateRootFilter6Params(plugin);
             updateThirdFilter6Params(plugin);
+            updateFifthFilter6Params(plugin);
+            %updateSeventhFilter6Params(plugin);
         end
         
         function set.lowMidCrossoverFreq(plugin,val)
             plugin.lowMidCrossoverFreq = val;
             updateRootFilter4Params(plugin);
             updateThirdFilter4Params(plugin);
+            updateFifthFilter4Params(plugin);
+            %updateSeventhFilter4Params(plugin);
         end
         
         function set.lowCrossoverFreq(plugin,val)
             plugin.lowCrossoverFreq = val;
             updateRootFilter2Params(plugin);
             updateThirdFilter2Params(plugin);
+            updateFifthFilter2Params(plugin);
+            %updateSeventhFilter2Params(plugin);
         end
         
     end
@@ -3011,6 +3019,58 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.fifthFrequency8 = 128 * fifthFreq;
             plugin.fifthFrequency9 = 256 * fifthFreq;
             
+        end
+        
+        function updateFifthFilter2Params(plugin)
+            if plugin.fifthFrequency2 < plugin.lowCrossoverFreq
+                plugin.fifthGain2 = plugin.lowRegionGain;
+                plugin.fifthQFactor2 = plugin.lowRegionQFactor;
+            else
+                plugin.fifthGain2 = plugin.lowMidRegionGain;
+                plugin.fifthQFactor2 = plugin.lowMidRegionQFactor;
+            end
+            
+            setUpdateFifthFilter2(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateFifthFilter4Params(plugin)
+            if plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq
+                plugin.fifthGain4 = plugin.lowMidRegionGain;
+                plugin.fifthQFactor4 = plugin.lowMidRegionQFactor;
+            else
+                plugin.fifthGain4 = plugin.midRegionGain;
+                plugin.fifthQFactor4 = plugin.midRegionQFactor;
+            end
+            
+            setUpdateFifthFilter4(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateFifthFilter6Params(plugin)
+            if plugin.fifthFrequency6 < plugin.midHighCrossoverFreq
+                plugin.fifthGain6 = plugin.midRegionGain;
+                plugin.fifthQFactor6 = plugin.midRegionQFactor;
+            else
+                plugin.fifthGain6 = plugin.highMidRegionGain;
+                plugin.fifthQFactor6 = plugin.highMidRegionQFactor;
+            end
+            
+            setUpdateFifthFilter6(plugin);
+            updateStateChangeStatus(plugin, true);
+        end
+        
+        function updateFifthFilter8Params(plugin)
+            if plugin.fifthFrequency8 < plugin.highCrossoverFreq
+                plugin.fifthGain8 = plugin.highMidRegionGain;
+                plugin.fifthQFactor8 = plugin.highMidRegionQFactor;
+            else
+                plugin.fifthGain8 = plugin.highRegionGain;
+                plugin.fifthQFactor8 = plugin.highRegionQFactor;
+            end
+            
+            setUpdateFifthFilter8(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateFifthGain1(plugin,val)
