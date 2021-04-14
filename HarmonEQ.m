@@ -2338,11 +2338,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 else % Was in mid region (3)
                     plugin.rootFilter4Region = 2; % set filter region to low-mid (2)
                     plugin.rootFilter4GainTarget = plugin.lowMidRegionGain;
-                    gainDiff = plugin.lowMidRegionGain - plugin.midRegionGain; % set differential for gain
+                    gainDiff = plugin.lowMidRegionGain - plugin.rootGain4; % set differential for gain
                     plugin.rootFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter4QTarget = plugin.lowMidRegionQFactor;
-                    qDiff = plugin.lowMidRegionQFactor - plugin.midRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.rootQFactor4;
                     plugin.rootFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter4SmoothStep = 0; % Reset the step counter for smoothing
@@ -2362,11 +2362,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 else % Was in low-mid Fregion (2)
                     plugin.rootFilter4Region = 3; % set filter region to mid (3)
                     plugin.rootFilter4GainTarget = plugin.midRegionGain;
-                    gainDiff = plugin.midRegionGain - plugin.lowMidRegionGain; % set differential for gain
+                    gainDiff = plugin.midRegionGain - plugin.rootGain4; % set differential for gain
                     plugin.rootFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter4QTarget = plugin.midRegionQFactor;
-                    qDiff = plugin.midRegionQFactor - plugin.lowMidRegionQFactor;
+                    qDiff = plugin.midRegionQFactor - plugin.rootQFactor4;
                     plugin.rootFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter4SmoothStep = 0; % Reset the step counter for smoothing
