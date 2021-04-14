@@ -2,7 +2,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
 % HarmonEQ.m
 % Harmonic Equalizer plugin
 % v0.3-alpha
-% Last updated: 12 April 2021
+% Last updated: 13 April 2021
 %
 % This plugin presents a new control scheme for the traditional equalizer.
 % Most people are familiar with the various types of EQs out there
@@ -29,6 +29,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
 
 % TODO:
 % - Look into State-variable filters vs biquads
+% - Make the parameter smoothing more dynamic at large buffer sizes. Right
+% now it goes really slowly if the buffer size is large since it only steps
+% once per buffer. It wouldn't be too hard to set it so that it stepped
+% multiple times per input buffer for larger buffer sizes
 %
 
     %----------------------------------------------------------------------
@@ -578,13 +582,16 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootFilter8Region = 4;
         rootFilter9Region = 5; % Not currently changeable
         %test
+        
+        % Root filter smoothing variables
         rootFilter2SmoothStatus = false;
         rootFilter2SmoothStep = 0;
         rootFilter2GainDiff = 0; % Gain differential for filter smoothing
         rootFilter2GainTarget = 0;
-        rootFilter2QInit = 26;
+        rootFilter2QDiff = 26;
         rootFilter2QTarget = 26; %todo: Do I need this?
-        numberOfSmoothSteps = 100; %todo: Find a good value for this
+        
+        numberOfSmoothSteps =20; %todo: Find a good value for this
         
         
         % Active state variables
@@ -1679,33 +1686,43 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.updateRootFilter2 = false; % No need to update further since no smoothing
             else % Case: smoothing active
                 gain = plugin.rootGain2;
+                qFactor = plugin.rootQFactor2;
                 step = plugin.rootFilter2SmoothStep;
                 if (step < plugin.numberOfSmoothSteps)
                     gain = gain + plugin.rootFilter2GainDiff;
+                    qFactor = qFactor + plugin.rootFilter2QDiff;
                     
                     [plugin.rootCoeffb2, plugin.rootCoeffa2] = peakNotchFilterCoeffs(...
                         plugin, fs, ...
                         plugin.rootFrequency2,...
-                        plugin.rootQFactor2,...
+                        qFactor,...
                         gain);
                     
                     plugin.rootFilter2SmoothStep = step + 1;
                     % Do not set updateRootFilter2 to false because we want
-                    % it to continue updating
+                    % it to continue updating until we finish the smoothing
+                    % operation
+                    
+                    plugin.rootGain2 = gain; %store updated root gain
+                    plugin.rootQFactor2 = qFactor; % store updated Q value
+                    
+                    % Update visualizer
                     updateStateChangeStatus(plugin, true);
                 else % Case: at the end of smoothing
                     gain = plugin.rootFilter2GainTarget;
+                    qFactor = plugin.rootFilter2QTarget;
                     [plugin.rootCoeffb2, plugin.rootCoeffa2] = peakNotchFilterCoeffs(...
                         plugin, fs, ...
                         plugin.rootFrequency2,...
-                        plugin.rootQFactor2,...
+                        qFactor,...
                         gain);
                     plugin.rootFilter2SmoothStatus = false;
                     plugin.updateRootFilter2 = false; % No need to update further since smoothing complete
+                    
+                    plugin.rootGain2 = gain; %store updated root gain
+                    plugin.rootQFactor2 = qFactor; % store updated Q value
                     updateStateChangeStatus(plugin, true);
                 end
-                plugin.rootGain2 = gain; %store updated root gain
-                disp(gain);
             end
             
             % Original code:
@@ -2106,9 +2123,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     %todo: should this reset the smoothing instead?
                     if ~plugin.rootFilter2SmoothStatus
                         plugin.rootGain2 = plugin.lowRegionGain;
+                        plugin.rootQFactor2 = plugin.lowRegionQFactor;
                     end
-                    disp('Updating rootGain2');
-                    plugin.rootQFactor2 = plugin.lowRegionQFactor;
                     disp('Stay in low region');
                     
                 else % Was in low-mid region (2)
@@ -2116,12 +2132,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootFilter2GainTarget = plugin.lowRegionGain;
                     gainDiff = plugin.lowRegionGain - plugin.lowMidRegionGain; % set differential for gain
                     plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter2QTarget = plugin.lowRegionQFactor;
+                    qDiff = plugin.lowRegionQFactor - plugin.lowMidRegionQFactor;
+                    plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
                     plugin.rootFilter2SmoothStep = 0; % Reset the step counter for smoothing
                     plugin.rootFilter2SmoothStatus = true; % Activate gain smoothing
                     % Updating plugin.rootGain2 will be taken care of by
                     % buildRootFilter2()
                     
-                    plugin.rootQFactor2 = plugin.lowRegionQFactor;
+%                     plugin.rootQFactor2 = plugin.lowRegionQFactor;
                     
                     disp('moved to low');
                 end
@@ -2130,20 +2151,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     % Update values if smoothing is done
                     if ~plugin.rootFilter2SmoothStatus
                         plugin.rootGain2 = plugin.lowMidRegionGain;
+                        plugin.rootQFactor2 = plugin.lowMidRegionQFactor;
                     end
-                    plugin.rootQFactor2 = plugin.lowMidRegionQFactor;
+                    
                     disp('stayed in low-mid');
                 else % Was in low Fregion (1)
                     plugin.rootFilter2Region = 2; % set filter region to low (1)
                     plugin.rootFilter2GainTarget = plugin.lowMidRegionGain;
-                    gainDiff = plugin.lowMidRegionGain- plugin.lowRegionGain; % set differential for gain
+                    gainDiff = plugin.lowMidRegionGain - plugin.lowRegionGain; % set differential for gain
                     plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter2QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.lowRegionQFactor;
+                    plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
                     plugin.rootFilter2SmoothStep = 0; % Reset the step counter for smoothing
                     plugin.rootFilter2SmoothStatus = true; % Activate gain smoothing
                     % Updating plugin.rootGain2 will be taken care of by
                     % buildRootFilter2()
                     
-                    plugin.rootQFactor2 = plugin.lowRegionQFactor;
+%                     plugin.rootQFactor2 = plugin.lowRegionQFactor;
                     disp('moved to low-mid');
                 end
             end
