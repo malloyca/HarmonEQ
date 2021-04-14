@@ -887,7 +887,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     methods
         
-        function plugin = HarmonEQ()
+        function plugin = HarmonEQ_mono()
             plugin.B = [1 0 0];
             plugin.A = [0 0 1];
         end
