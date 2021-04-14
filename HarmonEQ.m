@@ -1851,10 +1851,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain6 = gain; %store updated root gain
                     plugin.rootQFactor6 = qFactor; % store updated Q value
                     
-                    if step > 90
-                        disp(gain);
-                    end
-                    
                     % Update visualizer
                     updateStateChangeStatus(plugin, true);
                 else % Case: at the end of smoothing
@@ -1867,8 +1863,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         gain);
                     plugin.rootFilter6SmoothStatus = false;
                     plugin.updateRootFilter6 = false; % No need to update further since smoothing complete
-                    
-                    disp(gain);
                     
                     plugin.rootGain6 = gain; %store updated root gain
                     plugin.rootQFactor6 = qFactor; % store updated Q value
@@ -2461,11 +2455,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 else % Was in high region (5)
                     plugin.rootFilter8Region = 4; % set filter region to high (4)
                     plugin.rootFilter8GainTarget = plugin.highMidRegionGain;
-                    gainDiff = plugin.highMidRegionGain - plugin.highRegionGain; % set differential for gain
+                    gainDiff = plugin.highMidRegionGain - plugin.rootGain8; % set differential for gain
                     plugin.rootFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter8QTarget = plugin.highMidRegionQFactor;
-                    qDiff = plugin.highMidRegionQFactor - plugin.highRegionQFactor;
+                    qDiff = plugin.highMidRegionQFactor - plugin.rootQFactor8;
                     plugin.rootFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter8SmoothStep = 0; % Reset the step counter for smoothing
@@ -2485,11 +2479,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 else % Was in higih-mid region (4)
                     plugin.rootFilter8Region = 5; % set filter region to high (5)
                     plugin.rootFilter8GainTarget = plugin.highRegionGain;
-                    gainDiff = plugin.highRegionGain - plugin.highMidRegionGain; % set differential for gain
+                    gainDiff = plugin.highRegionGain - plugin.rootGain8; % set differential for gain
                     plugin.rootFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter8QTarget = plugin.highRegionQFactor;
-                    qDiff = plugin.highRegionQFactor - plugin.highMidRegionQFactor;
+                    qDiff = plugin.highRegionQFactor - plugin.rootQFactor8;
                     plugin.rootFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter8SmoothStep = 0; % Reset the step counter for smoothing
