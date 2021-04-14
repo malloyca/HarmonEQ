@@ -2049,12 +2049,53 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function buildThirdFilter4(plugin, fs)
-            [plugin.thirdCoeffb4, plugin.thirdCoeffa4] = peakNotchFilterCoeffs(...
-                plugin, fs, ...
-                plugin.thirdFrequency4,...
-                plugin.thirdQFactor4,...
-                plugin.thirdGain4);
-            plugin.updateThirdFilter4 = false;
+            if ~plugin.thirdFilter4SmoothStatus % No smoothing necessary
+                [plugin.thirdCoeffb4, plugin.thirdCoeffa4] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.thirdFrequency4,...
+                    plugin.thirdQFactor4,...
+                    plugin.thirdGain4);
+                plugin.updateThirdFilter4 = false; % No need to update further since no smoothing
+            else % Case: smoothing active
+                gain = plugin.thirdGain4;
+                qFactor = plugin.thirdQFactor4;
+                step = plugin.thirdFilter4SmoothStep;
+                if (step < plugin.numberOfSmoothSteps)
+                    gain = gain + plugin.thirdFilter4GainDiff;
+                    qFactor = qFactor + plugin.thirdFilter4QDiff;
+                    
+                    [plugin.thirdCoeffb4, plugin.thirdCoeffa4] = peakNotchFilterCoeffs(...
+                        plugin, fs, ...
+                        plugin.thirdFrequency4,...
+                        qFactor,...
+                        gain);
+                    
+                    plugin.thirdFilter4SmoothStep = step + 1;
+                    % Do not set updateThirdFilter4 to false because we want
+                    % it to continue updating until we finish the smoothing
+                    % operation
+                    
+                    plugin.thirdGain4 = gain; %store updated third gain
+                    plugin.thirdQFactor4 = qFactor; % store updated Q value
+                    
+                    % Update visualizer
+                    updateStateChangeStatus(plugin, true);
+                else % Case: at the end of smoothing
+                    gain = plugin.thirdFilter4GainTarget;
+                    qFactor = plugin.thirdFilter4QTarget;
+                    [plugin.thirdCoeffb4, plugin.thirdCoeffa4] = peakNotchFilterCoeffs(...
+                        plugin, fs, ...
+                        plugin.thirdFrequency4,...
+                        qFactor,...
+                        gain);
+                    plugin.thirdFilter4SmoothStatus = false;
+                    plugin.updateThirdFilter4 = false; % No need to update further since smoothing complete
+                    
+                    plugin.thirdGain4 = gain; %store updated third gain
+                    plugin.thirdQFactor4 = qFactor; % store updated Q value
+                    updateStateChangeStatus(plugin, true);
+                end
+            end
         end
         
         function buildThirdFilter5(plugin, fs)
@@ -2456,7 +2497,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function updateRootFilter6Params(plugin)
             if plugin.rootFrequency6 < plugin.midHighCrossoverFreq % Root filter 6 is in mid region
                 if plugin.rootFilter6Region == 3 % Already in mid region
@@ -2807,12 +2847,55 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateThirdFilter4Params(plugin)
-            if plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq
-                plugin.thirdGain4 = plugin.lowMidRegionGain;
-                plugin.thirdQFactor4 = plugin.lowMidRegionQFactor;
-            else
-                plugin.thirdGain4 = plugin.midRegionGain;
-                plugin.thirdQFactor4 = plugin.midRegionQFactor;
+            if plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq % Third filter 4 is in low-mid region
+                if plugin.thirdFilter4Region == 2 % Already in low-mid region (2)
+                    % Update values if smoothing is done
+                    %todo: should this reset the smoothing instead?
+                    if ~plugin.thirdFilter4SmoothStatus
+                        plugin.thirdGain4 = plugin.lowMidRegionGain;
+                        plugin.thirdQFactor4 = plugin.lowMidRegionQFactor;
+                    end
+                    
+                else % Was in mid region (3)
+                    plugin.thirdFilter4Region = 2; % set filter region to low-mid (2)
+                    plugin.thirdFilter4GainTarget = plugin.lowMidRegionGain;
+                    gainDiff = plugin.lowMidRegionGain - plugin.thirdGain4; % set differential for gain
+                    plugin.thirdFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.thirdFilter4QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.thirdQFactor4;
+                    plugin.thirdFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.thirdFilter4SmoothStep = 0; % Reset the step counter for smoothing
+                    plugin.thirdFilter4SmoothStatus = true; % Activate gain smoothing
+                    % Updating plugin.thirdGain4 will be taken care of by
+                    % buildThirdFilter4()
+                end
+                
+            else % Third filter 4 is in mid region
+                if plugin.thirdFilter4Region == 3 % Already in mid region
+                    % Update values if smoothing is done
+                    if ~plugin.thirdFilter4SmoothStatus
+                        plugin.thirdGain4 = plugin.midRegionGain;
+                        plugin.thirdQFactor4 = plugin.midRegionQFactor;
+                    end
+                    
+                else % Was in low-mid Fregion (2)
+                    plugin.thirdFilter4Region = 3; % set filter region to mid (3)
+                    plugin.thirdFilter4GainTarget = plugin.midRegionGain;
+                    gainDiff = plugin.midRegionGain - plugin.thirdGain4; % set differential for gain
+                    plugin.thirdFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.thirdFilter4QTarget = plugin.midRegionQFactor;
+                    qDiff = plugin.midRegionQFactor - plugin.thirdQFactor4;
+                    plugin.thirdFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.thirdFilter4SmoothStep = 0; % Reset the step counter for smoothing
+                    plugin.thirdFilter4SmoothStatus = true; % Activate gain smoothing
+                    % Updating plugin.thirdGain4 will be taken care of by
+                    % buildThirdFilter4()
+                    
+                end
             end
             
             setUpdateThirdFilter4(plugin);
