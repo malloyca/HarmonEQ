@@ -622,7 +622,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         thirdFilter8Region = 4;
         thirdFilter9Region = 5; % Not currently changeable
         
-        %test
         %-----Harmonic third smoothing variables
         thirdFilter2SmoothStatus = false;
         thirdFilter2SmoothStep = 0;
@@ -651,6 +650,47 @@ classdef HarmonEQ < matlab.System & audioPlugin
         thirdFilter8GainTarget = 0;
         thirdFilter8QDiff = 26;
         thirdFilter8QTarget = 26;
+        
+        %test
+        %-----Harmonic fifth region tracking
+        fifthFilter1Region = 1; % Not currently changeable
+        fifthFilter2Region = 1;
+        fifthFilter3Region = 2; % Not currently changeable
+        fifthFilter4Region = 2;
+        fifthFilter5Region = 3; % Not currently changeable
+        fifthFilter6Region = 3;
+        fifthFilter7Region = 4; % Not currently changeable
+        fifthFilter8Region = 4;
+        fifthFilter9Region = 5; % Not currently changeable
+        
+        %-----Harmonic fifth smoothing variables
+        fifthFilter2SmoothStatus = false;
+        fifthFilter2SmoothStep = 0;
+        fifthFilter2GainDiff = 0;
+        fifthFilter2GainTarget = 0;
+        fifthFilter2QDiff = 26;
+        fifthFilter2QTarget = 26;
+        
+        fifthFilter4SmoothStatus = false;
+        fifthFilter4SmoothStep = 0;
+        fifthFilter4GainDiff = 0;
+        fifthFilter4GainTarget = 0;
+        fifthFilter4QDiff = 26;
+        fifthFilter4QTarget = 26;
+        
+        fifthFilter6SmoothStatus = false;
+        fifthFilter6SmoothStep = 0;
+        fifthFilter6GainDiff = 0;
+        fifthFilter6GainTarget = 0;
+        fifthFilter6QDiff = 26;
+        fifthFilter6QTarget = 26;
+        
+        fifthFilter8SmoothStatus = false;
+        fifthFilter8SmoothStep = 0;
+        fifthFilter8GainDiff = 0;
+        fifthFilter8GainTarget = 0;
+        fifthFilter8QDiff = 26;
+        fifthFilter8QTarget = 26;
         
         numberOfSmoothSteps = 100; %todo: Find a good value for this
         
@@ -1861,6 +1901,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateRootFilter5 = false;
         end
         
+        %test
         function buildRootFilter6(plugin, fs)
             if ~plugin.rootFilter6SmoothStatus % No smoothing necessary
                 [plugin.rootCoeffb6, plugin.rootCoeffa6] = peakNotchFilterCoeffs(...
@@ -1920,7 +1961,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.updateRootFilter7 = false;
         end
         
-        %test
         function buildRootFilter8(plugin, fs)
             if ~plugin.rootFilter8SmoothStatus % No smoothing necessary
                 [plugin.rootCoeffb8, plugin.rootCoeffa8] = peakNotchFilterCoeffs(...
@@ -2236,12 +2276,53 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function buildFifthFilter2(plugin, fs)
-            [plugin.fifthCoeffb2, plugin.fifthCoeffa2] = peakNotchFilterCoeffs(...
-                plugin, fs, ...
-                plugin.fifthFrequency2,...
-                plugin.fifthQFactor2,...
-                plugin.fifthGain2);
-            plugin.updateFifthFilter2 = false;
+            if ~plugin.fifthFilter2SmoothStatus % No smoothing necessary
+                [plugin.fifthCoeffb2, plugin.fifthCoeffa2] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.fifthFrequency2,...
+                    plugin.fifthQFactor2,...
+                    plugin.fifthGain2);
+                plugin.updateFifthFilter2 = false; % No need to update further since no smoothing
+            else % Case: smoothing active
+                gain = plugin.fifthGain2;
+                qFactor = plugin.fifthQFactor2;
+                step = plugin.fifthFilter2SmoothStep;
+                if (step < plugin.numberOfSmoothSteps)
+                    gain = gain + plugin.fifthFilter2GainDiff;
+                    qFactor = qFactor + plugin.fifthFilter2QDiff;
+                    
+                    [plugin.fifthCoeffb2, plugin.fifthCoeffa2] = peakNotchFilterCoeffs(...
+                        plugin, fs, ...
+                        plugin.fifthFrequency2,...
+                        qFactor,...
+                        gain);
+                    
+                    plugin.fifthFilter2SmoothStep = step + 1;
+                    % Do not set updateFifthFilter2 to false because we want
+                    % it to continue updating until we finish the smoothing
+                    % operation
+                    
+                    plugin.fifthGain2 = gain; %store updated fifth gain
+                    plugin.fifthQFactor2 = qFactor; % store updated Q value
+                    
+                    % Update visualizer
+                    updateStateChangeStatus(plugin, true);
+                else % Case: at the end of smoothing
+                    gain = plugin.fifthFilter2GainTarget;
+                    qFactor = plugin.fifthFilter2QTarget;
+                    [plugin.fifthCoeffb2, plugin.fifthCoeffa2] = peakNotchFilterCoeffs(...
+                        plugin, fs, ...
+                        plugin.fifthFrequency2,...
+                        qFactor,...
+                        gain);
+                    plugin.fifthFilter2SmoothStatus = false;
+                    plugin.updateFifthFilter2 = false; % No need to update further since smoothing complete
+                    
+                    plugin.fifthGain2 = gain; %store updated fifth gain
+                    plugin.fifthQFactor2 = qFactor; % store updated Q value
+                    updateStateChangeStatus(plugin, true);
+                end
+            end
         end
         
         function buildFifthFilter3(plugin, fs)
@@ -2580,6 +2661,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
+        %test
         function updateRootFilter6Params(plugin)
             if plugin.rootFrequency6 < plugin.midHighCrossoverFreq % Root filter 6 is in mid region
                 if plugin.rootFilter6Region == 3 % Already in mid region
@@ -2636,7 +2718,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function updateRootFilter8Params(plugin)
             if plugin.rootFrequency8 < plugin.highCrossoverFreq % Root filter 8 is in mid-high region
                 if plugin.rootFilter8Region == 4 % Already in mid-high region
@@ -2928,7 +3009,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function updateThirdFilter4Params(plugin)
             if plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq % Third filter 4 is in low-mid region
                 if plugin.thirdFilter4Region == 2 % Already in low-mid region (2)
@@ -3280,12 +3360,55 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateFifthFilter2Params(plugin)
-            if plugin.fifthFrequency2 < plugin.lowCrossoverFreq
-                plugin.fifthGain2 = plugin.lowRegionGain;
-                plugin.fifthQFactor2 = plugin.lowRegionQFactor;
-            else
-                plugin.fifthGain2 = plugin.lowMidRegionGain;
-                plugin.fifthQFactor2 = plugin.lowMidRegionQFactor;
+            if plugin.fifthFrequency2 < plugin.lowCrossoverFreq % fifth filter 2 is in low region
+                if plugin.fifthFilter2Region == 1 % Already in low region
+                    % Update values if smoothing is done
+                    %todo: should this reset the smoothing instead?
+                    if ~plugin.fifthFilter2SmoothStatus
+                        plugin.fifthGain2 = plugin.lowRegionGain;
+                        plugin.fifthQFactor2 = plugin.lowRegionQFactor;
+                    end
+                    
+                else % Was in low-mid region (2)
+                    plugin.fifthFilter2Region = 1; % set filter region to low (1)
+                    plugin.fifthFilter2GainTarget = plugin.lowRegionGain;
+                    gainDiff = plugin.lowRegionGain - plugin.fifthGain2; % set differential for gain
+                    plugin.fifthFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2QTarget = plugin.lowRegionQFactor;
+                    qDiff = plugin.lowRegionQFactor - plugin.fifthQFactor2;
+                    plugin.fifthFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2SmoothStep = 0; % Reset the step counter for smoothing
+                    plugin.fifthFilter2SmoothStatus = true; % Activate gain smoothing
+                    % Updating plugin.fifthGain2 will be taken care of by
+                    % buildFifthFilter2()
+                    
+                end
+            else % Fifth filter 2 is in low-mid region
+                if plugin.fifthFilter2Region == 2 % Already in low-mid region
+                    % Update values if smoothing is done
+                    if ~plugin.fifthFilter2SmoothStatus
+                        plugin.fifthGain2 = plugin.lowMidRegionGain;
+                        plugin.fifthQFactor2 = plugin.lowMidRegionQFactor;
+                    end
+                    
+                else % Was in low Fregion (1)
+                    plugin.fifthFilter2Region = 2; % set filter region to low (1)
+                    plugin.fifthFilter2GainTarget = plugin.lowMidRegionGain;
+                    gainDiff = plugin.lowMidRegionGain - plugin.fifthGain2; % set differential for gain
+                    plugin.fifthFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.fifthQFactor2;
+                    plugin.fifthFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2SmoothStep = 0; % Reset the step counter for smoothing
+                    plugin.fifthFilter2SmoothStatus = true; % Activate gain smoothing
+                    % Updating plugin.fifthGain2 will be taken care of by
+                    % buildFifthFilter2()
+                    
+                end
             end
             
             setUpdateFifthFilter2(plugin);
@@ -3305,6 +3428,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
+        %test
         function updateFifthFilter6Params(plugin)
             if plugin.fifthFrequency6 < plugin.midHighCrossoverFreq
                 plugin.fifthGain6 = plugin.midRegionGain;
