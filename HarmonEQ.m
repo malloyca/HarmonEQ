@@ -2263,11 +2263,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 else % Was in low-mid region (2)
                     plugin.rootFilter2Region = 1; % set filter region to low (1)
                     plugin.rootFilter2GainTarget = plugin.lowRegionGain;
-                    gainDiff = plugin.lowRegionGain - plugin.lowMidRegionGain; % set differential for gain
+                    gainDiff = plugin.lowRegionGain - plugin.rootGain2; % set differential for gain
                     plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter2QTarget = plugin.lowRegionQFactor;
-                    qDiff = plugin.lowRegionQFactor - plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowRegionQFactor - plugin.rootQFactor2;
                     plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter2SmoothStep = 0; % Reset the step counter for smoothing
@@ -2291,11 +2291,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 else % Was in low Fregion (1)
                     plugin.rootFilter2Region = 2; % set filter region to low (1)
                     plugin.rootFilter2GainTarget = plugin.lowMidRegionGain;
-                    gainDiff = plugin.lowMidRegionGain - plugin.lowRegionGain; % set differential for gain
+                    gainDiff = plugin.lowMidRegionGain - plugin.rootGain2; % set differential for gain
                     plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter2QTarget = plugin.lowMidRegionQFactor;
-                    qDiff = plugin.lowMidRegionQFactor - plugin.lowRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.rootQFactor2;
                     plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
                     
                     plugin.rootFilter2SmoothStep = 0; % Reset the step counter for smoothing
