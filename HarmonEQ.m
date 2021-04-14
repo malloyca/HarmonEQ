@@ -2258,7 +2258,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         plugin.rootGain2 = plugin.lowRegionGain;
                         plugin.rootQFactor2 = plugin.lowRegionQFactor;
                     end
-                    disp('Stay in low region');
                     
                 else % Was in low-mid region (2)
                     plugin.rootFilter2Region = 1; % set filter region to low (1)
@@ -2275,9 +2274,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     % Updating plugin.rootGain2 will be taken care of by
                     % buildRootFilter2()
                     
-%                     plugin.rootQFactor2 = plugin.lowRegionQFactor;
-                    
-                    disp('moved to low');
                 end
             else % Root filter 2 is in low-mid region
                 if plugin.rootFilter2Region == 2 % Already in low-mid region
@@ -2287,7 +2283,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         plugin.rootQFactor2 = plugin.lowMidRegionQFactor;
                     end
                     
-                    disp('stayed in low-mid');
                 else % Was in low Fregion (1)
                     plugin.rootFilter2Region = 2; % set filter region to low (1)
                     plugin.rootFilter2GainTarget = plugin.lowMidRegionGain;
@@ -2303,8 +2298,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     % Updating plugin.rootGain2 will be taken care of by
                     % buildRootFilter2()
                     
-%                     plugin.rootQFactor2 = plugin.lowRegionQFactor;
-                    disp('moved to low-mid');
                 end
             end
             
@@ -2391,7 +2384,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         plugin.rootGain6 = plugin.midRegionGain;
                         plugin.rootQFactor6 = plugin.midRegionQFactor;
                     end
-                    disp('Staying in mid region');
                     
                 else % Was in high-mid region (4)
                     plugin.rootFilter6Region = 3; % set filter region to low (4)
@@ -2407,7 +2399,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootFilter6SmoothStatus = true; % Activate gain smoothing
                     % Updating plugin.rootGain6 will be taken care of by
                     % buildRootFilter6()
-                    disp('Moved to mid');
                     
                 end
             else % Root filter 6 is in high-mid region
@@ -2417,7 +2408,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         plugin.rootGain6 = plugin.highMidRegionGain;
                         plugin.rootQFactor6 = plugin.highMidRegionQFactor;
                     end
-                    disp('staying in high-mid');
                     
                 else % Was in mid Fregion (3)
                     plugin.rootFilter6Region = 4; % set filter region to high-mid (4)
@@ -2433,7 +2423,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootFilter6SmoothStatus = true; % Activate gain smoothing
                     % Updating plugin.rootGain6 will be taken care of by
                     % buildRootFilter6()
-                    disp('Moving to high-mid');
                     
                 end
             end
