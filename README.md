@@ -5,7 +5,7 @@ HarmonEQ differs from other equalizers in its control scheme. It is a parametric
 Rather than having precise control over filter frequencies, the user tunes HarmonEQ to a specific musical note or chord.
 The user can then define gain and Q values for five different ranges: low, low-mid, mid, high-mid, high.
 
-In the current iteration, there two sets of controls for testing while it is still being developed. The first set of controls apply to each chord tone across the entire frequency spectrum. The second set splits the controls into five bands with one gain control and one Q control affecting all filters within that band.
+Development is currently ongoing and stable functionality is not guaranteed.
 
 ## Compiled plugins
 Pre-compiled versions of the plugin are available:
@@ -25,7 +25,7 @@ Pre-compiled versions of the plugin are available:
   - Open Finder and go to the Home folder.
   - Navigate to `/Library/Audio/Plug-Ins/`.
   - Move `HarmonEQ.vst` to the `/VST/` folder and `HarmonEQ.component` to the `/components/` folder.
-  - On newer versions of macOS (10.14 or 10.15 and later) you will need to remove the plugins from quarantine. Instructions for that will be posted soon.
+  - On newer versions of macOS (10.14 or 10.15 and later) you will need to manually remove the plugins from quarantine. Instructions for that will be posted soon.
 
 ## Prereqs for compiling
 - MATLAB
