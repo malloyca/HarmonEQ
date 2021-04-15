@@ -2453,12 +2453,53 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function buildFifthFilter8(plugin, fs)
-            [plugin.fifthCoeffb8, plugin.fifthCoeffa8] = peakNotchFilterCoeffs(...
-                plugin, fs, ...
-                plugin.fifthFrequency8,...
-                plugin.fifthQFactor8,...
-                plugin.fifthGain8);
-            plugin.updateFifthFilter8 = false;
+            if ~plugin.fifthFilter8SmoothStatus % No smoothing necessary
+                [plugin.fifthCoeffb8, plugin.fifthCoeffa8] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.fifthFrequency8,...
+                    plugin.fifthQFactor8,...
+                    plugin.fifthGain8);
+                plugin.updateFifthFilter8 = false; % No need to update further since no smoothing
+            else % Case: smoothing active
+                gain = plugin.fifthGain8;
+                qFactor = plugin.fifthQFactor8;
+                step = plugin.fifthFilter8SmoothStep;
+                if (step < plugin.numberOfSmoothSteps)
+                    gain = gain + plugin.fifthFilter8GainDiff;
+                    qFactor = qFactor + plugin.fifthFilter8QDiff;
+                    
+                    [plugin.fifthCoeffb8, plugin.fifthCoeffa8] = peakNotchFilterCoeffs(...
+                        plugin, fs, ...
+                        plugin.fifthFrequency8,...
+                        qFactor,...
+                        gain);
+                    
+                    plugin.fifthFilter8SmoothStep = step + 1;
+                    % Do not set updateFifthFilter8 to false because we want
+                    % it to continue updating until we finish the smoothing
+                    % operation
+                    
+                    plugin.fifthGain8 = gain; %store updated fifth gain
+                    plugin.fifthQFactor8 = qFactor; % store updated Q value
+                    
+                    % Update visualizer
+                    updateStateChangeStatus(plugin, true);
+                else % Case: at the end of smoothing
+                    gain = plugin.fifthFilter8GainTarget;
+                    qFactor = plugin.fifthFilter8QTarget;
+                    [plugin.fifthCoeffb8, plugin.fifthCoeffa8] = peakNotchFilterCoeffs(...
+                        plugin, fs, ...
+                        plugin.fifthFrequency8,...
+                        qFactor,...
+                        gain);
+                    plugin.fifthFilter8SmoothStatus = false;
+                    plugin.updateFifthFilter8 = false; % No need to update further since smoothing complete
+                    
+                    plugin.fifthGain8 = gain; %store updated fifth gain
+                    plugin.fifthQFactor8 = qFactor; % store updated Q value
+                    updateStateChangeStatus(plugin, true);
+                end
+            end
         end
         
         function buildFifthFilter9(plugin, fs)
@@ -3611,12 +3652,55 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateFifthFilter8Params(plugin)
-            if plugin.fifthFrequency8 < plugin.highCrossoverFreq
-                plugin.fifthGain8 = plugin.highMidRegionGain;
-                plugin.fifthQFactor8 = plugin.highMidRegionQFactor;
-            else
-                plugin.fifthGain8 = plugin.highRegionGain;
-                plugin.fifthQFactor8 = plugin.highRegionQFactor;
+            if plugin.fifthFrequency8 < plugin.highCrossoverFreq % fifth filter 8 is in mid-high region
+                if plugin.fifthFilter8Region == 4 % Already in mid-high region
+                    % Update values if smoothing is done
+                    %todo: should this reset the smoothing instead?
+                    if ~plugin.fifthFilter8SmoothStatus
+                        plugin.fifthGain8 = plugin.highMidRegionGain;
+                        plugin.fifthQFactor8 = plugin.highMidRegionQFactor;
+                    end
+                    
+                else % Was in high region (5)
+                    plugin.fifthFilter8Region = 4; % set filter region to high (4)
+                    plugin.fifthFilter8GainTarget = plugin.highMidRegionGain;
+                    gainDiff = plugin.highMidRegionGain - plugin.fifthGain8; % set differential for gain
+                    plugin.fifthFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter8QTarget = plugin.highMidRegionQFactor;
+                    qDiff = plugin.highMidRegionQFactor - plugin.fifthQFactor8;
+                    plugin.fifthFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter8SmoothStep = 0; % Reset the step counter for smoothing
+                    plugin.fifthFilter8SmoothStatus = true; % Activate gain smoothing
+                    % Updating plugin.fifthGain8 will be taken care of by
+                    % buildFifthFilter8()
+                end
+                
+            else % fifth filter 8 is in high region
+                if plugin.fifthFilter8Region == 5 % Already in high region
+                    % Update values if smoothing is done
+                    if ~plugin.fifthFilter8SmoothStatus
+                        plugin.fifthGain8 = plugin.highRegionGain;
+                        plugin.fifthQFactor8 = plugin.highRegionQFactor;
+                    end
+                    
+                else % Was in higih-mid region (4)
+                    plugin.fifthFilter8Region = 5; % set filter region to high (5)
+                    plugin.fifthFilter8GainTarget = plugin.highRegionGain;
+                    gainDiff = plugin.highRegionGain - plugin.fifthGain8; % set differential for gain
+                    plugin.fifthFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter8QTarget = plugin.highRegionQFactor;
+                    qDiff = plugin.highRegionQFactor - plugin.fifthQFactor8;
+                    plugin.fifthFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter8SmoothStep = 0; % Reset the step counter for smoothing
+                    plugin.fifthFilter8SmoothStatus = true; % Activate gain smoothing
+                    % Updating plugin.fifthGain8 will be taken care of by
+                    % buildFifthFilter8()
+                end
+                
             end
             
             setUpdateFifthFilter8(plugin);
