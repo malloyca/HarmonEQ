@@ -637,6 +637,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootFilter6QSmooth = false
         rootFilter6QStep = Inf;
         
+        rootFilter7GainDiff = 0;
+        rootFilter7GainTarget = 0;
+        rootFilter7GainSmooth = false;
+        rootFilter7GainStep = Inf;
+        rootFilter7QDiff = 26;
+        rootFilter7QTarget = 26;
+        rootFilter7QSmooth = false
+        rootFilter7QStep = Inf;
+        
         %test
         rootFilter8SmoothStatus = false;
         rootFilter8SmoothStep = 0;
@@ -2196,12 +2205,54 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function buildRootFilter7(plugin, fs)
-            [plugin.rootCoeffb7, plugin.rootCoeffa7] = peakNotchFilterCoeffs(...
-                plugin, fs, ...
-                plugin.rootFrequency7,...
-                plugin.rootQFactor7,...
-                plugin.rootGain7);
-            plugin.updateRootFilter7 = false;
+            % Case: no smoothing active
+            if ~plugin.rootFilter7GainSmooth && ~plugin.rootFilter7QSmooth
+                [plugin.rootCoeffb7, plugin.rootCoeffa7] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.rootFrequency7,...
+                    plugin.rootQFactor7,...
+                    plugin.rootGain7);
+                plugin.updateRootFilter7 = false; % No need to update further since no smoothing
+            
+            else % Case gain or q smoothing is active
+                gain = plugin.rootGain7;
+                qFactor = plugin.rootQFactor7;
+                gainStep = plugin.rootFilter7GainStep;
+                qStep = plugin.rootFilter7QStep;
+                
+                if gainStep < plugin.numberOfSmoothSteps % Case: gain smoothing active and incomplete
+                    gain = gain + plugin.rootFilter7GainDiff;
+                    plugin.rootFilter7GainStep = gainStep + 1; % iterate gain smooth step counter
+                    plugin.rootGain7 = gain; % store updated gain value
+                    
+                elseif plugin.rootFilter7GainSmooth % Case: final step of gain smoothing
+                    gain = plugin.rootFilter7GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    plugin.rootGain7 = gain;
+                    
+                    plugin.rootFilter7GainDiff = 0;
+                    plugin.rootFilter7GainSmooth = false; % Set gain smoothing to false
+                end
+                
+                if qStep < plugin.numberOfSmoothSteps
+                    qFactor = qFactor + plugin.rootFilter7QDiff;
+                    plugin.rootFilter7QStep = qStep + 1; %iterate q smooth step counter
+                    plugin.rootQFactor7 = qFactor; % store updated q value
+                    
+                elseif plugin.rootFilter7QSmooth % Case: final step of q smoothing
+                    qFactor = plugin.rootFilter7QTarget;
+                    plugin.rootQFactor7 = qFactor;
+                    
+                    plugin.rootFilter7QDiff = 0;
+                    plugin.rootFilter7QSmooth = false; % set q smoothing to false
+                end
+                
+                [plugin.rootCoeffb7, plugin.rootCoeffa7] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.rootFrequency7,...
+                    qFactor,...
+                    gain);
+            end
+            updateStateChangeStatus(plugin, true);
         end
         
         function buildRootFilter8(plugin, fs)
@@ -3404,7 +3455,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateRootGain7(plugin,val)
-            plugin.rootGain7 = val;
+            plugin.rootFilter7GainTarget = val;
+            gainDiff = val - plugin.rootGain7; % set differential for gain
+            plugin.rootFilter7GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            
+            plugin.rootFilter7GainStep = 0;
+            plugin.rootFilter7GainSmooth = true;
+            
+            setUpdateRootFilter7(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         %test
@@ -3490,7 +3549,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateRootQFactor7(plugin,val)
-            plugin.rootQFactor7 = val;
+            plugin.rootFilter7QTarget = val;
+            qDiff = val - plugin.rootQFactor7; % set differential for q
+            plugin.rootFilter7QDiff = qDiff / plugin.numberOfSmoothSteps;
+            
+            plugin.rootFilter7QStep = 0;
+            plugin.rootFilter7QSmooth = true;
+            
+            setUpdateRootFilter7(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateRootQFactor8(plugin,val)
