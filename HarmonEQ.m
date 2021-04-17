@@ -586,11 +586,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootFilter1GainDiff = 0;
         rootFilter1GainTarget = 0;
         rootFilter1GainSmooth = false;
-        rootFilter1GainStep = 100;
+        rootFilter1GainStep = Inf;
         rootFilter1QDiff = 26;
         rootFilter1QTarget = 26;
         rootFilter1QSmooth = false
-        rootFilter1QStep = 100;
+        rootFilter1QStep = Inf;
         
         %test
         rootFilter2SmoothStatus = false; %todo: deprecated?
@@ -600,9 +600,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         rootFilter2QDiff = 26;
         rootFilter2QTarget = 26;
         rootFilter2GainSmooth = false;
-        rootFilter2GainStep = 100;
+        rootFilter2GainStep = Inf;
         rootFilter2QSmooth = false
-        rootFilter2QStep = 100;
+        rootFilter2QStep = Inf;
         
         rootFilter4SmoothStatus = false;
         rootFilter4SmoothStep = 0;
@@ -1853,7 +1853,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     qFactor = qFactor + plugin.rootFilter1QDiff;
                     plugin.rootFilter1QStep = qStep + 1; %iterate q smooth step counter
                     plugin.rootQFactor1 = qFactor; % store updated q value
-                    disp(qStep);
                     
                 elseif plugin.rootFilter1QSmooth % Case: final step of q smoothing
                     qFactor = plugin.rootFilter1QTarget;
@@ -1861,7 +1860,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     
                     plugin.rootFilter1QDiff = 0;
                     plugin.rootFilter1QSmooth = false; % set q smoothing to false
-                    disp('Done q smoothing');
                 end
                 
                 [plugin.rootCoeffb1, plugin.rootCoeffa1] = peakNotchFilterCoeffs(...
@@ -1870,7 +1868,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     qFactor,...
                     gain);
             end
-            disp('buildRootFilter1() called');
             updateStateChangeStatus(plugin, true);
         end
         
@@ -1883,7 +1880,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor2,...
                     plugin.rootGain2);
                 plugin.updateRootFilter2 = false; % No need to update further since no smoothing
-                disp('buildRootFilter2() thinks smoothing is not active');
             
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain2;
@@ -1922,7 +1918,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         qFactor,...
                         gain);
             end
-            disp('buildRootFilter2() called');
             updateStateChangeStatus(plugin, true);
         end
         
@@ -3259,9 +3254,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             setUpdateRootFilter1(plugin);
             updateStateChangeStatus(plugin, true);
             
-            disp('updateRootGain1() called');
-            disp(val);
-            
             %plugin.rootGain1 = val;
         end
         
@@ -3279,8 +3271,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             setUpdateRootFilter2(plugin);
             updateStateChangeStatus(plugin, true);
-            
-            disp('updateRootGain2() called');
             
             %plugin.rootGain2 = val;
         end
@@ -3323,8 +3313,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             setUpdateRootFilter1(plugin);
             updateStateChangeStatus(plugin, true);
-            
-            disp('updateRootQFactor1() called');
         end
         
         %test
@@ -3338,8 +3326,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             setUpdateRootFilter2(plugin);
             updateStateChangeStatus(plugin, true);
-            
-            disp('updateRootQFactor2() called');
             
             %plugin.rootQFactor2 = val;
         end
