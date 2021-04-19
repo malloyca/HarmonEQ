@@ -83,3 +83,5 @@ This project is currently in active development. The primary DSP functionality i
 - Smoothing has been implemented for when a filter changes controls regions (when the user adjusts a crossover control). However, this should really be implemented for any time there's a sudden shift in a parameter value, i.e. when a filer is activated/deactivated or the chord is changed.
   - How I have another plan in mind for when the chord is changed...
   - Perhaps the easiest way to implement this is to just smooth all parameter adjustments. Then you don't need complicated rules and it'll always be smoother. However, if I take this route, I may need more intelligent smoothing rules based on buffer size.
+- Can you set it so that adjusting the crossover settings does not continuously reset filter smoothing?
+  - I.e., it should only update once when the filter changes control region.
