@@ -66,6 +66,7 @@ This project is currently in active development. The primary DSP functionality i
 
 
 ### TODO list:
+- Implement harmonic fifth and seventh filter smoothing
 - Test to see if the filter frequency jumps needs smoothing.
   - Due the nature of the controls, the filter bands get adjusted instantaneously instead of gradually like on a regular EQ. This seems to cause some quite apparent audio artifacts.
   - There are a few ways smoothing could be applied.
@@ -75,9 +76,6 @@ This project is currently in active development. The primary DSP functionality i
   - In order to implement this, maybe I should convert the chord information to matrix form?
     - It might actually be simpler programming-wise to use the currently existing `thirdIntervalDistance`, etc attributes to creat a set of rules for concatenating the chord names to set the drop-down box.
   - A fun complication is dealing with "incomplete" chords (i.e., C7 (no fifth)). There are going to be a lot of option in this drop-down menu...
-- Smooth gain / Q value updates
-  - This isn't really a problem when changing the controls because that will do it more gradually. However when a peak updates due to changing a crossover frequency, then it could be a big, sudden jump. Need to smooth that.
-    - Possiblities: timed ramps, traditional one pole parameter smoothing
 - Post instructions for removing plugins from quarantine on macOS
 
 
