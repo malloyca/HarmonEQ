@@ -35,7 +35,7 @@ Pre-compiled versions of the plugin are available:
 
 
 ## Development Roadmap
-This project is currently in active development. The primary DSP functionality is implemented. I am currently working on designing the UI.
+This project is currently in active development. The primary DSP functionality is implemented. Current work is on transition smoothing and UI refinements.
 
 ### Features intended for April 6 deadline:
 - Harmonic controls:
