@@ -926,12 +926,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter7QSmooth = false
         seventhFilter7QStep = Inf;
         
-        seventhFilter8SmoothStatus = false;
-        seventhFilter8SmoothStep = 0;
         seventhFilter8GainDiff = 0;
         seventhFilter8GainTarget = 0;
+        seventhFilter8GainSmooth = false;
+        seventhFilter8GainStep = Inf;
         seventhFilter8QDiff = 26;
         seventhFilter8QTarget = 26;
+        seventhFilter8QSmooth = false
+        seventhFilter8QStep = Inf;
         
         numberOfSmoothSteps = 100; %todo: Find a good value for this
         
@@ -3741,53 +3743,54 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function buildSeventhFilter8(plugin, fs)
-            if ~plugin.seventhFilter8SmoothStatus % No smoothing necessary
+            % Case: no smoothing active
+            if ~plugin.seventhFilter8GainSmooth && ~plugin.seventhFilter8QSmooth
                 [plugin.seventhCoeffb8, plugin.seventhCoeffa8] = peakNotchFilterCoeffs(...
                     plugin, fs, ...
                     plugin.seventhFrequency8,...
                     plugin.seventhQFactor8,...
                     plugin.seventhGain8);
                 plugin.updateSeventhFilter8 = false; % No need to update further since no smoothing
-            else % Case: smoothing active
+            
+            else % Case gain or q smoothing is active
                 gain = plugin.seventhGain8;
                 qFactor = plugin.seventhQFactor8;
-                step = plugin.seventhFilter8SmoothStep;
-                if (step < plugin.numberOfSmoothSteps)
+                gainStep = plugin.seventhFilter8GainStep;
+                qStep = plugin.seventhFilter8QStep;
+                
+                if gainStep < plugin.numberOfSmoothSteps % Case: gain smoothing active and incomplete
                     gain = gain + plugin.seventhFilter8GainDiff;
-                    qFactor = qFactor + plugin.seventhFilter8QDiff;
+                    plugin.seventhFilter8GainStep = gainStep + 1; % iterate gain smooth step counter
+                    plugin.seventhGain8 = gain; % store updated gain value
                     
-                    [plugin.seventhCoeffb8, plugin.seventhCoeffa8] = peakNotchFilterCoeffs(...
-                        plugin, fs, ...
-                        plugin.seventhFrequency8,...
-                        qFactor,...
-                        gain);
+                elseif plugin.seventhFilter8GainSmooth % Case: final step of gain smoothing
+                    gain = plugin.seventhFilter8GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    plugin.seventhGain8 = gain;
                     
-                    plugin.seventhFilter8SmoothStep = step + 1;
-                    % Do not set updateSeventhFilter8 to false because we want
-                    % it to continue updating until we finish the smoothing
-                    % operation
-                    
-                    plugin.seventhGain8 = gain; %store updated seventh gain
-                    plugin.seventhQFactor8 = qFactor; % store updated Q value
-                    
-                    % Update visualizer
-                    updateStateChangeStatus(plugin, true);
-                else % Case: at the end of smoothing
-                    gain = plugin.seventhFilter8GainTarget;
-                    qFactor = plugin.seventhFilter8QTarget;
-                    [plugin.seventhCoeffb8, plugin.seventhCoeffa8] = peakNotchFilterCoeffs(...
-                        plugin, fs, ...
-                        plugin.seventhFrequency8,...
-                        qFactor,...
-                        gain);
-                    plugin.seventhFilter8SmoothStatus = false;
-                    plugin.updateSeventhFilter8 = false; % No need to update further since smoothing complete
-                    
-                    plugin.seventhGain8 = gain; %store updated seventh gain
-                    plugin.seventhQFactor8 = qFactor; % store updated Q value
-                    updateStateChangeStatus(plugin, true);
+                    plugin.seventhFilter8GainDiff = 0;
+                    plugin.seventhFilter8GainSmooth = false; % Set gain smoothing to false
                 end
+                
+                if qStep < plugin.numberOfSmoothSteps
+                    qFactor = qFactor + plugin.seventhFilter8QDiff;
+                    plugin.seventhFilter8QStep = qStep + 1; %iterate q smooth step counter
+                    plugin.seventhQFactor8 = qFactor; % store updated q value
+                    
+                elseif plugin.seventhFilter8QSmooth % Case: final step of q smoothing
+                    qFactor = plugin.seventhFilter8QTarget;
+                    plugin.seventhQFactor8 = qFactor;
+                    
+                    plugin.seventhFilter8QDiff = 0;
+                    plugin.seventhFilter8QSmooth = false; % set q smoothing to false
+                end
+                
+                [plugin.seventhCoeffb8, plugin.seventhCoeffa8] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.seventhFrequency8,...
+                    qFactor,...
+                    gain);
             end
+            updateStateChangeStatus(plugin, true);
         end
         
         function buildSeventhFilter9(plugin, fs)
@@ -5479,57 +5482,40 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhFilter8Params(plugin)
-            if plugin.seventhFrequency8 < plugin.highCrossoverFreq % seventh filter 8 is in mid-high region
-                if plugin.seventhFilter8Region == 4 % Already in mid-high region
-                    % Update values if smoothing is done
-                    %todo: should this reset the smoothing instead?
-                    if ~plugin.seventhFilter8SmoothStatus
-                        plugin.seventhGain8 = plugin.highMidRegionGain;
-                        plugin.seventhQFactor8 = plugin.highMidRegionQFactor;
-                    end
-                    
-                else % Was in high region (5)
-                    plugin.seventhFilter8Region = 4; % set filter region to high (4)
-                    plugin.seventhFilter8GainTarget = plugin.highMidRegionGain;
-                    gainDiff = plugin.highMidRegionGain - plugin.seventhGain8; % set differential for gain
-                    plugin.seventhFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
-                    
-                    plugin.seventhFilter8QTarget = plugin.highMidRegionQFactor;
-                    qDiff = plugin.highMidRegionQFactor - plugin.seventhQFactor8;
-                    plugin.seventhFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
-                    
-                    plugin.seventhFilter8SmoothStep = 0; % Reset the step counter for smoothing
-                    plugin.seventhFilter8SmoothStatus = true; % Activate gain smoothing
-                    % Updating plugin.seventhGain8 will be taken care of by
-                    % buildSeventhFilter8()
-                end
+            if plugin.seventhFrequency8 < plugin.highCrossoverFreq % seventh filter 8 is in high-mid control region
+                plugin.seventhFilter8GainTarget = plugin.highMidRegionGain;
+                gainDiff = plugin.highMidRegionGain - plugin.seventhGain8; % set differential for gain
+                plugin.seventhFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
                 
-            else % Seventh filter 8 is in high region
-                if plugin.seventhFilter8Region == 5 % Already in high region
-                    % Update values if smoothing is done
-                    if ~plugin.seventhFilter8SmoothStatus
-                        plugin.seventhGain8 = plugin.highRegionGain;
-                        plugin.seventhQFactor8 = plugin.highRegionQFactor;
-                    end
-                    
-                else % Was in higih-mid region (4)
-                    plugin.seventhFilter8Region = 5; % set filter region to high (5)
-                    plugin.seventhFilter8GainTarget = plugin.highRegionGain;
-                    gainDiff = plugin.highRegionGain - plugin.seventhGain8; % set differential for gain
-                    plugin.seventhFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
-                    
-                    plugin.seventhFilter8QTarget = plugin.highRegionQFactor;
-                    qDiff = plugin.highRegionQFactor - plugin.seventhQFactor8;
-                    plugin.seventhFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
-                    
-                    plugin.seventhFilter8SmoothStep = 0; % Reset the step counter for smoothing
-                    plugin.seventhFilter8SmoothStatus = true; % Activate gain smoothing
-                    % Updating plugin.seventhGain8 will be taken care of by
-                    % buildSeventhFilter8()
-                end
+                plugin.seventhFilter8QTarget = plugin.highMidRegionQFactor;
+                qDiff = plugin.highMidRegionQFactor - plugin.seventhQFactor8;
+                plugin.seventhFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
                 
+                plugin.seventhFilter8GainStep = 0;
+                plugin.seventhFilter8GainSmooth = true;
+                plugin.seventhFilter8QStep = 0;
+                plugin.seventhFilter8QSmooth = true;
+                
+                % Updating plugin.seventhGain8 will be taken care of by
+                % buildSeventhFilter8()
+                
+            else % then seventh filter 8 is in high control region
+                plugin.seventhFilter8GainTarget = plugin.highRegionGain;
+                gainDiff = plugin.highRegionGain - plugin.seventhGain8; % set differential for gain
+                plugin.seventhFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                
+                plugin.seventhFilter8QTarget = plugin.highRegionQFactor;
+                qDiff = plugin.highRegionQFactor - plugin.seventhQFactor8;
+                plugin.seventhFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
+                
+                plugin.seventhFilter8GainStep = 0;
+                plugin.seventhFilter8GainSmooth = true;
+                plugin.seventhFilter8QStep = 0;
+                plugin.seventhFilter8QSmooth = true;
+                
+                % Updating plugin.seventhGain8 will be taken care of by
+                % buildSeventhFilter8()
             end
-            
             setUpdateSeventhFilter8(plugin);
             updateStateChangeStatus(plugin, true);
         end
@@ -5620,7 +5606,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhGain8(plugin,val)
-            plugin.seventhGain8 = val;
+            plugin.seventhFilter8GainTarget = val;
+            gainDiff = val - plugin.seventhGain8; % set differential for gain
+            plugin.seventhFilter8GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            
+            plugin.seventhFilter8GainStep = 0;
+            plugin.seventhFilter8GainSmooth = true;
+            
+            setUpdateSeventhFilter8(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateSeventhGain9(plugin,val)
@@ -5712,7 +5706,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhQFactor8(plugin,val)
-            plugin.seventhQFactor8 = val;
+            plugin.seventhFilter8QTarget = val;
+            qDiff = val - plugin.seventhQFactor8; % set differential for q
+            plugin.seventhFilter8QDiff = qDiff / plugin.numberOfSmoothSteps;
+            
+            plugin.seventhFilter8QStep = 0;
+            plugin.seventhFilter8QSmooth = true;
+            
+            setUpdateSeventhFilter8(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateSeventhQFactor9(plugin,val)
