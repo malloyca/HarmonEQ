@@ -898,6 +898,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter4QSmooth = false
         seventhFilter4QStep = Inf;
         
+        seventhFilter5GainDiff = 0;
+        seventhFilter5GainTarget = 0;
+        seventhFilter5GainSmooth = false;
+        seventhFilter5GainStep = Inf;
+        seventhFilter5QDiff = 26;
+        seventhFilter5QTarget = 26;
+        seventhFilter5QSmooth = false
+        seventhFilter5QStep = Inf;
+        
         %test
         seventhFilter6SmoothStatus = false;
         seventhFilter6SmoothStep = 0;
@@ -3568,12 +3577,54 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %test
         function buildSeventhFilter5(plugin, fs)
-            [plugin.seventhCoeffb5, plugin.seventhCoeffa5] = peakNotchFilterCoeffs(...
-                plugin, fs, ...
-                plugin.seventhFrequency5,...
-                plugin.seventhQFactor5,...
-                plugin.seventhGain5);
-            plugin.updateSeventhFilter5 = false;
+            % Case: no smoothing active
+            if ~plugin.seventhFilter5GainSmooth && ~plugin.seventhFilter5QSmooth
+                [plugin.seventhCoeffb5, plugin.seventhCoeffa5] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.seventhFrequency5,...
+                    plugin.seventhQFactor5,...
+                    plugin.seventhGain5);
+                plugin.updateSeventhFilter5 = false; % No need to update further since no smoothing
+            
+            else % Case gain or q smoothing is active
+                gain = plugin.seventhGain5;
+                qFactor = plugin.seventhQFactor5;
+                gainStep = plugin.seventhFilter5GainStep;
+                qStep = plugin.seventhFilter5QStep;
+                
+                if gainStep < plugin.numberOfSmoothSteps % Case: gain smoothing active and incomplete
+                    gain = gain + plugin.seventhFilter5GainDiff;
+                    plugin.seventhFilter5GainStep = gainStep + 1; % iterate gain smooth step counter
+                    plugin.seventhGain5 = gain; % store updated gain value
+                    
+                elseif plugin.seventhFilter5GainSmooth % Case: final step of gain smoothing
+                    gain = plugin.seventhFilter5GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    plugin.seventhGain5 = gain;
+                    
+                    plugin.seventhFilter5GainDiff = 0;
+                    plugin.seventhFilter5GainSmooth = false; % Set gain smoothing to false
+                end
+                
+                if qStep < plugin.numberOfSmoothSteps
+                    qFactor = qFactor + plugin.seventhFilter5QDiff;
+                    plugin.seventhFilter5QStep = qStep + 1; %iterate q smooth step counter
+                    plugin.seventhQFactor5 = qFactor; % store updated q value
+                    
+                elseif plugin.seventhFilter5QSmooth % Case: final step of q smoothing
+                    qFactor = plugin.seventhFilter5QTarget;
+                    plugin.seventhQFactor5 = qFactor;
+                    
+                    plugin.seventhFilter5QDiff = 0;
+                    plugin.seventhFilter5QSmooth = false; % set q smoothing to false
+                end
+                
+                [plugin.seventhCoeffb5, plugin.seventhCoeffa5] = peakNotchFilterCoeffs(...
+                    plugin, fs, ...
+                    plugin.seventhFrequency5,...
+                    qFactor,...
+                    gain);
+            end
+            updateStateChangeStatus(plugin, true);
         end
         
         function buildSeventhFilter6(plugin, fs)
@@ -5496,7 +5547,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhGain5(plugin,val)
-            plugin.seventhGain5 = val;
+            plugin.seventhFilter5GainTarget = val;
+            gainDiff = val - plugin.seventhGain5; % set differential for gain
+            plugin.seventhFilter5GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            
+            plugin.seventhFilter5GainStep = 0;
+            plugin.seventhFilter5GainSmooth = true;
+            
+            setUpdateSeventhFilter5(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateSeventhGain6(plugin,val)
@@ -5564,7 +5623,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhQFactor5(plugin,val)
-            plugin.seventhQFactor5 = val;
+            plugin.seventhFilter5QTarget = val;
+            qDiff = val - plugin.seventhQFactor5; % set differential for q
+            plugin.seventhFilter5QDiff = qDiff / plugin.numberOfSmoothSteps;
+            
+            plugin.seventhFilter5QStep = 0;
+            plugin.seventhFilter5QSmooth = true;
+            
+            setUpdateSeventhFilter5(plugin);
+            updateStateChangeStatus(plugin, true);
         end
         
         function updateSeventhQFactor6(plugin,val)
