@@ -66,7 +66,6 @@ This project is currently in active development. The primary DSP functionality i
 
 
 ### TODO list:
-- Implement harmonic fifth and seventh filter smoothing
 - Test to see if the filter frequency jumps needs smoothing.
   - Due the nature of the controls, the filter bands get adjusted instantaneously instead of gradually like on a regular EQ. This seems to cause some quite apparent audio artifacts.
   - There are a few ways smoothing could be applied.
