@@ -4969,39 +4969,44 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateFifthFilter4Params(plugin)
-            if plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq % fifth filter 4 is in low-mid control region
-                plugin.fifthFilter4GainTarget = plugin.lowMidRegionGain;
-                gainDiff = plugin.lowMidRegionGain - plugin.fifthGain4; % set differential for gain
-                plugin.fifthFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            % Case: fifth filter 4 is in low-mid control region
+            if plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq
+                if plugin.fifthFilter4GainTarget ~= plugin.lowMidRegionGain
+                    plugin.fifthFilter4GainTarget = plugin.lowMidRegionGain;
+                    gainDiff = plugin.lowMidRegionGain - plugin.fifthGain4; % set differential for gain
+                    plugin.fifthFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter4GainStep = 0;
+                    plugin.fifthFilter4GainSmooth = true;
+                end
                 
-                plugin.fifthFilter4QTarget = plugin.lowMidRegionQFactor;
-                qDiff = plugin.lowMidRegionQFactor - plugin.fifthQFactor4;
-                plugin.fifthFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                if plugin.fifthFilter4QTarget ~= plugin.lowMidRegionQFactor
+                    plugin.fifthFilter4QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.fifthQFactor4;
+                    plugin.fifthFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter4QStep = 0;
+                    plugin.fifthFilter4QSmooth = true;
+                end
                 
-                plugin.fifthFilter4GainStep = 0;
-                plugin.fifthFilter4GainSmooth = true;
-                plugin.fifthFilter4QStep = 0;
-                plugin.fifthFilter4QSmooth = true;
+            else % Case: fifth filter 4 is in mid control region
+                if plugin.fifthFilter4GainTarget ~= plugin.midRegionGain
+                    plugin.fifthFilter4GainTarget = plugin.midRegionGain;
+                    gainDiff = plugin.midRegionGain - plugin.fifthGain4; % set differential for gain
+                    plugin.fifthFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter4GainStep = 0;
+                    plugin.fifthFilter4GainSmooth = true;
+                end
                 
-                % Updating plugin.fifthGain4 will be taken care of by
-                % buildFifthFilter4()
-                
-            else % then fifth filter 4 is in mid control region
-                plugin.fifthFilter4GainTarget = plugin.midRegionGain;
-                gainDiff = plugin.midRegionGain - plugin.fifthGain4; % set differential for gain
-                plugin.fifthFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.fifthFilter4QTarget = plugin.midRegionQFactor;
-                qDiff = plugin.midRegionQFactor - plugin.fifthQFactor4;
-                plugin.fifthFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.fifthFilter4GainStep = 0;
-                plugin.fifthFilter4GainSmooth = true;
-                plugin.fifthFilter4QStep = 0;
-                plugin.fifthFilter4QSmooth = true;
-                
-                % Updating plugin.fifthGain4 will be taken care of by
-                % buildFifthFilter4()
+                if plugin.fifthFilter4QTarget ~= plugin.midRegionQFactor
+                    plugin.fifthFilter4QTarget = plugin.midRegionQFactor;
+                    qDiff = plugin.midRegionQFactor - plugin.fifthQFactor4;
+                    plugin.fifthFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter4QStep = 0;
+                    plugin.fifthFilter4QSmooth = true;
+                end
             end
             setUpdateFifthFilter4(plugin);
             updateStateChangeStatus(plugin, true);
