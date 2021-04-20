@@ -907,7 +907,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter5QSmooth = false
         seventhFilter5QStep = Inf;
         
-        %test
         seventhFilter6GainDiff = 0;
         seventhFilter6GainTarget = 0;
         seventhFilter6GainSmooth = false;
@@ -2269,7 +2268,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function buildRootFilter6(plugin, fs)
             % Case: no smoothing active
             if ~plugin.rootFilter6GainSmooth && ~plugin.rootFilter6QSmooth
@@ -3597,7 +3595,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function buildSeventhFilter5(plugin, fs)
             % Case: no smoothing active
             if ~plugin.seventhFilter5GainSmooth && ~plugin.seventhFilter5QSmooth
@@ -3922,7 +3919,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %todo: This can probably just call updateRoot2Gain() and
         %updateRoot2Q()...
-        %test: don't need to track region right now...
         function updateRootFilter2Params(plugin)
             % Case: root filter two is in low control region
             if plugin.rootFrequency2 < plugin.lowCrossoverFreq
@@ -4185,7 +4181,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function updateRootGain8(plugin,val)
             plugin.rootFilter8GainTarget = val;
             gainDiff = val - plugin.rootGain8; % set differential for gain
@@ -4222,7 +4217,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function updateRootQFactor2(plugin,val)
             plugin.rootFilter2QTarget = val;
             qDiff = val - plugin.rootQFactor2; % set differential for q
@@ -4927,40 +4921,48 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
+        %test
+        %todo: fix crossover update bug for harmonic fifth and seventh
+        %filters
         function updateFifthFilter2Params(plugin)
-            if plugin.fifthFrequency2 < plugin.lowCrossoverFreq % fifth filter 2 is in low control region
-                plugin.fifthFilter2GainTarget = plugin.lowRegionGain;
-                gainDiff = plugin.lowRegionGain - plugin.fifthGain2; % set differential for gain
-                plugin.fifthFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            % Case: fifth filter 2 is in low control region
+            if plugin.fifthFrequency2 < plugin.lowCrossoverFreq
+                if plugin.fifthFilter2GainTarget ~= plugin.lowRegionGain
+                    plugin.fifthFilter2GainTarget = plugin.lowRegionGain;
+                    gainDiff = plugin.lowRegionGain - plugin.fifthGain2; % set differential for gain
+                    plugin.fifthFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2GainStep = 0;
+                    plugin.fifthFilter2GainSmooth = true;
+                end
                 
-                plugin.fifthFilter2QTarget = plugin.lowRegionQFactor;
-                qDiff = plugin.lowRegionQFactor - plugin.fifthQFactor2;
-                plugin.fifthFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                if plugin.fifthFilter2QTarget ~= plugin.lowRegionQFactor
+                    plugin.fifthFilter2QTarget = plugin.lowRegionQFactor;
+                    qDiff = plugin.lowRegionQFactor - plugin.fifthQFactor2;
+                    plugin.fifthFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2QStep = 0;
+                    plugin.fifthFilter2QSmooth = true;
+                end
                 
-                plugin.fifthFilter2GainStep = 0;
-                plugin.fifthFilter2GainSmooth = true;
-                plugin.fifthFilter2QStep = 0;
-                plugin.fifthFilter2QSmooth = true;
+            else % Case: fifth filter 2 is in mid-low control region
+                if plugin.fifthFilter2GainTarget ~= plugin.lowMidRegionGain
+                    plugin.fifthFilter2GainTarget = plugin.lowMidRegionGain;
+                    gainDiff = plugin.lowMidRegionGain - plugin.fifthGain2; % set differential for gain
+                    plugin.fifthFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2GainStep = 0;
+                    plugin.fifthFilter2GainSmooth = true;
+                end
                 
-                % Updating plugin.fifthGain2 will be taken care of by
-                % buildFifthFilter2()
-                
-            else % then fifth filter 2 is in mid-low control region
-                plugin.fifthFilter2GainTarget = plugin.lowMidRegionGain;
-                gainDiff = plugin.lowMidRegionGain - plugin.fifthGain2; % set differential for gain
-                plugin.fifthFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.fifthFilter2QTarget = plugin.lowMidRegionQFactor;
-                qDiff = plugin.lowMidRegionQFactor - plugin.fifthQFactor2;
-                plugin.fifthFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.fifthFilter2GainStep = 0;
-                plugin.fifthFilter2GainSmooth = true;
-                plugin.fifthFilter2QStep = 0;
-                plugin.fifthFilter2QSmooth = true;
-                
-                % Updating plugin.fifthGain2 will be taken care of by
-                % buildFifthFilter2()
+                if plugin.fifthFilter2QTarget ~= plugin.lowMidRegionQFactor
+                    plugin.fifthFilter2QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.fifthQFactor2;
+                    plugin.fifthFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.fifthFilter2QStep = 0;
+                    plugin.fifthFilter2QSmooth = true;
+                end
             end
             setUpdateFifthFilter2(plugin);
             updateStateChangeStatus(plugin, true);
@@ -5484,7 +5486,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function updateSeventhFilter6Params(plugin)
             if plugin.seventhFrequency6 < plugin.midHighCrossoverFreq % seventh filter 6 is in mid control region
                 plugin.seventhFilter6GainTarget = plugin.midRegionGain;
@@ -5599,7 +5600,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %test
         function updateSeventhGain4(plugin,val)
             plugin.seventhFilter4GainTarget = val;
             gainDiff = val - plugin.seventhGain4; % set differential for gain
