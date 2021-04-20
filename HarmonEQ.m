@@ -4921,9 +4921,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
-        %test
-        %todo: fix crossover update bug for harmonic fifth and seventh
-        %filters
         function updateFifthFilter2Params(plugin)
             % Case: fifth filter 2 is in low control region
             if plugin.fifthFrequency2 < plugin.lowCrossoverFreq
@@ -5424,39 +5421,44 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhFilter2Params(plugin)
-            if plugin.seventhFrequency2 < plugin.lowCrossoverFreq % seventh filter 2 is in low control region
-                plugin.seventhFilter2GainTarget = plugin.lowRegionGain;
-                gainDiff = plugin.lowRegionGain - plugin.seventhGain2; % set differential for gain
-                plugin.seventhFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            % Case: seventh filter 2 is in low control region
+            if plugin.seventhFrequency2 < plugin.lowCrossoverFreq
+                if plugin.seventhFilter2GainTarget ~= plugin.lowRegionGain
+                    plugin.seventhFilter2GainTarget = plugin.lowRegionGain;
+                    gainDiff = plugin.lowRegionGain - plugin.seventhGain2; % set differential for gain
+                    plugin.seventhFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter2GainStep = 0;
+                    plugin.seventhFilter2GainSmooth = true;
+                end
                 
-                plugin.seventhFilter2QTarget = plugin.lowRegionQFactor;
-                qDiff = plugin.lowRegionQFactor - plugin.seventhQFactor2;
-                plugin.seventhFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                if plugin.seventhFilter2QTarget ~= plugin.lowRegionQFactor
+                    plugin.seventhFilter2QTarget = plugin.lowRegionQFactor;
+                    qDiff = plugin.lowRegionQFactor - plugin.seventhQFactor2;
+                    plugin.seventhFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter2QStep = 0;
+                    plugin.seventhFilter2QSmooth = true;
+                end
                 
-                plugin.seventhFilter2GainStep = 0;
-                plugin.seventhFilter2GainSmooth = true;
-                plugin.seventhFilter2QStep = 0;
-                plugin.seventhFilter2QSmooth = true;
+            else % Case: seventh filter 2 is in mid-low control region
+                if plugin.seventhFilter2GainTarget ~= plugin.lowMidRegionGain
+                    plugin.seventhFilter2GainTarget = plugin.lowMidRegionGain;
+                    gainDiff = plugin.lowMidRegionGain - plugin.seventhGain2; % set differential for gain
+                    plugin.seventhFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter2GainStep = 0;
+                    plugin.seventhFilter2GainSmooth = true;
+                end
                 
-                % Updating plugin.seventhGain2 will be taken care of by
-                % buildSeventhFilter2()
-                
-            else % then seventh filter 2 is in mid-low control region
-                plugin.seventhFilter2GainTarget = plugin.lowMidRegionGain;
-                gainDiff = plugin.lowMidRegionGain - plugin.seventhGain2; % set differential for gain
-                plugin.seventhFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.seventhFilter2QTarget = plugin.lowMidRegionQFactor;
-                qDiff = plugin.lowMidRegionQFactor - plugin.seventhQFactor2;
-                plugin.seventhFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.seventhFilter2GainStep = 0;
-                plugin.seventhFilter2GainSmooth = true;
-                plugin.seventhFilter2QStep = 0;
-                plugin.seventhFilter2QSmooth = true;
-                
-                % Updating plugin.seventhGain2 will be taken care of by
-                % buildSeventhFilter2()
+                if plugin.seventhFilter2QTarget ~= plugin.lowMidRegionQFactor
+                    plugin.seventhFilter2QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.seventhQFactor2;
+                    plugin.seventhFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter2QStep = 0;
+                    plugin.seventhFilter2QSmooth = true;
+                end
             end
             setUpdateSeventhFilter2(plugin);
             updateStateChangeStatus(plugin, true);
