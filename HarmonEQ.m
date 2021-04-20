@@ -952,6 +952,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         fifthFiltersActive = false;
         seventhFiltersActive = false;
         
+        %test
+        thirdFiltersDeactivating = false; % this is an intermediary state for smoothly deactivating filters
+        
         % For visalization
         visualizerObject;
         
@@ -1330,7 +1333,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 'set.thirdInterval','ThirdInterval');
             plugin.thirdInterval = val;
             if val == "off"
-                %plugin.thirdFiltersActive = false;
                 deactivateThirdFilters(plugin);
             else
                 %todo: clean up
@@ -2472,7 +2474,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
-        %--------------------Harmonic third filters------------------------
+        %----------------Harmonic third filter builders--------------------
         function buildThirdFilter1(plugin, fs)
             % Case: no smoothing active
             if ~plugin.thirdFilter1GainSmooth && ~plugin.thirdFilter1QSmooth
@@ -2495,11 +2497,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain1 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter1GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter1GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    %test: add a setting to deactivate all third filters
+                    gain = plugin.thirdFilter1GainTarget;
                     plugin.thirdGain1 = gain;
                     
                     plugin.thirdFilter1GainDiff = 0;
                     plugin.thirdFilter1GainSmooth = false; % Set gain smoothing to false
+                    
+                    if plugin.thirdFiltersDeactivating
+                        plugin.thirdFiltersActive = false;
+                        %test
+                        disp('Third filters deactivated');
+                    end
                 end
                 
                 if qStep < plugin.numberOfSmoothSteps
@@ -4864,8 +4873,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.thirdIntervalDistance = val;
         end
         
+        %test
         function deactivateThirdFilters(plugin)
-            plugin.thirdFiltersActive = false;
+            %plugin.thirdFiltersActive = false;
+            
+            % set gain to 0 %todo: when gain reaches 0 smoothly, set
+            % plugin.thirdFiltersActive = false;
+            plugin.thirdFiltersDeactivating = true;
+            updateThirdGain1(plugin, 0);
+            updateThirdGain2(plugin, 0);
+            updateThirdGain3(plugin, 0);
+            updateThirdGain4(plugin, 0);
+            updateThirdGain5(plugin, 0);
+            updateThirdGain6(plugin, 0);
+            updateThirdGain7(plugin, 0);
+            updateThirdGain8(plugin, 0);
+            updateThirdGain9(plugin, 0);
+            
+            %test
+            disp('Third filters deactivating...');
+            
         end
         
         function activateThirdFilters(plugin)
