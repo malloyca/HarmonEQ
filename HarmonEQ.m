@@ -3925,47 +3925,47 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %test: don't need to track region right now...
         function updateRootFilter2Params(plugin)
             if plugin.rootFrequency2 < plugin.lowCrossoverFreq % root filter 2 is in low control region
-                %plugin.rootFilter2Region = 1; % set filter region to low
-                %(1) %todo: not currently using this; remove
-                plugin.rootFilter2GainTarget = plugin.lowRegionGain;
-                gainDiff = plugin.lowRegionGain - plugin.rootGain2; % set differential for gain
-                plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                %test: Don't update if it's not necessary
+                if plugin.rootFilter2GainTarget ~= plugin.lowRegionGain
+                    plugin.rootFilter2GainTarget = plugin.lowRegionGain;
+                    gainDiff = plugin.lowRegionGain - plugin.rootGain2; % set differential for gain
+                    plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter2GainStep = 0;
+                    plugin.rootFilter2GainSmooth = true;
+                end
                 
-                plugin.rootFilter2QTarget = plugin.lowRegionQFactor;
-                qDiff = plugin.lowRegionQFactor - plugin.rootQFactor2;
-                plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
-                
-                %todo: convert to individual smoothing for gain and q
-                %plugin.rootFilter2SmoothStep = 0; % Reset the step counter for smoothing
-                %plugin.rootFilter2SmoothStatus = true; % Activate gain smoothing
-                
-                plugin.rootFilter2GainStep = 0;
-                plugin.rootFilter2GainSmooth = true;
-                plugin.rootFilter2QStep = 0;
-                plugin.rootFilter2QSmooth = true;
+                if plugin.rootFilter2QTarget ~= plugin.lowRegionQFactor
+                    plugin.rootFilter2QTarget = plugin.lowRegionQFactor;
+                    qDiff = plugin.lowRegionQFactor - plugin.rootQFactor2;
+                    plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter2QStep = 0;
+                    plugin.rootFilter2QSmooth = true;
+                end
                 
                 % Updating plugin.rootGain2 will be taken care of by
                 % buildRootFilter2()
                 
-            else % then root filter 2 is in mid-low control region
-                %plugin.rootFilter2Region = 2; % set filter region to low
-                %(1) %todo: not currently using this; remove
-                plugin.rootFilter2GainTarget = plugin.lowMidRegionGain;
-                gainDiff = plugin.lowMidRegionGain - plugin.rootGain2; % set differential for gain
-                plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            else % Case: root filter 2 is in mid-low control region
                 
-                plugin.rootFilter2QTarget = plugin.lowMidRegionQFactor;
-                qDiff = plugin.lowMidRegionQFactor - plugin.rootQFactor2;
-                plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                if plugin.rootFilter2GainTarget ~= plugin.lowMidRegionGain
+                    plugin.rootFilter2GainTarget = plugin.lowMidRegionGain;
+                    gainDiff = plugin.lowMidRegionGain - plugin.rootGain2; % set differential for gain
+                    plugin.rootFilter2GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter2GainStep = 0;
+                    plugin.rootFilter2GainSmooth = true;
+                end
                 
-                %todo: clean up
-                %plugin.rootFilter2SmoothStep = 0; % Reset the step counter for smoothing
-                %plugin.rootFilter2SmoothStatus = true; % Activate gain smoothing
-                
-                plugin.rootFilter2GainStep = 0;
-                plugin.rootFilter2GainSmooth = true;
-                plugin.rootFilter2QStep = 0;
-                plugin.rootFilter2QSmooth = true;
+                if plugin.rootFilter2QTarget ~= plugin.lowMidRegionQFactor
+                    plugin.rootFilter2QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.rootQFactor2;
+                    plugin.rootFilter2QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter2QStep = 0;
+                    plugin.rootFilter2QSmooth = true;
+                end
                 
                 % Updating plugin.rootGain2 will be taken care of by
                 % buildRootFilter2()
@@ -3976,45 +3976,46 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function updateRootFilter4Params(plugin)
             if plugin.rootFrequency4 < plugin.lowMidCrossoverFreq % root filter 4 is in low-mid control region
-                %plugin.rootFilter4Region = 2; % set filter region to low (2) %todo: Unnecessary now? delete?
-                plugin.rootFilter4GainTarget = plugin.lowMidRegionGain;
-                gainDiff = plugin.lowMidRegionGain - plugin.rootGain4; % set differential for gain
-                plugin.rootFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                if plugin.rootFilter4GainTarget ~= plugin.lowMidRegionGain
+                    plugin.rootFilter4GainTarget = plugin.lowMidRegionGain;
+                    gainDiff = plugin.lowMidRegionGain - plugin.rootGain4; % set differential for gain
+                    plugin.rootFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter4GainStep = 0;
+                    plugin.rootFilter4GainSmooth = true;
+                end
                 
-                plugin.rootFilter4QTarget = plugin.lowMidRegionQFactor;
-                qDiff = plugin.lowMidRegionQFactor - plugin.rootQFactor4;
-                plugin.rootFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
-                
-                %todo: convert to individual smoothing for gain and q
-                %plugin.rootFilter4SmoothStep = 0; % Reset the step counter for smoothing
-                %plugin.rootFilter4SmoothStatus = true; % Activate gain smoothing
-                
-                plugin.rootFilter4GainStep = 0;
-                plugin.rootFilter4GainSmooth = true;
-                plugin.rootFilter4QStep = 0;
-                plugin.rootFilter4QSmooth = true;
+                if plugin.rootFilter4QTarget ~= plugin.lowMidRegionQFactor
+                    plugin.rootFilter4QTarget = plugin.lowMidRegionQFactor;
+                    qDiff = plugin.lowMidRegionQFactor - plugin.rootQFactor4;
+                    plugin.rootFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter4QStep = 0;
+                    plugin.rootFilter4QSmooth = true;
+                end
                 
                 % Updating plugin.rootGain4 will be taken care of by
                 % buildRootFilter4()
                 
-            else % then root filter 4 is in mid control region
-                %plugin.rootFilter4Region = 3; % set filter region to mid (3) %todo: delete?
-                plugin.rootFilter4GainTarget = plugin.midRegionGain;
-                gainDiff = plugin.midRegionGain - plugin.rootGain4; % set differential for gain
-                plugin.rootFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            else % Case: root filter 4 is in mid control region
                 
-                plugin.rootFilter4QTarget = plugin.midRegionQFactor;
-                qDiff = plugin.midRegionQFactor - plugin.rootQFactor4;
-                plugin.rootFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                if plugin.rootFilter4GainTarget ~= plugin.midRegionGain
+                    plugin.rootFilter4GainTarget = plugin.midRegionGain;
+                    gainDiff = plugin.midRegionGain - plugin.rootGain4; % set differential for gain
+                    plugin.rootFilter4GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter4GainStep = 0;
+                    plugin.rootFilter4GainSmooth = true;
+                end
                 
-                %todo: clean up
-                %plugin.rootFilter4SmoothStep = 0; % Reset the step counter for smoothing
-                %plugin.rootFilter4SmoothStatus = true; % Activate gain smoothing
-                
-                plugin.rootFilter4GainStep = 0;
-                plugin.rootFilter4GainSmooth = true;
-                plugin.rootFilter4QStep = 0;
-                plugin.rootFilter4QSmooth = true;
+                if plugin.rootFilter4QTarget ~= plugin.midRegionQFactor
+                    plugin.rootFilter4QTarget = plugin.midRegionQFactor;
+                    qDiff = plugin.midRegionQFactor - plugin.rootQFactor4;
+                    plugin.rootFilter4QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.rootFilter4QStep = 0;
+                    plugin.rootFilter4QSmooth = true;
+                end
                 
                 % Updating plugin.rootGain4 will be taken care of by
                 % buildRootFilter4()
