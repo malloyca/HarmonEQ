@@ -5509,39 +5509,44 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateSeventhFilter6Params(plugin)
-            if plugin.seventhFrequency6 < plugin.midHighCrossoverFreq % seventh filter 6 is in mid control region
-                plugin.seventhFilter6GainTarget = plugin.midRegionGain;
-                gainDiff = plugin.midRegionGain - plugin.seventhGain6; % set differential for gain
-                plugin.seventhFilter6GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+            % Case: seventh filter 6 is in mid control region
+            if plugin.seventhFrequency6 < plugin.midHighCrossoverFreq
+                if plugin.seventhFilter6GainTarget ~= plugin.midRegionGain
+                    plugin.seventhFilter6GainTarget = plugin.midRegionGain;
+                    gainDiff = plugin.midRegionGain - plugin.seventhGain6; % set differential for gain
+                    plugin.seventhFilter6GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter6GainStep = 0;
+                    plugin.seventhFilter6GainSmooth = true;
+                end
                 
-                plugin.seventhFilter6QTarget = plugin.midRegionQFactor;
-                qDiff = plugin.midRegionQFactor - plugin.seventhQFactor6;
-                plugin.seventhFilter6QDiff = qDiff / plugin.numberOfSmoothSteps;
+                if plugin.seventhFilter6QTarget ~= plugin.midRegionQFactor
+                    plugin.seventhFilter6QTarget = plugin.midRegionQFactor;
+                    qDiff = plugin.midRegionQFactor - plugin.seventhQFactor6;
+                    plugin.seventhFilter6QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter6QStep = 0;
+                    plugin.seventhFilter6QSmooth = true;
+                end
                 
-                plugin.seventhFilter6GainStep = 0;
-                plugin.seventhFilter6GainSmooth = true;
-                plugin.seventhFilter6QStep = 0;
-                plugin.seventhFilter6QSmooth = true;
+            else % Case: seventh filter 6 is in high-mid control region
+                if plugin.seventhFilter6GainTarget ~= plugin.highMidRegionGain
+                    plugin.seventhFilter6GainTarget = plugin.highMidRegionGain;
+                    gainDiff = plugin.highMidRegionGain - plugin.seventhGain6; % set differential for gain
+                    plugin.seventhFilter6GainDiff = gainDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter6GainStep = 0;
+                    plugin.seventhFilter6GainSmooth = true;
+                end
                 
-                % Updating plugin.seventhGain6 will be taken care of by
-                % buildSeventhFilter6()
-                
-            else % then seventh filter 6 is in high-mid control region
-                plugin.seventhFilter6GainTarget = plugin.highMidRegionGain;
-                gainDiff = plugin.highMidRegionGain - plugin.seventhGain6; % set differential for gain
-                plugin.seventhFilter6GainDiff = gainDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.seventhFilter6QTarget = plugin.highMidRegionQFactor;
-                qDiff = plugin.highMidRegionQFactor - plugin.seventhQFactor6;
-                plugin.seventhFilter6QDiff = qDiff / plugin.numberOfSmoothSteps;
-                
-                plugin.seventhFilter6GainStep = 0;
-                plugin.seventhFilter6GainSmooth = true;
-                plugin.seventhFilter6QStep = 0;
-                plugin.seventhFilter6QSmooth = true;
-                
-                % Updating plugin.seventhGain6 will be taken care of by
-                % buildSeventhFilter6()
+                if plugin.seventhFilter6QTarget ~= plugin.highMidRegionQFactor
+                    plugin.seventhFilter6QTarget = plugin.highMidRegionQFactor;
+                    qDiff = plugin.highMidRegionQFactor - plugin.seventhQFactor6;
+                    plugin.seventhFilter6QDiff = qDiff / plugin.numberOfSmoothSteps;
+                    
+                    plugin.seventhFilter6QStep = 0;
+                    plugin.seventhFilter6QSmooth = true;
+                end
             end
             setUpdateSeventhFilter6(plugin);
             updateStateChangeStatus(plugin, true);
