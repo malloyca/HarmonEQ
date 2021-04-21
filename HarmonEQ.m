@@ -1,40 +1,40 @@
 classdef HarmonEQ < matlab.System & audioPlugin
-% HarmonEQ.m
-% Harmonic Equalizer plugin
-% v0.3-alpha
-% Last updated: 13 April 2021
-%
-% This plugin presents a new control scheme for the traditional equalizer.
-% Most people are familiar with the various types of EQs out there
-% (graphics EQs, parametric and semi-parametric EQs, etc). These tools work
-% well for many jobs, but sometimes certain situations would benefit from
-% an EQ that is defined in a more musically-informed way. HarmonEQ is a
-% plugin designed to showcase a new control paradigm for the standard
-% parametric EQ that is based on harmony instead of direct frequency
-% control by the user. This allows the user to target the EQ more finely
-% based on the current harmony of a track.
-%
-% To run this with the visualizer in Matlab, run these commands:
-% eq = HarmonEQ;
-% Visualizer(eq);
-% audioTestBench(eq);
-%
-% To validate for generation:
-% validateAudioPlugin HarmonEQ;
-% To export as a VST, run:
-% generateAudioPlugin -outdir plugins HarmonEQ;
-% To export as an AU (on macOS):
-% generateAudioPlugin -au -outdir plugins HarmonEQ;
-
-
-% TODO:
-% - Look into State-variable filters vs biquads
-% - Make the parameter smoothing more dynamic at large buffer sizes. Right
-% now it goes really slowly if the buffer size is large since it only steps
-% once per buffer. It wouldn't be too hard to set it so that it stepped
-% multiple times per input buffer for larger buffer sizes
-%
-
+    % HarmonEQ.m
+    % Harmonic Equalizer plugin
+    % v0.3-alpha
+    % Last updated: 13 April 2021
+    %
+    % This plugin presents a new control scheme for the traditional equalizer.
+    % Most people are familiar with the various types of EQs out there
+    % (graphics EQs, parametric and semi-parametric EQs, etc). These tools work
+    % well for many jobs, but sometimes certain situations would benefit from
+    % an EQ that is defined in a more musically-informed way. HarmonEQ is a
+    % plugin designed to showcase a new control paradigm for the standard
+    % parametric EQ that is based on harmony instead of direct frequency
+    % control by the user. This allows the user to target the EQ more finely
+    % based on the current harmony of a track.
+    %
+    % To run this with the visualizer in Matlab, run these commands:
+    % eq = HarmonEQ;
+    % Visualizer(eq);
+    % audioTestBench(eq);
+    %
+    % To validate for generation:
+    % validateAudioPlugin HarmonEQ;
+    % To export as a VST, run:
+    % generateAudioPlugin -outdir plugins HarmonEQ;
+    % To export as an AU (on macOS):
+    % generateAudioPlugin -au -outdir plugins HarmonEQ;
+    
+    
+    % TODO:
+    % - Look into State-variable filters vs biquads
+    % - Make the parameter smoothing more dynamic at large buffer sizes. Right
+    % now it goes really slowly if the buffer size is large since it only steps
+    % once per buffer. It wouldn't be too hard to set it so that it stepped
+    % multiple times per input buffer for larger buffer sizes
+    %
+    
     %----------------------------------------------------------------------
     % TUNABLE PROPERTIES
     %----------------------------------------------------------------------
@@ -76,7 +76,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         midHighCrossoverFreq = 1437.85;
         highCrossoverFreq = 5751.38;
         
-                
+        
     end
     
     
@@ -411,30 +411,30 @@ classdef HarmonEQ < matlab.System & audioPlugin
     
     
     % todo: Delete this once new UI is setup and working satisfactorily
-%     audioPluginParameter('rootGain',...
-%             'DisplayName','Root Note Gain',...
-%             'Mapping',{'lin',-15,15}),...
-%             audioPluginParameter('rootQFactor',...
-%             'DisplayName','Root Q Factor',...
-%             'Mapping',{'pow', 2, 0.5, 100}),...
-%             audioPluginParameter('thirdGain',...
-%             'DisplayName','Harmonic Third Gain',...
-%             'Mapping',{'lin',-15,15}),...
-%             audioPluginParameter('thirdQFactor',...
-%             'DisplayName','Harmonic Third Q Factor',...
-%             'Mapping',{'pow', 2, 0.5, 100}),...
-%              audioPluginParameter('fifthGain',...
-%             'DisplayName','Harmonic Fifth Gain',...
-%             'Mapping',{'lin',-15,15}),...
-%             audioPluginParameter('fifthQFactor',...
-%             'DisplayName','Harmonic Fifth Q Factor',...
-%             'Mapping',{'pow', 2, 0.5, 100}),...
-%             audioPluginParameter('seventhGain',...
-%             'DisplayName','Harmonic Seventh Gain',...
-%             'Mapping',{'lin',-15,15}),...
-%             audioPluginParameter('seventhQFactor',...
-%             'DisplayName','Harmonic Seventh Q Factor',...
-%             'Mapping',{'pow', 2, 0.5, 100}),...
+    %     audioPluginParameter('rootGain',...
+    %             'DisplayName','Root Note Gain',...
+    %             'Mapping',{'lin',-15,15}),...
+    %             audioPluginParameter('rootQFactor',...
+    %             'DisplayName','Root Q Factor',...
+    %             'Mapping',{'pow', 2, 0.5, 100}),...
+    %             audioPluginParameter('thirdGain',...
+    %             'DisplayName','Harmonic Third Gain',...
+    %             'Mapping',{'lin',-15,15}),...
+    %             audioPluginParameter('thirdQFactor',...
+    %             'DisplayName','Harmonic Third Q Factor',...
+    %             'Mapping',{'pow', 2, 0.5, 100}),...
+    %              audioPluginParameter('fifthGain',...
+    %             'DisplayName','Harmonic Fifth Gain',...
+    %             'Mapping',{'lin',-15,15}),...
+    %             audioPluginParameter('fifthQFactor',...
+    %             'DisplayName','Harmonic Fifth Q Factor',...
+    %             'Mapping',{'pow', 2, 0.5, 100}),...
+    %             audioPluginParameter('seventhGain',...
+    %             'DisplayName','Harmonic Seventh Gain',...
+    %             'Mapping',{'lin',-15,15}),...
+    %             audioPluginParameter('seventhQFactor',...
+    %             'DisplayName','Harmonic Seventh Q Factor',...
+    %             'Mapping',{'pow', 2, 0.5, 100}),...
     
     %----------------------------------------------------------------------
     % PROTECTED PROPERTIES
@@ -956,6 +956,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         % Deactivation flag variables
         thirdFiltersDeactivating = false; % this is an intermediary state for smoothly deactivating filters
         fifthFiltersDeactivating = false;
+        seventhFiltersDeactivating = false;
         
         % For visalization
         visualizerObject;
@@ -1426,7 +1427,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 activateSeventhFilters(plugin);
                 updateSeventhFrequencies(plugin);
                 setUpdateSeventhFilters(plugin);
-            end 
+            end
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1477,18 +1478,19 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency9 > plugin.highCrossoverFreq)
-                updateSeventhGain9(plugin,val);
-                setUpdateSeventhFilter9(plugin);
-            end
-            if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
-                updateSeventhGain8(plugin,val);
-                setUpdateSeventhFilter8(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency9 > plugin.highCrossoverFreq)
+                    updateSeventhGain9(plugin,val);
+                    setUpdateSeventhFilter9(plugin);
+                end
+                if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
+                    updateSeventhGain8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
             end
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
-            
         end
         
         function set.highRegionQFactor(plugin,val)
@@ -1506,7 +1508,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             if plugin.thirdFiltersActive
                 %todo: get rid of if statement, filter 9 should always be
                 %higher than the crossover freq
-                if (plugin.thirdFrequency9 > plugin.highCrossoverFreq) 
+                if (plugin.thirdFrequency9 > plugin.highCrossoverFreq)
                     updateThirdQFactor9(plugin,val);
                     setUpdateThirdFilter9(plugin);
                 end
@@ -1527,13 +1529,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency9 > plugin.highCrossoverFreq)
-                updateSeventhQFactor9(plugin,val);
-                setUpdateSeventhFilter9(plugin);
-            end
-            if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
-                updateSeventhQFactor8(plugin,val);
-                setUpdateSeventhFilter8(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency9 > plugin.highCrossoverFreq)
+                    updateSeventhQFactor9(plugin,val);
+                    setUpdateSeventhFilter9(plugin);
+                end
+                if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
+                    updateSeventhQFactor8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
             end
             
             % State change update for visualizer
@@ -1586,15 +1590,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
-                updateSeventhGain8(plugin,val);
-                setUpdateSeventhFilter8(plugin);
-            end
-            updateSeventhGain7(plugin,val);
-            setUpdateSeventhFilter7(plugin);
-            if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
-                updateSeventhGain6(plugin,val);
-                setUpdateSeventhFilter6(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
+                    updateSeventhGain8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
+                updateSeventhGain7(plugin,val);
+                setUpdateSeventhFilter7(plugin);
+                if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
+                    updateSeventhGain6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
             end
             
             % State change update for visualizer
@@ -1647,15 +1653,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
-                updateSeventhQFactor8(plugin,val);
-                setUpdateSeventhFilter8(plugin);
-            end
-            updateSeventhQFactor7(plugin,val);
-            setUpdateSeventhFilter7(plugin);
-            if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
-                updateSeventhQFactor6(plugin,val);
-                setUpdateSeventhFilter6(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
+                    updateSeventhQFactor8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
+                updateSeventhQFactor7(plugin,val);
+                setUpdateSeventhFilter7(plugin);
+                if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
+                    updateSeventhQFactor6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
             end
             
             % State change update for visualizer
@@ -1708,15 +1716,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
-                updateSeventhGain6(plugin,val);
-                setUpdateSeventhFilter6(plugin);
-            end
-            updateSeventhGain5(plugin,val);
-            setUpdateSeventhFilter5(plugin);
-            if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
-                updateSeventhGain4(plugin,val);
-                setUpdateSeventhFilter4(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
+                    updateSeventhGain6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
+                updateSeventhGain5(plugin,val);
+                setUpdateSeventhFilter5(plugin);
+                if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateSeventhGain4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
             end
             
             % State change update for visualizer
@@ -1770,15 +1780,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
-                updateSeventhQFactor6(plugin,val);
-                setUpdateSeventhFilter6(plugin);
-            end
-            updateSeventhQFactor5(plugin,val);
-            setUpdateSeventhFilter5(plugin);
-            if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
-                updateSeventhQFactor4(plugin,val);
-                setUpdateSeventhFilter4(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
+                    updateSeventhQFactor6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
+                updateSeventhQFactor5(plugin,val);
+                setUpdateSeventhFilter5(plugin);
+                if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateSeventhQFactor4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
             end
             
             % State change update for visualizer
@@ -1831,15 +1843,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
-                updateSeventhGain4(plugin,val);
-                setUpdateSeventhFilter4(plugin);
-            end
-            updateSeventhGain3(plugin,val);
-            setUpdateSeventhFilter3(plugin);
-            if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
-                updateSeventhGain2(plugin,val);
-                setUpdateSeventhFilter2(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateSeventhGain4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
+                updateSeventhGain3(plugin,val);
+                setUpdateSeventhFilter3(plugin);
+                if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
+                    updateSeventhGain2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
             end
             
             % State change update for visualizer
@@ -1893,15 +1907,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
             end
             
-            if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
-                updateSeventhQFactor4(plugin,val);
-                setUpdateSeventhFilter4(plugin);
-            end
-            updateSeventhQFactor3(plugin,val);
-            setUpdateSeventhFilter3(plugin);
-            if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
-                updateSeventhQFactor2(plugin,val);
-                setUpdateSeventhFilter2(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateSeventhQFactor4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
+                updateSeventhQFactor3(plugin,val);
+                setUpdateSeventhFilter3(plugin);
+                if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
+                    updateSeventhQFactor2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
             end
             
             % State change update for visualizer
@@ -1942,12 +1958,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateFifthFilter1(plugin);
             end
             
-            if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
-                updateSeventhGain2(plugin,val);
-                setUpdateSeventhFilter2(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
+                    updateSeventhGain2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
+                updateSeventhGain1(plugin,val);
+                setUpdateSeventhFilter1(plugin);
             end
-            updateSeventhGain1(plugin,val);
-            setUpdateSeventhFilter1(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -1990,12 +2008,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateFifthFilter1(plugin);
             end
             
-            if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
-                updateSeventhQFactor2(plugin,val);
-                setUpdateSeventhFilter2(plugin);
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
+                    updateSeventhQFactor2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
+                updateSeventhQFactor1(plugin,val);
+                setUpdateSeventhFilter1(plugin);
             end
-            updateSeventhQFactor1(plugin,val);
-            setUpdateSeventhFilter1(plugin);
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
@@ -2076,7 +2096,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor1,...
                     plugin.rootGain1);
                 plugin.updateRootFilter1 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain1;
                 qFactor = plugin.rootQFactor1;
@@ -2127,7 +2147,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor2,...
                     plugin.rootGain2);
                 plugin.updateRootFilter2 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain2;
                 qFactor = plugin.rootQFactor2;
@@ -2160,10 +2180,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 end
                 
                 [plugin.rootCoeffb2, plugin.rootCoeffa2] = peakNotchFilterCoeffs(...
-                        plugin, fs, ...
-                        plugin.rootFrequency2,...
-                        qFactor,...
-                        gain);
+                    plugin, fs, ...
+                    plugin.rootFrequency2,...
+                    qFactor,...
+                    gain);
             end
             updateStateChangeStatus(plugin, true);
         end
@@ -2177,7 +2197,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor3,...
                     plugin.rootGain3);
                 plugin.updateRootFilter3 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain3;
                 qFactor = plugin.rootQFactor3;
@@ -2228,7 +2248,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor4,...
                     plugin.rootGain4);
                 plugin.updateRootFilter4 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain4;
                 qFactor = plugin.rootQFactor4;
@@ -2279,7 +2299,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor5,...
                     plugin.rootGain5);
                 plugin.updateRootFilter5 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain5;
                 qFactor = plugin.rootQFactor5;
@@ -2330,7 +2350,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor6,...
                     plugin.rootGain6);
                 plugin.updateRootFilter6 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain6;
                 qFactor = plugin.rootQFactor6;
@@ -2381,7 +2401,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor7,...
                     plugin.rootGain7);
                 plugin.updateRootFilter7 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain7;
                 qFactor = plugin.rootQFactor7;
@@ -2432,7 +2452,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor8,...
                     plugin.rootGain8);
                 plugin.updateRootFilter8 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain8;
                 qFactor = plugin.rootQFactor8;
@@ -2483,7 +2503,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootQFactor9,...
                     plugin.rootGain9);
                 plugin.updateRootFilter9 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.rootGain9;
                 qFactor = plugin.rootQFactor9;
@@ -2535,7 +2555,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor1,...
                     plugin.thirdGain1);
                 plugin.updateThirdFilter1 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain1;
                 qFactor = plugin.thirdQFactor1;
@@ -2594,7 +2614,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor2,...
                     plugin.thirdGain2);
                 plugin.updateThirdFilter2 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain2;
                 qFactor = plugin.thirdQFactor2;
@@ -2645,7 +2665,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor3,...
                     plugin.thirdGain3);
                 plugin.updateThirdFilter3 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain3;
                 qFactor = plugin.thirdQFactor3;
@@ -2696,7 +2716,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor4,...
                     plugin.thirdGain4);
                 plugin.updateThirdFilter4 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain4;
                 qFactor = plugin.thirdQFactor4;
@@ -2747,7 +2767,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor5,...
                     plugin.thirdGain5);
                 plugin.updateThirdFilter5 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain5;
                 qFactor = plugin.thirdQFactor5;
@@ -2798,7 +2818,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor6,...
                     plugin.thirdGain6);
                 plugin.updateThirdFilter6 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain6;
                 qFactor = plugin.thirdQFactor6;
@@ -2849,7 +2869,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor7,...
                     plugin.thirdGain7);
                 plugin.updateThirdFilter7 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain7;
                 qFactor = plugin.thirdQFactor7;
@@ -2900,7 +2920,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor8,...
                     plugin.thirdGain8);
                 plugin.updateThirdFilter8 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain8;
                 qFactor = plugin.thirdQFactor8;
@@ -2951,7 +2971,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdQFactor9,...
                     plugin.thirdGain9);
                 plugin.updateThirdFilter9 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.thirdGain9;
                 qFactor = plugin.thirdQFactor9;
@@ -2993,6 +3013,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
+        %----------------Harmonic fifth filter builders--------------------
         function buildFifthFilter1(plugin, fs)
             % Case: no smoothing active
             if ~plugin.fifthFilter1GainSmooth && ~plugin.fifthFilter1QSmooth
@@ -3002,7 +3023,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor1,...
                     plugin.fifthGain1);
                 plugin.updateFifthFilter1 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain1;
                 qFactor = plugin.fifthQFactor1;
@@ -3060,7 +3081,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor2,...
                     plugin.fifthGain2);
                 plugin.updateFifthFilter2 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain2;
                 qFactor = plugin.fifthQFactor2;
@@ -3111,7 +3132,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor3,...
                     plugin.fifthGain3);
                 plugin.updateFifthFilter3 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain3;
                 qFactor = plugin.fifthQFactor3;
@@ -3162,7 +3183,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor4,...
                     plugin.fifthGain4);
                 plugin.updateFifthFilter4 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain4;
                 qFactor = plugin.fifthQFactor4;
@@ -3213,7 +3234,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor5,...
                     plugin.fifthGain5);
                 plugin.updateFifthFilter5 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain5;
                 qFactor = plugin.fifthQFactor5;
@@ -3264,7 +3285,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor6,...
                     plugin.fifthGain6);
                 plugin.updateFifthFilter6 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain6;
                 qFactor = plugin.fifthQFactor6;
@@ -3315,7 +3336,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor7,...
                     plugin.fifthGain7);
                 plugin.updateFifthFilter7 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain7;
                 qFactor = plugin.fifthQFactor7;
@@ -3366,7 +3387,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor8,...
                     plugin.fifthGain8);
                 plugin.updateFifthFilter8 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain8;
                 qFactor = plugin.fifthQFactor8;
@@ -3417,7 +3438,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthQFactor9,...
                     plugin.fifthGain9);
                 plugin.updateFifthFilter9 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.fifthGain9;
                 qFactor = plugin.fifthQFactor9;
@@ -3459,6 +3480,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin, true);
         end
         
+        %---------------Harmonic seventh filter builders-------------------
         function buildSeventhFilter1(plugin, fs)
             % Case: no smoothing active
             if ~plugin.seventhFilter1GainSmooth && ~plugin.seventhFilter1QSmooth
@@ -3468,7 +3490,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor1,...
                     plugin.seventhGain1);
                 plugin.updateSeventhFilter1 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain1;
                 qFactor = plugin.seventhQFactor1;
@@ -3486,6 +3508,13 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     
                     plugin.seventhFilter1GainDiff = 0;
                     plugin.seventhFilter1GainSmooth = false; % Set gain smoothing to false
+                    
+                    if plugin.seventhFiltersDeactivating
+                        plugin.seventhFiltersActive = false;
+                        plugin.seventhFiltersDeactivating = false;
+                        %test
+                        disp('Seventh filters deactivated');
+                    end
                 end
                 
                 if qStep < plugin.numberOfSmoothSteps
@@ -3519,7 +3548,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor2,...
                     plugin.seventhGain2);
                 plugin.updateSeventhFilter2 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain2;
                 qFactor = plugin.seventhQFactor2;
@@ -3570,7 +3599,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor3,...
                     plugin.seventhGain3);
                 plugin.updateSeventhFilter3 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain3;
                 qFactor = plugin.seventhQFactor3;
@@ -3621,7 +3650,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor4,...
                     plugin.seventhGain4);
                 plugin.updateSeventhFilter4 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain4;
                 qFactor = plugin.seventhQFactor4;
@@ -3672,7 +3701,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor5,...
                     plugin.seventhGain5);
                 plugin.updateSeventhFilter5 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain5;
                 qFactor = plugin.seventhQFactor5;
@@ -3723,7 +3752,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor6,...
                     plugin.seventhGain6);
                 plugin.updateSeventhFilter6 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain6;
                 qFactor = plugin.seventhQFactor6;
@@ -3774,7 +3803,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor7,...
                     plugin.seventhGain7);
                 plugin.updateSeventhFilter7 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain7;
                 qFactor = plugin.seventhQFactor7;
@@ -3825,7 +3854,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor8,...
                     plugin.seventhGain8);
                 plugin.updateSeventhFilter8 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain8;
                 qFactor = plugin.seventhQFactor8;
@@ -3876,7 +3905,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhQFactor9,...
                     plugin.seventhGain9);
                 plugin.updateSeventhFilter9 = false; % No need to update further since no smoothing
-            
+                
             else % Case gain or q smoothing is active
                 gain = plugin.seventhGain9;
                 qFactor = plugin.seventhQFactor9;
@@ -4070,7 +4099,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootFilter4QStep = 0;
                     plugin.rootFilter4QSmooth = true;
                 end
-
+                
             end
             setUpdateRootFilter4(plugin);
             updateStateChangeStatus(plugin, true);
@@ -4446,7 +4475,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             thirdFreq = plugin.thirdFrequency1; % todo: Declaring this here to pass validation
             thirdNoteNumber = mod(plugin.rootNoteValue + plugin.thirdIntervalDistance, 12);
             
-             %TODO: Eventually create a getBaseFreq function for this...
+            %TODO: Eventually create a getBaseFreq function for this...
             switch thirdNoteNumber
                 case 9
                     thirdFreq = 55;
@@ -4984,7 +5013,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             fifthFreq = plugin.fifthFrequency1; % todo: Declaring this here to pass validation
             fifthNoteNumber = mod(plugin.rootNoteValue + plugin.fifthIntervalDistance, 12);
             
-             %TODO: Eventually create a getBaseFreq function for this...
+            %TODO: Eventually create a getBaseFreq function for this...
             switch fifthNoteNumber
                 case 9
                     fifthFreq = 55;
@@ -5517,7 +5546,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             seventhFreq = plugin.seventhFrequency1; % todo: Declaring this here to pass validation
             seventhNoteNumber = mod(plugin.rootNoteValue + plugin.seventhIntervalDistance, 12);
             
-             %TODO: Eventually create a getBaseFreq function for this...
+            %TODO: Eventually create a getBaseFreq function for this...
             switch seventhNoteNumber
                 case 9
                     seventhFreq = 55;
@@ -6002,11 +6031,44 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function deactivateSeventhFilters(plugin)
-            plugin.seventhFiltersActive = false;
+            %plugin.seventhFiltersActive = false;
+            
+            % set gain to 0, flag for deactivation
+            plugin.seventhFiltersDeactivating = true;
+            updateSeventhGain1(plugin, 0);
+            updateSeventhGain2(plugin, 0);
+            updateSeventhGain3(plugin, 0);
+            updateSeventhGain4(plugin, 0);
+            updateSeventhGain5(plugin, 0);
+            updateSeventhGain6(plugin, 0);
+            updateSeventhGain7(plugin, 0);
+            updateSeventhGain8(plugin, 0);
+            updateSeventhGain9(plugin, 0);
+            
+            %test
+            disp('Seventh filters deactivating');
         end
         
         function activateSeventhFilters(plugin)
             plugin.seventhFiltersActive = true;
+            
+            updateSeventhGain1(plugin, plugin.lowRegionGain);
+            updateSeventhQFactor1(plugin, plugin.lowRegionQFactor);
+            updateSeventhFilter2Params(plugin);
+            updateSeventhGain3(plugin, plugin.lowMidRegionGain);
+            updateSeventhQFactor3(plugin, plugin.lowMidRegionQFactor);
+            updateSeventhFilter4Params(plugin);
+            updateSeventhGain5(plugin, plugin.midRegionGain);
+            updateSeventhQFactor5(plugin, plugin.midRegionQFactor);
+            updateSeventhFilter6Params(plugin);
+            updateSeventhGain7(plugin, plugin.highMidRegionGain);
+            updateSeventhQFactor7(plugin, plugin.highMidRegionQFactor);
+            updateSeventhFilter8Params(plugin);
+            updateSeventhGain9(plugin, plugin.highRegionGain);
+            updateSeventhQFactor9(plugin, plugin.highRegionQFactor);
+            
+            %test
+            disp('Activating Seventh filters');
         end
         
         
