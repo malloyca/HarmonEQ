@@ -953,7 +953,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFiltersActive = false;
         
         %test
+        % Deactivation flag variables
         thirdFiltersDeactivating = false; % this is an intermediary state for smoothly deactivating filters
+        fifthFiltersDeactivating = false;
         
         % For visalization
         visualizerObject;
@@ -2998,6 +3000,13 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     
                     plugin.fifthFilter1GainDiff = 0;
                     plugin.fifthFilter1GainSmooth = false; % Set gain smoothing to false
+                    
+                    %test
+                    if plugin.fifthFiltersDeactivating
+                        plugin.fifthFiltersActive = false;
+                        plugin.fifthFiltersDeactivating = false;
+                        disp('Fifth filters deactivated');
+                    end
                 end
                 
                 if qStep < plugin.numberOfSmoothSteps
@@ -3961,7 +3970,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function updateRootFilter2Params(plugin)
             % Case: root filter two is in low control region
             if plugin.rootFrequency2 < plugin.lowCrossoverFreq
-                %test: Don't update if it's not necessary
                 if plugin.rootFilter2GainTarget ~= plugin.lowRegionGain
                     plugin.rootFilter2GainTarget = plugin.lowRegionGain;
                     gainDiff = plugin.lowRegionGain - plugin.rootGain2; % set differential for gain
@@ -4907,8 +4915,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function deactivateThirdFilters(plugin)
             %plugin.thirdFiltersActive = false;
             
-            % set gain to 0 %todo: when gain reaches 0 smoothly, set
-            % plugin.thirdFiltersActive = false;
+            % set gain to 0
             plugin.thirdFiltersDeactivating = true;
             updateThirdGain1(plugin, 0);
             updateThirdGain2(plugin, 0);
@@ -5443,7 +5450,24 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function deactivateFifthFilters(plugin)
-            plugin.fifthFiltersActive = false;
+            %plugin.fifthFiltersActive = false;
+            
+            %test
+            % set gain to 0, then deactivate (taken care of by... %todo:
+            % fill that note in
+            plugin.fifthFiltersDeactivating = true;
+            updateFifthGain1(plugin, 0);
+            updateFifthGain2(plugin, 0);
+            updateFifthGain3(plugin, 0);
+            updateFifthGain4(plugin, 0);
+            updateFifthGain5(plugin, 0);
+            updateFifthGain6(plugin, 0);
+            updateFifthGain7(plugin, 0);
+            updateFifthGain8(plugin, 0);
+            updateFifthGain9(plugin, 0);
+            
+            %test
+            disp('Fifth filters deactivating...');
         end
         
         function activateFifthFilters(plugin)
