@@ -1451,13 +1451,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateRootFilter8(plugin);
             end
             
-            if (plugin.thirdFrequency9 > plugin.highCrossoverFreq)
-                updateThirdGain9(plugin,val);
-                setUpdateThirdFilter9(plugin);
-            end
-            if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
-                updateThirdGain8(plugin,val);
-                setUpdateThirdFilter8(plugin);
+            if plugin.thirdFiltersActive
+                % todo: get rid of if statment, thirdFrequency9 should
+                % alwasy be greater than highCrossoverFreq
+                if (plugin.thirdFrequency9 > plugin.highCrossoverFreq)
+                    updateThirdGain9(plugin,val);
+                    setUpdateThirdFilter9(plugin);
+                end
+                if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
+                    updateThirdGain8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
             end
             
             if (plugin.fifthFrequency9 > plugin.highCrossoverFreq)
@@ -1495,13 +1499,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateRootFilter8(plugin);
             end
             
-            if (plugin.thirdFrequency9 > plugin.highCrossoverFreq)
-                updateThirdQFactor9(plugin,val);
-                setUpdateThirdFilter9(plugin);
-            end
-            if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
-                updateThirdQFactor8(plugin,val);
-                setUpdateThirdFilter8(plugin);
+            if plugin.thirdFiltersActive
+                %todo: get rid of if statement, filter 9 should always be
+                %higher than the crossover freq
+                if (plugin.thirdFrequency9 > plugin.highCrossoverFreq) 
+                    updateThirdQFactor9(plugin,val);
+                    setUpdateThirdFilter9(plugin);
+                end
+                if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
+                    updateThirdQFactor8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
             end
             
             if (plugin.fifthFrequency9 > plugin.highCrossoverFreq)
@@ -1546,15 +1554,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateRootFilter6(plugin);
             end
             
-            if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
-                updateThirdGain8(plugin,val);
-                setUpdateThirdFilter8(plugin);
-            end
-            updateThirdGain7(plugin,val);
-            setUpdateThirdFilter7(plugin);
-            if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
-                updateThirdGain6(plugin,val);
-                setUpdateThirdFilter6(plugin);
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
+                    updateThirdGain8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
+                updateThirdGain7(plugin,val);
+                setUpdateThirdFilter7(plugin);
+                if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
+                    updateThirdGain6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
             end
             
             if (plugin.fifthFrequency8 < plugin.highCrossoverFreq)
@@ -1603,15 +1613,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateRootFilter6(plugin);
             end
             
-            if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
-                updateThirdQFactor8(plugin,val);
-                setUpdateThirdFilter8(plugin);
-            end
-            updateThirdQFactor7(plugin,val);
-            setUpdateThirdFilter7(plugin);
-            if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
-                updateThirdQFactor6(plugin,val);
-                setUpdateThirdFilter6(plugin);
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
+                    updateThirdQFactor8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
+                updateThirdQFactor7(plugin,val);
+                setUpdateThirdFilter7(plugin);
+                if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
+                    updateThirdQFactor6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
             end
             
             if (plugin.fifthFrequency8 < plugin.highCrossoverFreq)
@@ -1660,15 +1672,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateRootFilter4(plugin);
             end
             
-            if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
-                updateThirdGain6(plugin,val);
-                setUpdateThirdFilter6(plugin);
-            end
-            updateThirdGain5(plugin,val);
-            setUpdateThirdFilter5(plugin);
-            if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
-                updateThirdGain4(plugin,val);
-                setUpdateThirdFilter4(plugin);
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
+                    updateThirdGain6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
+                updateThirdGain5(plugin,val);
+                setUpdateThirdFilter5(plugin);
+                if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateThirdGain4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
             end
             
             if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
@@ -1717,15 +1731,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateRootFilter4(plugin);
             end
             
-            if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
-                updateThirdQFactor6(plugin,val);
-                setUpdateThirdFilter6(plugin);
-            end
-            updateThirdQFactor5(plugin,val);
-            setUpdateThirdFilter5(plugin);
-            if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
-                updateThirdQFactor4(plugin,val);
-                setUpdateThirdFilter4(plugin);
+            %test
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
+                    updateThirdQFactor6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
+                updateThirdQFactor5(plugin,val);
+                setUpdateThirdFilter5(plugin);
+                if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateThirdQFactor4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
             end
             
             if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
@@ -1773,15 +1790,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 updateRootGain2(plugin,val);
             end
             
-            if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
-                updateThirdGain4(plugin,val);
-                setUpdateThirdFilter4(plugin);
-            end
-            updateThirdGain3(plugin,val);
-            setUpdateThirdFilter3(plugin);
-            if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
-                updateThirdGain2(plugin,val);
-                setUpdateThirdFilter2(plugin);
+            %test
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateThirdGain4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
+                updateThirdGain3(plugin,val);
+                setUpdateThirdFilter3(plugin);
+                if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
+                    updateThirdGain2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
             end
             
             if (plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq)
@@ -1830,15 +1850,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 setUpdateRootFilter2(plugin);
             end
             
-            if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
-                updateThirdQFactor4(plugin,val);
-                setUpdateThirdFilter4(plugin);
-            end
-            updateThirdQFactor3(plugin,val);
-            setUpdateThirdFilter3(plugin);
-            if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
-                updateThirdQFactor2(plugin,val);
-                setUpdateThirdFilter2(plugin);
+            %test
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateThirdQFactor4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
+                updateThirdQFactor3(plugin,val);
+                setUpdateThirdFilter3(plugin);
+                if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
+                    updateThirdQFactor2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
             end
             
             if (plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq)
@@ -1882,12 +1905,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             end
             updateRootGain1(plugin,val);
             
-            if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
-                updateThirdGain2(plugin,val);
-                setUpdateThirdFilter2(plugin);
+            %test
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
+                    updateThirdGain2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
+                updateThirdGain1(plugin,val);
+                setUpdateThirdFilter1(plugin);
             end
-            updateThirdGain1(plugin,val);
-            setUpdateThirdFilter1(plugin);
             
             if (plugin.fifthFrequency2 < plugin.lowCrossoverFreq)
                 updateFifthGain2(plugin,val);
@@ -1925,12 +1951,15 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateRootQFactor1(plugin,val);
             setUpdateRootFilter1(plugin);
             
-            if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
-                updateThirdQFactor2(plugin,val);
-                setUpdateThirdFilter2(plugin);
+            %test
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
+                    updateThirdQFactor2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
+                updateThirdQFactor1(plugin,val);
+                setUpdateThirdFilter1(plugin);
             end
-            updateThirdQFactor1(plugin,val);
-            setUpdateThirdFilter1(plugin);
             
             if (plugin.fifthFrequency2 < plugin.lowCrossoverFreq)
                 updateFifthQFactor2(plugin,val);
@@ -2506,6 +2535,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     
                     if plugin.thirdFiltersDeactivating
                         plugin.thirdFiltersActive = false;
+                        plugin.thirdFiltersDeactivating = false;
                         %test
                         disp('Third filters deactivated');
                     end
@@ -4895,8 +4925,27 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
+        %test
         function activateThirdFilters(plugin)
             plugin.thirdFiltersActive = true;
+            
+            updateThirdGain1(plugin, plugin.lowRegionGain);
+            updateThirdQFactor1(plugin, plugin.lowRegionQFactor);
+            updateThirdFilter2Params(plugin);
+            updateThirdGain3(plugin, plugin.lowMidRegionGain);
+            updateThirdQFactor3(plugin, plugin.lowMidRegionQFactor);
+            updateThirdFilter4Params(plugin);
+            updateThirdGain5(plugin, plugin.midRegionGain);
+            updateThirdQFactor5(plugin, plugin.midRegionQFactor);
+            updateThirdFilter6Params(plugin);
+            updateThirdGain7(plugin, plugin.highMidRegionGain);
+            updateThirdQFactor7(plugin, plugin.highMidRegionQFactor);
+            updateThirdFilter8Params(plugin);
+            updateThirdGain9(plugin, plugin.highRegionGain);
+            updateThirdQFactor9(plugin, plugin.highRegionQFactor);
+            
+            %test
+            disp('Activating third filters');
         end
         
         
