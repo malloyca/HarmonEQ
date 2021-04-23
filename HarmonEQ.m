@@ -1458,91 +1458,111 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 case '5'
                     deactivateThirdFilters(plugin);
                     setFifthIntervalDistance(plugin,7);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
+                    if plugin.rootFiltersActive
+                        activateFifthFilters(plugin);
+                    end
                 case 'min'
                     setThirdIntervalDistance(plugin,3);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                    end
                 case 'maj'
                     setThirdIntervalDistance(plugin,4);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                    end
                 case 'dim'
                     setThirdIntervalDistance(plugin,3);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                    end
                 case 'aug'
                     setThirdIntervalDistance(plugin,4);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,8);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                    end
                 case 'min7'
                     setThirdIntervalDistance(plugin,3);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,10);
-                    activateSeventhFilters(plugin);
                     updateSeventhFrequencies(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                        activateSeventhFilters(plugin);
+                    end
                 case 'dom7'
                     setThirdIntervalDistance(plugin,4);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,10);
-                    activateSeventhFilters(plugin);
                     updateSeventhFrequencies(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                        activateSeventhFilters(plugin);
+                    end
                 case 'maj7'
                     setThirdIntervalDistance(plugin,4);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,11);
-                    activateSeventhFilters(plugin);
                     updateSeventhFrequencies(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                        activateSeventhFilters(plugin);
+                    end
                 case 'm7b5'
                     setThirdIntervalDistance(plugin,3);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,10);
-                    activateSeventhFilters(plugin);
                     updateSeventhFrequencies(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                        activateSeventhFilters(plugin);
+                    end
                 case 'dim7'
                     setThirdIntervalDistance(plugin,3);
-                    activateThirdFilters(plugin);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
-                    activateFifthFilters(plugin);
                     updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,9);
-                    activateSeventhFilters(plugin);
                     updateSeventhFrequencies(plugin);
+                    if plugin.rootFiltersActive
+                        activateThirdFilters(plugin);
+                        activateFifthFilters(plugin);
+                        activateSeventhFilters(plugin);
+                    end
             end
             
             setUpdateThirdFilters(plugin);
