@@ -962,7 +962,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         fifthFiltersActive = false;
         seventhFiltersActive = false;
         
-        %test
         % Deactivation flag variables
         rootFiltersDeactivating = false;
         thirdFiltersDeactivating = false;
@@ -1373,7 +1372,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % update visualizer
             updateStateChangeStatus(plugin,true);
-            
         end
         
         
@@ -1417,7 +1415,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             validatestring(val, {'off','Dim7','Min7','Maj7'},...
                 'set.seventhInterval','SeventhInterval');
             plugin.seventhInterval = val;
-            if val == "off"
+            if val == "off" %todo: can't I just make this a case for the switch?
                 %plugin.seventhFiltersActive = false;
                 deactivateSeventhFilters(plugin);
             else
@@ -1442,6 +1440,116 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % State change update for visualizer
             updateStateChangeStatus(plugin,true);
+        end
+        
+        %-------------------------Chord type setter------------------------
+        %test
+        function set.chordType(plugin,val)
+            validatestring(val, {'no chord','5','min','maj','dim','aug',...
+                'min7','dom7','maj7','m7b5','dim7'});
+            plugin.chordType = val;
+            
+            %todo: move the following to its own function
+            switch val
+                case 'no chord'
+                    deactivateThirdFilters(plugin);
+                    deactivateFifthFilters(plugin);
+                    deactivateSeventhFilters(plugin);
+                case '5'
+                    deactivateThirdFilters(plugin);
+                    setFifthIntervalDistance(plugin,7);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    deactivateSeventhFilters(plugin);
+                case 'min'
+                    setThirdIntervalDistance(plugin,3);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,7);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    deactivateSeventhFilters(plugin);
+                case 'maj'
+                    setThirdIntervalDistance(plugin,4);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,7);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    deactivateSeventhFilters(plugin);
+                case 'dim'
+                    setThirdIntervalDistance(plugin,3);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,6);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    deactivateSeventhFilters(plugin);
+                case 'aug'
+                    setThirdIntervalDistance(plugin,4);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,8);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    deactivateSeventhFilters(plugin);
+                case 'min7'
+                    setThirdIntervalDistance(plugin,3);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,7);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    setSeventhIntervalDistance(plugin,10);
+                    activateSeventhFilters(plugin);
+                    updateSeventhFrequencies(plugin);
+                case 'dom7'
+                    setThirdIntervalDistance(plugin,4);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,7);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    setSeventhIntervalDistance(plugin,10);
+                    activateSeventhFilters(plugin);
+                    updateSeventhFrequencies(plugin);
+                case 'maj7'
+                    setThirdIntervalDistance(plugin,4);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,7);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    setSeventhIntervalDistance(plugin,11);
+                    activateSeventhFilters(plugin);
+                    updateSeventhFrequencies(plugin);
+                case 'm7b5'
+                    setThirdIntervalDistance(plugin,3);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,6);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    setSeventhIntervalDistance(plugin,10);
+                    activateSeventhFilters(plugin);
+                    updateSeventhFrequencies(plugin);
+                case 'dim7'
+                    setThirdIntervalDistance(plugin,3);
+                    activateThirdFilters(plugin);
+                    updateThirdFrequencies(plugin);
+                    setFifthIntervalDistance(plugin,6);
+                    activateFifthFilters(plugin);
+                    updateFifthFrequencies(plugin);
+                    setSeventhIntervalDistance(plugin,9);
+                    activateSeventhFilters(plugin);
+                    updateSeventhFrequencies(plugin);
+            end
+            
+            setUpdateThirdFilters(plugin);
+            setUpdateFifthFilters(plugin);
+            setUpdateSeventhFilters(plugin);
+            updateStateChangeStatus(plugin,true);
+            
         end
         
         
@@ -2149,10 +2257,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootFilter1GainSmooth = false; % Set gain smoothing to false
                     
                     if plugin.rootFiltersDeactivating
-                        %test
                         plugin.rootFiltersActive = false;
                         plugin.rootFiltersDeactivating = false;
-                        disp('Root filters deactivated');
                     end
                 end
                 
@@ -2618,8 +2724,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     if plugin.thirdFiltersDeactivating
                         plugin.thirdFiltersActive = false;
                         plugin.thirdFiltersDeactivating = false;
-                        %test
-                        disp('Third filters deactivated');
                     end
                 end
                 
@@ -3086,7 +3190,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     if plugin.fifthFiltersDeactivating
                         plugin.fifthFiltersActive = false;
                         plugin.fifthFiltersDeactivating = false;
-                        disp('Fifth filters deactivated');
                     end
                 end
                 
@@ -3552,8 +3655,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     if plugin.seventhFiltersDeactivating
                         plugin.seventhFiltersActive = false;
                         plugin.seventhFiltersDeactivating = false;
-                        %test
-                        disp('Seventh filters deactivated');
                     end
                 end
                 
@@ -5042,9 +5143,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateThirdGain8(plugin, 0);
             updateThirdGain9(plugin, 0);
             
-            %test
-            disp('Third filters deactivating...');
-            
         end
         
         %test
@@ -5065,9 +5163,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateThirdFilter8Params(plugin);
             updateThirdGain9(plugin, plugin.highRegionGain);
             updateThirdQFactor9(plugin, plugin.highRegionQFactor);
-            
-            %test
-            disp('Activating third filters');
         end
         
         
@@ -5580,9 +5675,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateFifthGain7(plugin, 0);
             updateFifthGain8(plugin, 0);
             updateFifthGain9(plugin, 0);
-            
-            %test
-            disp('Fifth filters deactivating...');
         end
         
         %test
@@ -6110,9 +6202,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateSeventhGain7(plugin, 0);
             updateSeventhGain8(plugin, 0);
             updateSeventhGain9(plugin, 0);
-            
-            %test
-            disp('Seventh filters deactivating');
         end
         
         function activateSeventhFilters(plugin)
@@ -6132,9 +6221,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateSeventhFilter8Params(plugin);
             updateSeventhGain9(plugin, plugin.highRegionGain);
             updateSeventhQFactor9(plugin, plugin.highRegionQFactor);
-            
-            %test
-            disp('Activating Seventh filters');
         end
         
         
