@@ -42,25 +42,21 @@ This project is currently in active development. The primary DSP functionality i
   - Root control
     - off
     - Chromatic notes: A, A#/Bb, B, C, ..., G, G#/Ab
-  - Third
-    - off
-    - Sus2
-    - Min3
-    - Maj3
-    - Sus4
-  - Fifth
-    - off
-    - Dim5
-    - Perf5
-    - Aug5
-  - Seventh
-    - off
-    - Dim7 (Maj6)
-    - Min7
-    - Maj7
-- Control for the filters will be split into five regions: low, low-mid, mid, high-mid, and high
+  - Chord type
+    - no chord
+    - 5
+    - min
+    - maj
+    - aug
+    - dim
+    - min7
+    - dom7
+    - maj7
+    - m7b5
+    - dim7
+- Control for the filters are split into five regions: low, low-mid, mid, high-mid, and high
   - The user can set the gain and Q factors for each region, but cannot affect individual filters directly
-  - There will also be four crossover controls for defining the frequency ranges for each region.
+  - There are also four crossover controls for adjusting the frequency ranges for each region.
 - Input gain control
   - Output gain control?
 
@@ -69,18 +65,5 @@ This project is currently in active development. The primary DSP functionality i
 - Test to see if the filter frequency jumps needs smoothing.
   - Due the nature of the controls, the filter bands get adjusted instantaneously instead of gradually like on a regular EQ. This seems to cause some quite apparent audio artifacts.
   - There are a few ways smoothing could be applied.
-- Is there a way to display the current chord?
-  - Currently you see the settings for the root, third, fifth, and seventh. It would be more satisfying and give the user good feedback if it had a way to display a chord as Fmin7 instead of F / Min3 / Perf5 / Min7. That's not the way we think.
-  -  Yes. This can be accomlished by having a dropdown box with a getter function that does nothing, but a setter function that updates every time there is a harmonic change.
-  - In order to implement this, maybe I should convert the chord information to matrix form?
-    - It might actually be simpler programming-wise to use the currently existing `thirdIntervalDistance`, etc attributes to creat a set of rules for concatenating the chord names to set the drop-down box.
-  - A fun complication is dealing with "incomplete" chords (i.e., C7 (no fifth)). There are going to be a lot of option in this drop-down menu...
 - Post instructions for removing plugins from quarantine on macOS
 
-
-## Bug List
-- Smoothing has been implemented for when a filter changes controls regions (when the user adjusts a crossover control). However, this should really be implemented for any time there's a sudden shift in a parameter value, i.e. when a filer is activated/deactivated or the chord is changed.
-  - How I have another plan in mind for when the chord is changed...
-  - Perhaps the easiest way to implement this is to just smooth all parameter adjustments. Then you don't need complicated rules and it'll always be smoother. However, if I take this route, I may need more intelligent smoothing rules based on buffer size.
-- Can you set it so that adjusting the crossover settings does not continuously reset filter smoothing?
-  - I.e., it should only update once when the filter changes control region.
