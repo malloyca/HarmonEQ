@@ -937,7 +937,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter9QSmooth = false
         seventhFilter9QStep = Inf;
         
-        numberOfSmoothSteps = 5; %todo: Find a good value for this
+        numberOfSmoothSteps = 10; %todo: Find a good value for this
         
         
         % Active state variables
