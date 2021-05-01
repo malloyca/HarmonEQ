@@ -2,7 +2,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
     % HarmonEQ.m
     % Harmonic Equalizer plugin
     % v0.4-alpha
-    % Last updated: 23 April 2021
+    % Last updated: 30 April 2021
     %
     % This plugin presents a new control scheme for the traditional equalizer.
     % Most people are familiar with the various types of EQs out there
@@ -39,8 +39,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
     % TUNABLE PROPERTIES
     %----------------------------------------------------------------------
     properties
-        %test
-        %rootNote = 'C';
         rootNote = EQRootNote.C;
         rootNoteValue = 0; %todo: move this to private
         
@@ -78,8 +76,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         midHighCrossoverFreq = 1437.85;
         highCrossoverFreq = 5751.38;
         
-        
-        %test
         chordType = EQChordType.noChord;
     end
     
@@ -1289,7 +1285,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %----------------------------Root note-----------------------------
         function set.rootNote(plugin,val)
-            %test
             plugin.rootNote = val;
             
             switch (plugin.rootNote)
@@ -1303,22 +1298,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     updateChordType(plugin);
             end
             
-            
-            % This if statement will throw an error if using single quotes
-            % 'off' instead of double quotes "off". Seems to have something
-            % to do with type... This is true in the other instances as
-            % well.
-            
-%             if val == "off"
-%                 deactivateRootFilters(plugin);
-%                 deactivateThirdFilters(plugin);
-%                 deactivateFifthFilters(plugin);
-%                 deactivateSeventhFilters(plugin);
-%             else
-%                 activateRootFilters(plugin);
-%                 %test
-%                 updateChordType(plugin);
-%             end
             setUpdateRootFilters(plugin);
             setUpdateThirdFilters(plugin);
             setUpdateFifthFilters(plugin);
@@ -1442,9 +1421,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         %-------------------------Chord type setter------------------------
-        %test
         function set.chordType(plugin,val)
-            %test
             plugin.chordType = val;
             
             updateChordType(plugin);
@@ -4111,7 +4088,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %-----------------------Root filter updaters-----------------------
         function updateRootFrequencies(plugin)
-            %test
             root_note = plugin.rootNote;
             rootNoteNumber = plugin.rootNoteValue; % todo: Declaring this here to pass validation
             rootFreq = plugin.rootFrequency1; % todo: Declaring this here to pass validation
