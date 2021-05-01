@@ -2,7 +2,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
     % HarmonEQ_mono.m
     % Harmonic Equalizer plugin
     % v0.4-alpha
-    % Last updated: 23 April 2021
+    % Last updated: 30 April 2021
     %
     % This plugin presents a new control scheme for the traditional equalizer.
     % Most people are familiar with the various types of EQs out there
@@ -39,7 +39,9 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
     % TUNABLE PROPERTIES
     %----------------------------------------------------------------------
     properties
-        rootNote = 'C';
+        %test
+        %rootNote = 'C';
+        rootNote = EQRootNote.C;
         rootNoteValue = 0; %todo: move this to private
         
         thirdInterval = 'off';
@@ -78,7 +80,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
         
         
         %test
-        chordType = 'no chord';
+        chordType = EQChordType.noChord;
     end
     
     
@@ -284,8 +286,8 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
             'VendorVersion','0.2',...
             ...
             audioPluginParameter('rootNote','DisplayName','Root Note',...
-            'Mapping',{'enum','off','A','A# / Bb','B','C','C# / Db','D',...
-            'D# / Eb','E','F','F# / Gb','G','G# / Ab'},...
+            'Mapping',{'enum','off','C','C# / Db','D','D# / Eb','E','F',...
+            'F# / Gb','G','G# / Ab','A','A# / Bb','B',},...
             'Style','dropdown',...
             'Layout',[2,11],...
             'DisplayNameLocation','above'),...
@@ -1252,7 +1254,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
         end
         
         function Visualizer(plugin)
-            %Visualizer This is the visualizer function for HarmonEQ. This
+            %Visualizer This is the visualizer function for HarmonEQ_mono. This
             % function only works inside of Matlab. To use this plugin,
             % run:
             % eq = HarmonEQ_mono;
@@ -1287,25 +1289,36 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
         
         %----------------------------Root note-----------------------------
         function set.rootNote(plugin,val)
-            validatestring(val, {'off','A','A# / Bb','B','C','C# / Db',...
-                'D','D# / Eb','E','F','F# / Gb','G','G# / Ab'},...
-                'set.rootNote', 'RootNote');
+            %test
+            plugin.rootNote = val;
+            
+            switch (plugin.rootNote)
+                case EQRootNote.off
+                    deactivateRootFilters(plugin);
+                    deactivateThirdFilters(plugin);
+                    deactivateFifthFilters(plugin);
+                    deactivateSeventhFilters(plugin);
+                otherwise
+                    activateRootFilters(plugin);
+                    updateChordType(plugin);
+            end
+            
+            
             % This if statement will throw an error if using single quotes
             % 'off' instead of double quotes "off". Seems to have something
             % to do with type... This is true in the other instances as
             % well.
-            if val == "off"
-                plugin.rootNote = val;
-                deactivateRootFilters(plugin);
-                deactivateThirdFilters(plugin);
-                deactivateFifthFilters(plugin);
-                deactivateSeventhFilters(plugin);
-            else
-                plugin.rootNote = val;
-                activateRootFilters(plugin);
-                %test
-                updateChordType(plugin);
-            end
+            
+%             if val == "off"
+%                 deactivateRootFilters(plugin);
+%                 deactivateThirdFilters(plugin);
+%                 deactivateFifthFilters(plugin);
+%                 deactivateSeventhFilters(plugin);
+%             else
+%                 activateRootFilters(plugin);
+%                 %test
+%                 updateChordType(plugin);
+%             end
             setUpdateRootFilters(plugin);
             setUpdateThirdFilters(plugin);
             setUpdateFifthFilters(plugin);
@@ -1319,6 +1332,8 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
             % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
+        
+        %todo: Do I need a getter function?
         
         
         %--------------------------Harmonic Third--------------------------
@@ -1429,8 +1444,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
         %-------------------------Chord type setter------------------------
         %test
         function set.chordType(plugin,val)
-            validatestring(val, {'no chord','5','min','maj','dim','aug',...
-                'min7','dom7','maj7','m7b5','dim7'});
+            %test
             plugin.chordType = val;
             
             updateChordType(plugin);
@@ -1446,11 +1460,11 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
             chord = plugin.chordType;
             
             switch chord
-                case 'no chord'
+                case EQChordType.noChord
                     deactivateThirdFilters(plugin);
                     deactivateFifthFilters(plugin);
                     deactivateSeventhFilters(plugin);
-                case '5'
+                case EQChordType.five
                     deactivateThirdFilters(plugin);
                     setFifthIntervalDistance(plugin,7);
                     updateFifthFrequencies(plugin);
@@ -1458,7 +1472,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                     if plugin.rootFiltersActive
                         activateFifthFilters(plugin);
                     end
-                case 'min'
+                case EQChordType.minor
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1468,7 +1482,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'maj'
+                case EQChordType.major
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1478,7 +1492,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'dim'
+                case EQChordType.diminished
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
@@ -1488,7 +1502,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'aug'
+                case EQChordType.augmented
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,8);
@@ -1498,7 +1512,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'min7'
+                case EQChordType.minor7
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1510,7 +1524,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'dom7'
+                case EQChordType.dominant7
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1522,7 +1536,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'maj7'
+                case EQChordType.major7
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1534,7 +1548,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'm7b5'
+                case EQChordType.minor7b5
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
@@ -1546,7 +1560,7 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'dim7'
+                case EQChordType.diminished7
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
@@ -1895,7 +1909,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                 end
             end
             
-            %test
             if plugin.thirdFiltersActive
                 if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
                     updateThirdQFactor6(plugin,val);
@@ -1960,7 +1973,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                 end
             end
             
-            %test
             if plugin.thirdFiltersActive
                 if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
                     updateThirdGain4(plugin,val);
@@ -2026,7 +2038,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                 end
             end
             
-            %test
             if plugin.thirdFiltersActive
                 if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
                     updateThirdQFactor4(plugin,val);
@@ -2087,7 +2098,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                 updateRootGain1(plugin,val);
             end
             
-            %test
             if plugin.thirdFiltersActive
                 if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
                     updateThirdGain2(plugin,val);
@@ -2139,7 +2149,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                 setUpdateRootFilter1(plugin);
             end
             
-            %test
             if plugin.thirdFiltersActive
                 if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
                     updateThirdQFactor2(plugin,val);
@@ -2723,7 +2732,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                     plugin.thirdGain1 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter1GainSmooth % Case: final step of gain smoothing
-                    %test: add a setting to deactivate all third filters
                     gain = plugin.thirdFilter1GainTarget;
                     plugin.thirdGain1 = gain;
                     
@@ -3195,7 +3203,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
                     plugin.fifthFilter1GainDiff = 0;
                     plugin.fifthFilter1GainSmooth = false; % Set gain smoothing to false
                     
-                    %test
                     if plugin.fifthFiltersDeactivating
                         plugin.fifthFiltersActive = false;
                         plugin.fifthFiltersDeactivating = false;
@@ -4104,51 +4111,52 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
         
         %-----------------------Root filter updaters-----------------------
         function updateRootFrequencies(plugin)
+            %test
             root_note = plugin.rootNote;
             rootNoteNumber = plugin.rootNoteValue; % todo: Declaring this here to pass validation
             rootFreq = plugin.rootFrequency1; % todo: Declaring this here to pass validation
             
             switch root_note %TODO: Eventually create a getBaseFreq function for this...
-                case "off"
-                case 'A'
+                case EQRootNote.off
+                case EQRootNote.A
                     rootFreq = 55;
                     rootNoteNumber = 9;
-                case 'A# / Bb'
+                case EQRootNote.Bb
                     rootFreq = 58.27047;
                     rootNoteNumber = 10;
-                case 'B'
+                case EQRootNote.B
                     rootFreq = 61.73541;
                     rootNoteNumber = 11;
-                case 'C'
+                case EQRootNote.C
                     rootFreq = 32.70320;
                     rootNoteNumber = 0;
-                case 'C# / Db'
+                case EQRootNote.Db
                     rootFreq = 34.64783;
                     rootNoteNumber = 1;
-                case 'D'
+                case EQRootNote.D
                     rootFreq = 36.70810;
                     rootNoteNumber = 2;
-                case 'D# / Eb'
+                case EQRootNote.Eb
                     rootFreq = 38.89087;
                     rootNoteNumber = 3;
-                case 'E'
+                case EQRootNote.E
                     rootFreq = 41.20344;
                     rootNoteNumber = 4;
-                case 'F'
+                case EQRootNote.F
                     rootFreq = 43.65353;
                     rootNoteNumber = 5;
-                case 'F# / Gb'
+                case EQRootNote.Gb
                     rootFreq = 46.24930;
                     rootNoteNumber = 6;
-                case 'G'
+                case EQRootNote.G
                     rootFreq = 48.99943;
                     rootNoteNumber = 7;
-                case 'G# / Ab'
+                case EQRootNote.Ab
                     rootFreq = 51.91309;
                     rootNoteNumber = 8;
             end
             
-            if root_note ~= "off"
+            if root_note ~= EQRootNote.off
                 plugin.rootFrequency1 = rootFreq;
                 plugin.rootFrequency2 = 2 * rootFreq;
                 plugin.rootFrequency3 = 4 * rootFreq;
@@ -5136,7 +5144,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
             plugin.thirdIntervalDistance = val;
         end
         
-        %test
         function deactivateThirdFilters(plugin)
             %plugin.thirdFiltersActive = false;
             
@@ -5154,7 +5161,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
             
         end
         
-        %test
         function activateThirdFilters(plugin)
             plugin.thirdFiltersActive = true;
             
@@ -5671,7 +5677,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
         function deactivateFifthFilters(plugin)
             %plugin.fifthFiltersActive = false;
             
-            %test
             % set gain to 0, then deactivate (taken care of by... %todo:
             % fill that note in
             plugin.fifthFiltersDeactivating = true;
@@ -5686,7 +5691,6 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
             updateFifthGain9(plugin, 0);
         end
         
-        %test
         function activateFifthFilters(plugin)
             plugin.fifthFiltersActive = true;
             
@@ -6362,6 +6366,8 @@ classdef HarmonEQ_mono < matlab.System & audioPlugin
     
     
 end
+
+
 
 
 
