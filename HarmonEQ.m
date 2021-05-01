@@ -80,7 +80,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         
         %test
-        chordType = 'no chord';
+        chordType = EQChordType.noChord;
     end
     
     
@@ -1444,8 +1444,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %-------------------------Chord type setter------------------------
         %test
         function set.chordType(plugin,val)
-            validatestring(val, {'no chord','5','min','maj','dim','aug',...
-                'min7','dom7','maj7','m7b5','dim7'});
+            %test
             plugin.chordType = val;
             
             updateChordType(plugin);
@@ -1461,11 +1460,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
             chord = plugin.chordType;
             
             switch chord
-                case 'no chord'
+                case EQChordType.noChord
                     deactivateThirdFilters(plugin);
                     deactivateFifthFilters(plugin);
                     deactivateSeventhFilters(plugin);
-                case '5'
+                case EQChordType.five
                     deactivateThirdFilters(plugin);
                     setFifthIntervalDistance(plugin,7);
                     updateFifthFrequencies(plugin);
@@ -1473,7 +1472,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     if plugin.rootFiltersActive
                         activateFifthFilters(plugin);
                     end
-                case 'min'
+                case EQChordType.minor
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1483,7 +1482,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'maj'
+                case EQChordType.major
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1493,7 +1492,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'dim'
+                case EQChordType.diminished
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
@@ -1503,7 +1502,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'aug'
+                case EQChordType.augmented
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,8);
@@ -1513,7 +1512,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
-                case 'min7'
+                case EQChordType.minor7
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1525,7 +1524,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'dom7'
+                case EQChordType.dominant7
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1537,7 +1536,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'maj7'
+                case EQChordType.major7
                     setThirdIntervalDistance(plugin,4);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
@@ -1549,7 +1548,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'm7b5'
+                case EQChordType.minor7b5
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
@@ -1561,7 +1560,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         activateFifthFilters(plugin);
                         activateSeventhFilters(plugin);
                     end
-                case 'dim7'
+                case EQChordType.diminished7
                     setThirdIntervalDistance(plugin,3);
                     updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
