@@ -11,11 +11,11 @@ Development is currently ongoing and stable functionality is not guaranteed.
 Pre-compiled versions of the plugin are available:
 - macOS
   - VST:
-    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ_mono.vst.zip)
-    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ.vst.zip)
+    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ_mono.vst.zip)
+    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ.vst.zip)
   - AU:
-    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ_mono.component.zip)
-    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.3-alpha/HarmonEQ.component.zip)
+    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ_mono.component.zip)
+    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ.component.zip)
 - Windows
   - Coming soon. I need a Windows installation in order to be able to compile for Windows...
 
