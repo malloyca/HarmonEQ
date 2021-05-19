@@ -1,17 +1,23 @@
 function transformMatrix = buildChromaTransform(n_fft, samplerate)
 % BUILDCHROMATRANSFORM Build a trasformation matrix for converting from
-% STFT spectrum to Chroma vector for harmonic analysis.
+% STFT spectrum to chroma vector for harmonic analysis.
 % 
+% INPUT:
 % n_fft (required) - FFT window size for the spectrum to be converted
 % samplerate (required) - samplerate of the audio being analyzed
+% 
+% OUTPUT:
+% transformMatrix - A (12 x 1 + n_fft/2) matrix for converting from STFT
+% power spectrum to chroma vector.
 % 
 % If the samplerate is 44.1k or 48k, n_fft = 2048 is recommended. If
 % samplerate is 88.2k (who even uses that?) or 96k, n_fft = 4096 is
 % recommended. If samplerate is 192k, n_fft = 8192 is recommended.
 % 
 % This function is set up with the assumption that we are working in the
-% western 12-tone system. It currently does not support tuning adjustment,
-% but that is a planned feature.
+% western 12-tone system and uses A as it's base. That is, when used to get
+% the chroma vector, element 1 will be for A, 2 for Bb, etc. It currently
+% does not support tuning adjustment, but that is a planned feature.
 
 % This function is based on the chroma filter from the Librosa audio
 % analysis library. Code and information is available at www.librosa.org.
@@ -75,7 +81,4 @@ function transformMatrix = buildChromaTransform(n_fft, samplerate)
     % Prep for output
     transformMatrix = transformMatrix .* scaleTile;
     transformMatrix = transformMatrix(:, 1:1 + n_fft / 2);
-    
-
-
 end
