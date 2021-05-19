@@ -77,6 +77,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         highCrossoverFreq = 5751.38;
         
         chordType = EQChordType.noChord;
+        
+        automaticMode = false;
     end
     
     
@@ -281,11 +283,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'VendorName','Colin Malloy',...
             'VendorVersion','0.2',...
             ...
+            audioPluginParameter('automaticMode',...
+            'DisplayName','Control Mode',...
+            'DisplayNameLocation','above',...
+            'Mapping', {'enum','Manual','Automatic'},...
+            'Layout',[2,12;4,12],...
+            'Style','vrocker'),...
+            ...
             audioPluginParameter('rootNote','DisplayName','Root Note',...
             'Mapping',{'enum','off','C','C# / Db','D','D# / Eb','E','F',...
             'F# / Gb','G','G# / Ab','A','A# / Bb','B',},...
             'Style','dropdown',...
-            'Layout',[2,11],...
+            'Layout',[7,12],...
             'DisplayNameLocation','above'),...
             ...
             audioPluginParameter('chordType',...
@@ -293,7 +302,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'Mapping',{'enum','no chord','5','min','maj','dim','aug',...
             'min7','dom7','maj7','m7b5','dim7'},... % todo: complete this list
             'Style','dropdown',...
-            'Layout',[4,11],...
+            'Layout',[9,12],...
             'DisplayNameLocation','above'),...
             ...
             audioPluginParameter('highRegionGain',...
@@ -391,7 +400,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             ...
             audioPluginGridLayout(...
             'RowHeight',[25,25,25,25,25,25,25,25,25,100,100,25],... %todo: I don't think the 25 near the end is necessary
-            'ColumnWidth',[50,50,50,50,50,50,50,50,50,50,150],...
+            'ColumnWidth',[50,50,50,50,50,50,50,50,50,50,50,150],...
             'RowSpacing',15)...
             );
     end
@@ -953,6 +962,19 @@ classdef HarmonEQ < matlab.System & audioPlugin
         % For visalization
         visualizerObject;
         
+        
+        %------------------------Harmonic analysis-------------------------
+        %test
+        chordTemplates;
+        chromaTransformMatrix;
+        analysisBuffer = dsp.AsyncBuffer;
+        
+        % filter coefficient variables for HP filter
+        butterB;
+        butterA;
+        
+        nFFT = 2048;
+        hannWindow;
     end
     
     
@@ -963,6 +985,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function out = stepImpl(plugin,in)
             %-------------------Get necessary parameters-------------------
             fs = getSampleRate(plugin);
+            n_fft = plugin.nFFT;
+            n_fft2 = n_fft / 2;
             
             %-------------------Update filter parameters-------------------
             %-----Update root filters
@@ -1182,6 +1206,64 @@ classdef HarmonEQ < matlab.System & audioPlugin
             if ~isempty(plugin.visualizerObject) && plugin.stateChange
                 updateVisualizer(plugin);
             end
+            
+            %-----Harmonic analysis
+            %test
+            if plugin.automaticMode
+                % Sum to mono for harmonic analysis
+                monoIn = plugin.sumToMono(in);
+                % HP filter to reduce low freq noise which interferes with
+                % chord detection
+                monoIn = filter(plugin.butterB, plugin.butterA, monoIn);
+                
+                write(plugin.analysisBuffer,monoIn);
+                
+                if plugin.analysisBuffer.NumUnreadSamples >= n_fft
+                    
+                    chord_templates = plugin.chordTemplates;
+                    
+                    %todo - move to separate helper functions
+                    %todo - system for updating chord settings and rules
+                    %for how to update them
+                    
+                    analysisFrame = read(plugin.analysisBuffer, n_fft, n_fft2);
+                    analysisFrame = analysisFrame .* plugin.hannWindow;
+                    
+                    fftOut = fft(analysisFrame);
+                    magnitudes = abs(fftOut(1:n_fft2+1)).^2;
+                    
+                    % Calculate the raw chroma vector
+                    rawChroma = plugin.chromaTransformMatrix * magnitudes;
+                    
+                    % Normalize chroma vector
+                    chromaVector = zeros(12,1);
+                    rawMax = max(rawChroma);
+                    for i = 1:12
+                        chromaVector(i) = rawChroma(i) / rawMax;
+                    end
+                    
+                    best_similarity = 0;
+                    best_sim_index = 0;
+                    for i = 1:36
+                        similarity = dot(chord_templates(i,:), chromaVector) / ...
+                            (norm(chord_templates(i,:)) * norm(chromaVector));
+                        if similarity > best_similarity
+                            best_similarity = similarity;
+                            best_sim_index = i;
+                        end
+                        if i == 13
+                            disp(['A major similarity: ', num2str(similarity)]);
+                        end
+                    end
+                    disp(['Best similarity: ', num2str(best_similarity)]);
+                    disp(best_sim_index);
+                end
+            end
+            
+            %todo I need a new logical state variable for automatic
+            %harmonic analysis mode. if automaticMode then all of this
+            %stuff
+            
         end
         
         function setupImpl(plugin,~)
@@ -1229,12 +1311,34 @@ classdef HarmonEQ < matlab.System & audioPlugin
             buildSeventhFilter8(plugin, fs);
             buildSeventhFilter9(plugin, fs);
             
+            
+            
+            % Build chord template matrix %test
+            plugin.chordTemplates = buildChordTemplates();
+            
+            % Build Chroma Transform Matrix
+            initializeTransformMatrix(plugin);
         end
         
-        function resetImpl(~)
+        function resetImpl(plugin)
+            fs = getSampleRate(plugin);
             %TODO: resetFilters / resetAllFilters / resetRootFilters /
             %resetThirdFilters / resetFifthFilters / resetSeventhFilters
             
+            % Rebuild Chroma transform matrix in case the sample rate
+            % changed
+            initializeTransformMatrix(plugin);
+            
+            % Design highpass filter for automatic chord analysis
+            [plugin.butterB, plugin.butterA] = butter(6, 90/fs, 'high');
+            
+            % Build Hann window
+            plugin.hannWindow = hann(plugin.nFFT,'periodic');
+            
+            % Reset analysis buffer
+            plugin.analysisBuffer = dsp.AsyncBuffer;
+            write(plugin.analysisBuffer, [0; 0]);
+            read(plugin.analysisBuffer, 2);
         end
         
     end
@@ -1245,8 +1349,23 @@ classdef HarmonEQ < matlab.System & audioPlugin
     methods
         
         function plugin = HarmonEQ()
+            fs = getSampleRate(plugin);
+            % Initialize filter coefficients to an allpass filter for the
+            % visualizer
             plugin.B = [1 0 0];
             plugin.A = [0 0 1];
+            
+            % Design highpass filter for automatic chord analysis
+            [plugin.butterB, plugin.butterA] = butter(6, 90/fs, 'high');
+            
+            % Build Hann window
+            plugin.hannWindow = hann(plugin.nFFT,'periodic');
+            
+            % Initialize buffer for harmonic analysis
+            plugin.analysisBuffer = dsp.AsyncBuffer;
+            write(plugin.analysisBuffer, [0; 0]);
+            read(plugin.analysisBuffer, 2);
+            
         end
         
         function Visualizer(plugin)
@@ -1282,6 +1401,22 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %------------------------------------------------------------------
         % SETTERS
         %------------------------------------------------------------------
+        
+        %test
+        function set.automaticMode(plugin,val)
+            plugin.automaticMode = val;
+            %todo - Use this space to trigger activation / deactivation
+            %behavior
+            if plugin.automaticMode
+                disp('Activated automatic mode.');
+            else
+                disp('Activated manual mode.');
+                % Reset the buffer so that it's fresh for the next time
+                % automatic mode is activated
+                %todo - move this to a helper function
+                plugin.analysisBuffer.reset;
+            end
+        end
         
         %----------------------------Root note-----------------------------
         function set.rootNote(plugin,val)
@@ -6336,6 +6471,35 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % reset plugin.stateChange after updating visualizer
             updateStateChangeStatus(plugin,false);
+        end
+        
+        
+        %--------------------Harmonic Analysis Helpers---------------------
+        function initializeTransformMatrix(plugin)
+            fs = getSampleRate(plugin);
+            
+            % Set analysis FFT size based on samplerate
+            if fs <= 48000
+                numFFT = 2048;
+                plugin.nFFT = 2048;
+            elseif fs <= 96000
+                numFFT = 4096;
+                plugin.nFFT = 4096;
+            elseif fs <= 192000
+                numFFT = 8192;
+                plugin.nFFT = 8192;
+            end
+            
+            % Build chroma transform matrix
+            plugin.chromaTransformMatrix = buildChromaTransform(numFFT, fs);
+        end
+        
+        function monoOut = sumToMono(~,in) %test
+            [~,n] = size(in);
+            
+            if n == 2
+                monoOut = sum(in, 2);
+            end
         end
         
     end
