@@ -73,12 +73,12 @@ function transformMatrix = buildChromaTransform(n_fft, samplerate)
     
     % Apply scaling for FFT bins
     scaleTile = zeros(12,n_fft);
-    temp = exp(-0.5 * (((midiBins./12 - 5.0)./2.0).^2));
+    temp = exp(-0.5 * (((midiBins./12 - 5.0) ./ 2.0).^2));
     for i = 1:12
         scaleTile(i,:) = temp;
     end
     
     % Prep for output
     transformMatrix = transformMatrix .* scaleTile;
-    transformMatrix = transformMatrix(:, 1:1 + n_fft / 2);
+    transformMatrix = transformMatrix(:, 1:1 + n_fft/2);
 end
