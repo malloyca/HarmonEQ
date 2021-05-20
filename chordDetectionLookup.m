@@ -1,284 +1,536 @@
-function chord = chordDetectionLookup(index)
-% I will eventually want to change this to [root, chordType] =
-% chordDetectionLookup(index)
+function [chordName, rootNote, chordType] = chordDetectionLookup(index)
+% CHORDDETECTIONLOOKUP This is a lookup function for converting from a
+% matrix index chord information
+%
+% Input:
+% index - This is an integer value corresponding to the index of the chord
+% template returned by the chord detection system.
+%
+% Output:
+% chordName - This is a string containing the name of the chord.
+% rootNote - This is a string corresponding to the root note of the
+% chord for updating plugin.rootNote.
+% chordType - This is a string corresponding to the chord type to use for
+% updating plugin.chordType.
+
     if index < 13 % case: five chord
         switch index
             case 1
-                chord = 'A5';
+                chordName = 'A5';
+                rootNote = 'A';
+                chordType = 'five';
             case 2
-                chord = 'Bb5';
+                chordName = 'Bb5';
+                rootNote = 'Bb';
+                chordType = 'five';
             case 3
-                chord = 'B5';
+                chordName = 'Bfive';
+                rootNote = 'B';
+                chordType = 'five';
             case 4
-                chord = 'C5';
+                chordName = 'C5';
+                rootNote = 'C';
+                chordType = 'five';
             case 5
-                chord = 'Db5';
+                chordName = 'Db5';
+                rootNote = 'Db';
+                chordType = 'five';
             case 6
-                chord = 'D5';
+                chordName = 'D5';
+                rootNote = 'D';
+                chordType = 'five';
             case 7
-                chord = 'Eb5';
+                chordName = 'Eb5';
+                rootNote = 'Eb';
+                chordType = 'five';
             case 8
-                chord = 'E5';
+                chordName = 'E5';
+                rootNote = 'E';
+                chordType = 'five';
             case 9
-                chord = 'F5';
+                chordName = 'F5';
+                rootNote = 'F';
+                chordType = 'five';
             case 10
-                chord = 'Gb5';
+                chordName = 'Gb5';
+                rootNote = 'Gb';
+                chordType = 'five';
             case 11
-                chord = 'G5';
+                chordName = 'G5';
+                rootNote = 'G';
+                chordType = 'five';
             case 12
-                chord = 'Ab5';
+                chordName = 'Ab5';
+                rootNote = 'Ab';
+                chordType = 'five';
         end
         
     elseif index < 25 % major chord
         switch index
             case 13
-                chord = 'A major';
+                chordName = 'A major';
+                rootNote = 'A';
+                chordType = 'major';
             case 14
-                chord = 'bb major';
+                chordName = 'Bb major';
+                rootNote = 'Bb';
+                chordType = 'major';
             case 15
-                chord = 'B major';
+                chordName = 'B major';
+                rootNote = 'B';
+                chordType = 'major';
             case 16
-                chord = 'C major';
+                chordName = 'C major';
+                rootNote = 'C';
+                chordType = 'major';
             case 17
-                chord = 'Db major';
+                chordName = 'Db major';
+                rootNote = 'Db';
+                chordType = 'major';
             case 18
-                chord = 'D major';
+                chordName = 'D major';
+                rootNote = 'D';
+                chordType = 'major';
             case 19
-                chord = 'Eb major';
+                chordName = 'Eb major';
+                rootNote = 'Eb';
+                chordType = 'major';
             case 20
-                chord = 'E major';
+                chordName = 'E major';
+                rootNote = 'E';
+                chordType = 'major';
             case 21
-                chord = 'F major';
+                chordName = 'F major';
+                rootNote = 'F';
+                chordType = 'major';
             case 22
-                chord = 'Gb major';
+                chordName = 'Gb major';
+                rootNote = 'Gb';
+                chordType = 'major';
             case 23
-                chord = 'G major';
+                chordName = 'G major';
+                rootNote = 'G';
+                chordType = 'major';
             case 24
-                chord = 'Ab major';
+                chordName = 'Ab major';
+                rootNote = 'Ab';
+                chordType = 'major';
         end
         
     elseif index < 37 % case: minor chord
         switch index
             case 25
-                chord = 'A minor';
+                chordName = 'A minor';
+                rootNote = 'A';
+                chordType = 'minor';
             case 26
-                chord = 'Bb minor';
+                chordName = 'Bb minor';
+                rootNote = 'Bb';
+                chordType = 'minor';
             case 27
-                chord = 'B minor';
+                chordName = 'B minor';
+                rootNote = 'B';
+                chordType = 'minor';
             case 28
-                chord = 'C minor';
+                chordName = 'C minor';
+                rootNote = 'C';
+                chordType = 'minor';
             case 29
-                chord = 'Db minor';
+                chordName = 'Db minor';
+                rootNote = 'Db';
+                chordType = 'minor';
             case 30
-                chord = 'D minor';
+                chordName = 'D minor';
+                rootNote = 'D';
+                chordType = 'minor';
             case 31
-                chord = 'Eb minor';
+                chordName = 'Eb minor';
+                rootNote = 'Eb';
+                chordType = 'minor';
             case 32
-                chord = 'E minor';
+                chordName = 'E minor';
+                rootNote = 'E';
+                chordType = 'minor';
             case 33
-                chord = 'F minor';
+                chordName = 'F minor';
+                rootNote = 'F';
+                chordType = 'minor';
             case 34
-                chord = 'Gb minor';
+                chordName = 'Gb minor';
+                rootNote = 'Gb';
+                chordType = 'minor';
             case 35
-                chord = 'G minor';
+                chordName = 'G minor';
+                rootNote = 'G';
+                chordType = 'minor';
             case 36
-                chord = 'Ab minor';
+                chordName = 'Ab minor';
+                rootNote = 'Ab';
+                chordType = 'minor';
         end
         
     elseif index < 49 % case: diminished chord
         switch index
             case 37
-                chord = 'A diminished';
+                chordName = 'A diminished';
+                rootNote = 'A';
+                chordType = 'diminished';
             case 38
-                chord = 'Bb diminished';
+                chordName = 'Bb diminished';
+                rootNote = 'Bb';
+                chordType = 'diminished';
             case 39
-                chord = 'B diminished';
+                chordName = 'B diminished';
+                rootNote = 'B';
+                chordType = 'diminished';
             case 40
-                chord = 'C diminished';
+                chordName = 'C diminished';
+                rootNote = 'C';
+                chordType = 'diminished';
             case 41
-                chord = 'Db diminished';
+                chordName = 'Db diminished';
+                rootNote = 'Db';
+                chordType = 'diminished';
             case 42
-                chord = 'D diminished';
+                chordName = 'D diminished';
+                rootNote = 'D';
+                chordType = 'diminished';
             case 43
-                chord = 'Eb diminished';
+                chordName = 'Eb diminished';
+                rootNote = 'Eb';
+                chordType = 'diminished';
             case 44
-                chord = 'E diminished';
+                chordName = 'E diminished';
+                rootNote = 'E';
+                chordType = 'diminished';
             case 45
-                chord = 'F diminished';
+                chordName = 'F diminished';
+                rootNote = 'F';
+                chordType = 'diminished';
             case 46
-                chord = 'Gb diminished';
+                chordName = 'Gb diminished';
+                rootNote = 'Gb';
+                chordType = 'diminished';
             case 47
-                chord = 'G diminished';
+                chordName = 'G diminished';
+                rootNote = 'G';
+                chordType = 'diminished';
             case 48
-                chord = 'Ab diminished';
+                chordName = 'Ab diminished';
+                rootNote = 'Ab';
+                chordType = 'diminished';
         end
         
     elseif index < 61 % case: augmented chord
         switch index
             case 49
-                chord = 'A augmented';
+                chordName = 'A augmented';
+                rootNote = 'A';
+                chordType = 'augmented';
             case 50
-                chord = 'Bb augmented';
+                chordName = 'Bb augmented';
+                rootNote = 'Bb';
+                chordType = 'augmented';
             case 51
-                chord = 'B augmented';
+                chordName = 'B augmented';
+                rootNote = 'B';
+                chordType = 'augmented';
             case 52
-                chord = 'C augmented';
+                chordName = 'C augmented';
+                rootNote = 'C';
+                chordType = 'augmented';
             case 53
-                chord = 'Db augmented';
+                chordName = 'Db augmented';
+                rootNote = 'Db';
+                chordType = 'augmented';
             case 54
-                chord = 'D augmented';
+                chordName = 'D augmented';
+                rootNote = 'D';
+                chordType = 'augmented';
             case 55
-                chord = 'Eb augmented';
+                chordName = 'Eb augmented';
+                rootNote = 'Eb';
+                chordType = 'augmented';
             case 56
-                chord = 'E augmented';
+                chordName = 'E augmented';
+                rootNote = 'E';
+                chordType = 'augmented';
             case 57
-                chord = 'F augmented';
+                chordName = 'F augmented';
+                rootNote = 'F';
+                chordType = 'augmented';
             case 58
-                chord = 'Gb augmented';
+                chordName = 'Gb augmented';
+                rootNote = 'Gb';
+                chordType = 'augmented';
             case 59
-                chord = 'G augmented';
+                chordName = 'G augmented';
+                rootNote = 'G';
+                chordType = 'augmented';
             case 60
-                chord = 'Ab augmented';
+                chordName = 'Ab augmented';
+                rootNote = 'Ab';
+                chordType = 'augmented';
         end
         
     elseif index < 73 % case: major 7 chord
         switch index
             case 61
-                chord = 'A major 7';
+                chordName = 'A major 7';
+                rootNote = 'A';
+                chordType = 'major7';
             case 62
-                chord = 'Bb major 7';
+                chordName = 'Bb major 7';
+                rootNote = 'Bb';
+                chordType = 'major7';
             case 63
-                chord = 'B major 7';
+                chordName = 'B major 7';
+                rootNote = 'B';
+                chordType = 'major7';
             case 64
-                chord = 'C major 7';
+                chordName = 'C major 7';
+                rootNote = 'C';
+                chordType = 'major7';
             case 65
-                chord = 'Db major 7';
+                chordName = 'Db major 7';
+                rootNote = 'Db';
+                chordType = 'major7';
             case 66
-                chord = 'D major 7';
+                chordName = 'D major 7';
+                rootNote = 'D';
+                chordType = 'major7';
             case 67
-                chord = 'Eb major 7';
+                chordName = 'Eb major 7';
+                rootNote = 'Eb';
+                chordType = 'major7';
             case 68
-                chord = 'E major 7';
+                chordName = 'E major 7';
+                rootNote = 'E';
+                chordType = 'major7';
             case 69
-                chord = 'F major 7';
+                chordName = 'F major 7';
+                rootNote = 'F';
+                chordType = 'major7';
             case 70
-                chord = 'Gb major 7';
+                chordName = 'Gb major 7';
+                rootNote = 'Gb';
+                chordType = 'major7';
             case 71
-                chord = 'G major 7';
+                chordName = 'G major 7';
+                rootNote = 'G';
+                chordType = 'major7';
             case 72
-                chord = 'Ab major 7';
+                chordName = 'Ab major 7';
+                rootNote = 'Ab';
+                chordType = 'major7';
         end
         
     elseif index < 85 % case: dominant 7 chord
         switch index
             case 73
-                chord = 'A dominant 7';
+                chordName = 'A dominant 7';
+                rootNote = 'A';
+                chordType = 'dominant7';
             case 74
-                chord = 'Bb dominant 7';
+                chordName = 'Bb dominant 7';
+                rootNote = 'Bb';
+                chordType = 'dominant7';
             case 75
-                chord = 'B dominant 7';
+                chordName = 'B dominant 7';
+                rootNote = 'B';
+                chordType = 'dominant7';
             case 76
-                chord = 'C dominant 7';
+                chordName = 'C dominant 7';
+                rootNote = 'C';
+                chordType = 'dominant7';
             case 77
-                chord = 'Db dominant 7';
+                chordName = 'Db dominant 7';
+                rootNote = 'Db';
+                chordType = 'dominant7';
             case 78
-                chord = 'D dominant 7';
+                chordName = 'D dominant 7';
+                rootNote = 'D';
+                chordType = 'dominant7';
             case 79
-                chord = 'Eb dominant 7';
+                chordName = 'Eb dominant 7';
+                rootNote = 'Eb';
+                chordType = 'dominant7';
             case 80
-                chord = 'E dominant 7';
+                chordName = 'E dominant 7';
+                rootNote = 'E';
+                chordType = 'dominant7';
             case 81
-                chord = 'F dominant 7';
+                chordName = 'F dominant 7';
+                rootNote = 'F';
+                chordType = 'dominant7';
             case 82
-                chord = 'Gb dominant 7';
+                chordName = 'Gb dominant 7';
+                rootNote = 'Gb';
+                chordType = 'dominant7';
             case 83
-                chord = 'G dominant 7';
+                chordName = 'G dominant 7';
+                rootNote = 'G';
+                chordType = 'dominant7';
             case 84
-                chord = 'Ab dominant 7';
+                chordName = 'Ab dominant 7';
+                rootNote = 'Ab';
+                chordType = 'dominant7';
         end
         
     elseif index < 97 % case: minor 7 chord
         switch index
             case 85
-                chord = 'A minor 7';
+                chordName = 'A minor 7';
+                rootNote = 'A';
+                chordType = 'minor7';
             case 86
-                chord = 'Bb minor 7';
+                chordName = 'Bb minor 7';
+                rootNote = 'Bb';
+                chordType = 'minor7';
             case 87
-                chord = 'B minor 7';
+                chordName = 'B minor 7';
+                rootNote = 'B';
+                chordType = 'minor7';
             case 88
-                chord = 'C minor 7';
+                chordName = 'C minor 7';
+                rootNote = 'C';
+                chordType = 'minor7';
             case 89
-                chord = 'Db minor 7';
+                chordName = 'Db minor 7';
+                rootNote = 'Db';
+                chordType = 'minor7';
             case 90
-                chord = 'D minor 7';
+                chordName = 'D minor 7';
+                rootNote = 'D';
+                chordType = 'minor7';
             case 91
-                chord = 'Eb minor 7';
+                chordName = 'Eb minor 7';
+                rootNote = 'Eb';
+                chordType = 'minor7';
             case 92
-                chord = 'E minor 7';
+                chordName = 'E minor 7';
+                rootNote = 'E';
+                chordType = 'minor7';
             case 93
-                chord = 'F minor 7';
+                chordName = 'F minor 7';
+                rootNote = 'F';
+                chordType = 'minor7';
             case 94
-                chord = 'Gb minor 7';
+                chordName = 'Gb minor 7';
+                rootNote = 'Gb';
+                chordType = 'minor7';
             case 95
-                chord = 'G minor 7';
+                chordName = 'G minor 7';
+                rootNote = 'G';
+                chordType = 'minor7';
             case 96
-                chord = 'Ab minor 7';
+                chordName = 'Ab minor 7';
+                rootNote = 'Ab';
+                chordType = 'minor7';
         end
         
     elseif index < 109 % case: minor 7 flat 5 chord
         switch index
             case 97
-                chord = 'A minor 7 b5';
+                chordName = 'A minor 7 b5';
+                rootNote = 'A';
+                chordType = 'minor7b5';
             case 98
-                chord = 'Bb minor 7 b5';
+                chordName = 'Bb minor 7 b5';
+                rootNote = 'Bb';
+                chordType = 'minor7b5';
             case 99
-                chord = 'B minor 7 b5';
+                chordName = 'B minor 7 b5';
+                rootNote = 'B';
+                chordType = 'minor7b5';
             case 100
-                chord = 'C minor 7 b5';
+                chordName = 'C minor 7 b5';
+                rootNote = 'C';
+                chordType = 'minor7b5';
             case 101
-                chord = 'Db minor 7 b5';
+                chordName = 'Db minor 7 b5';
+                rootNote = 'Db';
+                chordType = 'minor7b5';
             case 102
-                chord = 'D minor 7 b5';
+                chordName = 'D minor 7 b5';
+                rootNote = 'D';
+                chordType = 'minor7b5';
             case 103
-                chord = 'Eb minor 7 b5';
+                chordName = 'Eb minor 7 b5';
+                rootNote = 'Eb';
+                chordType = 'minor7b5';
             case 104
-                chord = 'E minor 7 b5';
+                chordName = 'E minor 7 b5';
+                rootNote = 'E';
+                chordType = 'minor7b5';
             case 105
-                chord = 'F minor 7 b5';
+                chordName = 'F minor 7 b5';
+                rootNote = 'F';
+                chordType = 'minor7b5';
             case 106
-                chord = 'Gb minor 7 b5';
+                chordName = 'Gb minor 7 b5';
+                rootNote = 'Gb';
+                chordType = 'minor7b5';
             case 107
-                chord = 'G minor 7 b5';
+                chordName = 'G minor 7 b5';
+                rootNote = 'G';
+                chordType = 'minor7b5';
             case 108
-                chord = 'Ab minor 7 b5';
+                chordName = 'Ab minor 7 b5';
+                rootNote = 'Ab';
+                chordType = 'minor7b5';
         end
         
     else
         switch index
             case 109
-                chord = 'A diminished 7';
+                chordName = 'A diminished 7';
+                rootNote = 'A';
+                chordType = 'diminished7';
             case 110
-                chord = 'Bb diminished 7';
+                chordName = 'Bb diminished 7';
+                rootNote = 'Bb';
+                chordType = 'diminished7';
             case 111
-                chord = 'B diminished 7';
+                chordName = 'B diminished 7';
+                rootNote = 'B';
+                chordType = 'diminished7';
             case 112
-                chord = 'C diminished 7';
+                chordName = 'C diminished 7';
+                rootNote = 'C';
+                chordType = 'diminished7';
             case 113
-                chord = 'Db diminished 7';
+                chordName = 'Db diminished 7';
+                rootNote = 'Db';
+                chordType = 'diminished7';
             case 114
-                chord = 'D diminished 7';
+                chordName = 'D diminished 7';
+                rootNote = 'D';
+                chordType = 'diminished7';
             case 115
-                chord = 'Eb diminished 7';
+                chordName = 'Eb diminished 7';
+                rootNote = 'Eb';
+                chordType = 'diminished7';
             case 116
-                chord = 'E diminished 7';
+                chordName = 'E diminished 7';
+                rootNote = 'E';
+                chordType = 'diminished7';
             case 117
-                chord = 'F diminished 7';
+                chordName = 'F diminished 7';
+                rootNote = 'F';
+                chordType = 'diminished7';
             case 118
-                chord = 'Gb diminished 7';
+                chordName = 'Gb diminished 7';
+                rootNote = 'Gb';
+                chordType = 'diminished7';
             case 119
-                chord = 'G diminished 7';
+                chordName = 'G diminished 7';
+                rootNote = 'G';
+                chordType = 'diminished7';
             case 120
-                chord = 'Ab diminished 7';
+                chordName = 'Ab diminished 7';
+                rootNote = 'Ab';
+                chordType = 'diminished7';
         end
     end
 end

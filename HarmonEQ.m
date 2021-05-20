@@ -27,13 +27,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
     % generateAudioPlugin -au -outdir plugins HarmonEQ;
     
     
-    % TODO:
-    % - Look into State-variable filters vs biquads
-    % - Make the parameter smoothing more dynamic at large buffer sizes. Right
-    % now it goes really slowly if the buffer size is large since it only steps
-    % once per buffer. It wouldn't be too hard to set it so that it stepped
-    % multiple times per input buffer for larger buffer sizes
-    %
     
     %----------------------------------------------------------------------
     % TUNABLE PROPERTIES
@@ -913,7 +906,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter9QSmooth = false
         seventhFilter9QStep = Inf;
         
-        numberOfSmoothSteps = 10; %todo: Find a good value for this
+        numberOfSmoothSteps = 3; %todo: Find a good value for this
         
         
         % Active state variables
@@ -954,6 +947,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         prevChordEstimates = dsp.AsyncBuffer;
         prevEstimateIndex;
         estSmooth;
+        currentChord = 'no chord';
     end
     
     
@@ -962,7 +956,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     methods (Access = protected)
         function out = stepImpl(plugin,in)
-            disp('----------');
             %-------------------Get necessary parameters-------------------
             fs = getSampleRate(plugin);
             n_fft = plugin.nFFT;
@@ -1222,41 +1215,38 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 % As part of this, perhaps I should just save the
                 % similarity score matrix
                 
-                magnitudes = getPowSpectrum(plugin, n_fft, n_fft2);
-                
-                % Get normalized chroma vector %test
-                chromaVector = getNormChroma(plugin,magnitudes);
-                
-                % Calculate similarity values with chord templates
-                prevIndex = plugin.prevEstimateIndex;
-                [best_sim_index, best_similarity, prevEstSim] =...
-                    getSimilarities(plugin,chromaVector,...
-                    chord_templates, prevIndex);
-                
-                % Store raw estimates
-                write(plugin.prevChordEstimates, ...
-                    [best_sim_index, best_similarity]);
-                
-                chordEstimate = getChordEstimate(plugin, best_sim_index,...
-                    best_similarity, prevIndex, prevEstSim);
-                plugin.estSmooth = chordEstimate;
-                
-                %todo - get rid of this estimation buffer?
-                estimations = read(plugin.prevChordEstimates,5,4);
-                plugin.prevEstimateIndex = plugin.estSmooth;
-                disp(estimations);
-                disp(['Previous estimate score: ', num2str(prevEstSim)]);
-                disp(['Best similarity score: ', num2str(best_similarity)]);
-                disp(['Smoothed estimate: ', num2str(plugin.estSmooth)]);
-                estMode = mode(estimations(:,1));
-                disp(['Mode of last five estimates: ', num2str(estMode)]);
-                
+                if plugin.analysisBuffer.NumUnreadSamples >=n_fft2
+                    
+                    magnitudes = getPowSpectrum(plugin, n_fft, n_fft2);
+                    
+                    % Get normalized chroma vector %test
+                    chromaVector = getNormChroma(plugin,magnitudes);
+                    
+                    % Calculate similarity values with chord templates
+                    prevIndex = plugin.prevEstimateIndex;
+                    [best_sim_index, best_similarity, prevEstSim] =...
+                        getSimilarities(plugin,chromaVector,...
+                        chord_templates, prevIndex);
+                    
+                    % Store raw estimates
+                    write(plugin.prevChordEstimates, ...
+                        [best_sim_index, best_similarity]);
+                    
+                    chordEstimate = getChordEstimate(plugin, best_sim_index,...
+                        best_similarity, prevIndex, prevEstSim);
+                    plugin.estSmooth = chordEstimate;
+                    
+                    %todo - get rid of this estimation buffer?
+                    plugin.prevEstimateIndex = plugin.estSmooth;
+                    
+                    [~, smooth_root,smooth_chord_type] = ...
+                        chordDetectionLookup(plugin.estSmooth);
+                    %test
+                    updateRootNote(plugin, smooth_root);
+                    updateChordType(plugin, smooth_chord_type);
+                end
                 
             end
-            
-            %todo I need a new logical state variable for automatic
-            %harmonic analysis mode. if automaticMode then all of this
-            %stuff
             
         end
         
@@ -1428,55 +1418,61 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.rootNote(plugin,val)
             % Update rootNote if in manual mode, do nothing if in automatic
             % chord detection mode
-            mode = plugin.checkMode;
-            if ~mode % case: manual mode
-                plugin.rootNote = val;
-                
-                switch (plugin.rootNote)
-                    case EQRootNote.off
-                        deactivateRootFilters(plugin);
-                        deactivateThirdFilters(plugin);
-                        deactivateFifthFilters(plugin);
-                        deactivateSeventhFilters(plugin);
-                    otherwise
-                        activateRootFilters(plugin);
-                        updateChordType(plugin);
-                end
-                
-                setUpdateRootFilters(plugin);
-                setUpdateThirdFilters(plugin);
-                setUpdateFifthFilters(plugin);
-                setUpdateSeventhFilters(plugin);
-                
-                updateRootFrequencies(plugin);
-                updateThirdFrequencies(plugin);
-                updateFifthFrequencies(plugin);
-                updateSeventhFrequencies(plugin);
-                
-                % Update visualizer
-                updateStateChangeStatus(plugin,true);
+            plugin.rootNote = val;
+            
+            %todo: If I have time, set up a internalRootUpdate boolean
+            %state variable so that I can ignore updates from the user in
+            %automatic mode and accept only internal updates
+%             mode = plugin.checkMode;
+%             if ~mode % case: manual mode
+            
+            switch (plugin.rootNote)
+                case EQRootNote.off
+                    deactivateRootFilters(plugin);
+                    deactivateThirdFilters(plugin);
+                    deactivateFifthFilters(plugin);
+                    deactivateSeventhFilters(plugin);
+                otherwise
+                    activateRootFilters(plugin);
+                    updateChord(plugin);
             end
+            
+            setUpdateRootFilters(plugin);
+            setUpdateThirdFilters(plugin);
+            setUpdateFifthFilters(plugin);
+            setUpdateSeventhFilters(plugin);
+            
+            updateRootFrequencies(plugin);
+            updateThirdFrequencies(plugin);
+            updateFifthFrequencies(plugin);
+            updateSeventhFrequencies(plugin);
+            
+            % Update visualizer
+            updateStateChangeStatus(plugin,true);
+%             end
         end
         
         %-------------------------Chord type setter------------------------
         function set.chordType(plugin,val)
             % Update chordType if in manual mode, do nothing if in
             % automatic chord detection mode
-            mode = plugin.checkMode;
-            if ~mode % case: manual mode
-                plugin.chordType = val;
-                
-                updateChordType(plugin);
-                
-                setUpdateThirdFilters(plugin);
-                setUpdateFifthFilters(plugin);
-                setUpdateSeventhFilters(plugin);
-                updateStateChangeStatus(plugin,true);
-            end
+            
+            %todo: same as above about filtering user vs internal updates
+%             mode = plugin.checkMode;
+%             if ~mode % case: manual mode
+            plugin.chordType = val;
+            
+            updateChord(plugin);
+            
+            setUpdateThirdFilters(plugin);
+            setUpdateFifthFilters(plugin);
+            setUpdateSeventhFilters(plugin);
+            updateStateChangeStatus(plugin,true);
+%             end
             
         end
         
-        function updateChordType(plugin)
+        function updateChord(plugin)
             chord = plugin.chordType;
             
             switch chord
@@ -6444,15 +6440,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
             bestSimIndex = 0;
             simOfPrevEstimate = 0;
             [m,~] = size(chordTemplates);
-            disp(m);
             
             for i = 1:m
                 similarity = dot(chordTemplates(i,:), chromaVector) / ...
                     (norm(chordTemplates(i,:)) * norm(chromaVector));
                 if i < 13
-                    similarity = 0.94 * similarity; % De-emphasize 5 chords
-                elseif i > 37
-                    similarity = 0.8 * similarity; % De-emphasize chords
+                    similarity = 0.93 * similarity; % De-emphasize 5 chords
+                elseif i > 36
+                    similarity = 0.75 * similarity; % De-emphasize non major/minor chords
                 end
                 if i == previousIndex
                     similarity = 1.025 * similarity; % Give weighting to previous estimate
@@ -6477,7 +6472,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 % index, then they're in agreement and use that
                 estimateOut = bestSimilarityIndex;
             else
-                if 1 - prevIndexSimilarity/bestSimilarity < 0.065
+                if 1 - prevIndexSimilarity/bestSimilarity < 0.06
                     % If the similarity of the new estimate is not
                     % significantly more than the similarity of the last,
                     % don't update. Default to stability.
@@ -6492,7 +6487,106 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     end
                 end
             end
-            
+        end
+        
+        function updateRootNote(plugin, rootNote)
+            % Update the root note if it does not match the newest
+            % estimation.
+            switch rootNote
+                case 'A'
+                    if plugin.rootNote ~= EQRootNote.A
+                        plugin.rootNote = EQRootNote.A;
+                    end
+                case 'Bb'
+                    if plugin.rootNote ~= EQRootNote.Bb
+                        plugin.rootNote = EQRootNote.Bb;
+                    end
+                case 'B'
+                    if plugin.rootNote ~= EQRootNote.B
+                        plugin.rootNote = EQRootNote.B;
+                    end
+                case 'C'
+                    if plugin.rootNote ~= EQRootNote.C
+                        plugin.rootNote = EQRootNote.C;
+                    end
+                case 'Db'
+                    if plugin.rootNote ~= EQRootNote.Db
+                        plugin.rootNote = EQRootNote.Db;
+                    end
+                case 'D'
+                    if plugin.rootNote ~= EQRootNote.D
+                        plugin.rootNote = EQRootNote.D;
+                    end
+                case 'Eb'
+                    if plugin.rootNote ~= EQRootNote.Eb
+                        plugin.rootNote = EQRootNote.Eb;
+                    end
+                case 'E'
+                    if plugin.rootNote ~= EQRootNote.E
+                        plugin.rootNote = EQRootNote.E;
+                    end
+                case 'F'
+                    if plugin.rootNote ~= EQRootNote.F
+                        plugin.rootNote = EQRootNote.F;
+                    end
+                case 'Gb'
+                    if plugin.rootNote ~= EQRootNote.Gb
+                        plugin.rootNote = EQRootNote.Gb;
+                    end
+                case 'G'
+                    if plugin.rootNote ~= EQRootNote.G
+                        plugin.rootNote = EQRootNote.G;
+                    end
+                case 'Ab'
+                    if plugin.rootNote ~= EQRootNote.Ab
+                        plugin.rootNote = EQRootNote.Ab;
+                    end
+            end
+        end
+        
+        function updateChordType(plugin, chordType)
+           switch chordType
+               case 'five'
+                   if plugin.chordType ~= EQChordType.five
+                       plugin.chordType = EQChordType.five;
+                   end
+               case 'minor'
+                   if plugin.chordType ~= EQChordType.minor
+                       plugin.chordType = EQChordType.minor;
+                   end
+               case 'major'
+                   if plugin.chordType ~= EQChordType.major
+                       plugin.chordType = EQChordType.major;
+                   end
+               case 'diminished'
+                   if plugin.chordType ~= EQChordType.diminished
+                       plugin.chordType = EQChordType.diminished;
+                   end
+               case 'augmented'
+                   if plugin.chordType ~= EQChordType.augmented
+                       plugin.chordType = EQChordType.augmented;
+                   end
+               case 'minor7'
+                   if plugin.chordType ~= EQChordType.minor7
+                       plugin.chordType = EQChordType.minor7;
+                   end
+               case 'dominant7'
+                   if plugin.chordType ~= EQChordType.dominant7
+                       plugin.chordType = EQChordType.dominant7;
+                   end
+               case 'major7'
+                   if plugin.chordType ~= EQChordType.major7
+                       plugin.chordType = EQChordType.major7;
+                   end
+               case 'minor7b5'
+                   if plugin.chordType ~= EQChordType.minor7b5
+                       plugin.chordType = EQChordType.minor7b5;
+                   end
+               case 'diminished7'
+                   if plugin.chordType ~= EQChordType.diminished7
+                       plugin.chordType = EQChordType.diminished7;
+                   end
+           end
         end
         
     end
