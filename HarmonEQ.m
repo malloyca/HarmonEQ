@@ -40,17 +40,20 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     properties
         rootNote = EQRootNote.C;
+        chordType = EQChordType.noChord;
+        automaticMode = false;
+        
         rootNoteValue = 0; %todo: move this to private
         
-        thirdInterval = 'off';
+        thirdInterval = 'off'; %todo: move this to private
         thirdIntervalDistance = 4; %todo: move this to private
         thirdNote = 'E'; %todo: move this to private
         
-        fifthInterval = 'off';
+        fifthInterval = 'off'; %todo: move this to private
         fifthIntervalDistance = 7; %todo: move this to private
         fifthNote = 'G'; %todo: move this to private
         
-        seventhInterval = 'off';
+        seventhInterval = 'off'; %todo: move this to private
         seventhIntervalDistance = 11; %todo: move this to private
         seventhNote = 'B'; %todo: move this to private
         
@@ -76,13 +79,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
         midHighCrossoverFreq = 1437.85;
         highCrossoverFreq = 5751.38;
         
-        chordType = EQChordType.noChord;
         
-        automaticMode = false;
     end
     
     
-    properties
+    properties %todo - move to or make this section private
         %--------------------------Harmonic root---------------------------
         % Center frequencies for root bands
         rootFrequency1 = 32.70320;
@@ -300,7 +301,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             audioPluginParameter('chordType',...
             'DisplayName','Chord Type',...
             'Mapping',{'enum','no chord','5','min','maj','dim','aug',...
-            'min7','dom7','maj7','m7b5','dim7'},... % todo: complete this list
+            'min7','dom7','maj7','m7b5','dim7'},...
             'Style','dropdown',...
             'Layout',[9,12],...
             'DisplayNameLocation','above'),...
@@ -404,38 +405,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             'RowSpacing',15)...
             );
     end
-    
-    
-
-    %todo: delete this once I'm happy with new interface
-%             audioPluginParameter('thirdInterval',...
-%             'DisplayName','Harmonic Third Interval',...
-%             'Mapping',{'enum','off','Sus2','Min3','Maj3','Sus4'},...
-%             'Style','dropdown',...
-%             'Layout',[4,11],...
-%             'DisplayNameLocation','above'),...
-%             ...
-%             audioPluginParameter('fifthInterval',...
-%             'DisplayName','Harmonic Fifth Interval',...
-%             'Mapping',{'enum','off','Dim5','Perf5','Aug5'},...
-%             'Style','dropdown',...
-%             'Layout',[6,11],...
-%             'DisplayNameLocation','above'),...
-%             ...
-%             audioPluginParameter('seventhInterval',...
-%             'DisplayName','Harmonic Seventh Interval',...
-%             'Mapping',{'enum','off','Dim7','Min7','Maj7'},...
-%             'Style','dropdown',...
-%             'Layout',[8,11],...
-%             'DisplayNameLocation','above'),...
-%             ...
-%             audioPluginParameter('chordType',...
-%             'DisplayName','Chord Type',...
-%             'Mapping',{'enum','no chord','5','min','maj','dim','aug',...
-%             'min7','dom7','maj7','m7b5','dim7'},... % todo: complete this list
-%             'Style','dropdown',...
-%             'Layout',[10,11],...
-%             'DisplayNameLocation','above'),...
     
     %----------------------------------------------------------------------
     % PROTECTED PROPERTIES
@@ -970,11 +939,21 @@ classdef HarmonEQ < matlab.System & audioPlugin
         analysisBuffer = dsp.AsyncBuffer;
         
         % filter coefficient variables for HP filter
-        butterB;
-        butterA;
+        butterLowB;
+        butterLowA;
+        butterHiB;
+        butterHiA;
         
         nFFT = 2048;
         hannWindow;
+        
+        % Store previous estimates in a buffer
+        % Channel one (int) is chord estimate
+        % Channel two (float) is similarity score with chroma vector
+        %todo - determine how many to store for smoothing chord detection
+        prevChordEstimates = dsp.AsyncBuffer;
+        prevEstimateIndex;
+        estSmooth;
     end
     
     
@@ -983,10 +962,12 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     methods (Access = protected)
         function out = stepImpl(plugin,in)
+            disp('----------');
             %-------------------Get necessary parameters-------------------
             fs = getSampleRate(plugin);
             n_fft = plugin.nFFT;
             n_fft2 = n_fft / 2;
+            monoIn = double(in); % Ensure doubles for analysis
             
             %-------------------Update filter parameters-------------------
             %-----Update root filters
@@ -1113,6 +1094,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % Root note filters
             %TODO: convert these to functions
+            %todo: change output name from 'in'
             if plugin.rootFiltersActive
                 [in, plugin.rootPrevState1] = filter(plugin.rootCoeffb1,...
                     plugin.rootCoeffa1, in, plugin.rootPrevState1);
@@ -1211,53 +1193,65 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %test
             if plugin.automaticMode
                 % Sum to mono for harmonic analysis
-                monoIn = plugin.sumToMono(in);
-                % HP filter to reduce low freq noise which interferes with
-                % chord detection
-                monoIn = filter(plugin.butterB, plugin.butterA, monoIn);
-                
+                monoIn = plugin.sumToMono(monoIn);
+                % HP filter to reduce low freq noise which can interfere
+                % with chord detection
+                monoIn = filter(plugin.butterLowB, plugin.butterLowA, monoIn);
+                monoIn = filter(plugin.butterHiB, plugin.butterHiA, monoIn);
                 write(plugin.analysisBuffer,monoIn);
                 
-                if plugin.analysisBuffer.NumUnreadSamples >= n_fft
-                    
-                    chord_templates = plugin.chordTemplates;
-                    
-                    %todo - move to separate helper functions
-                    %todo - system for updating chord settings and rules
-                    %for how to update them
-                    
-                    analysisFrame = read(plugin.analysisBuffer, n_fft, n_fft2);
-                    analysisFrame = analysisFrame .* plugin.hannWindow;
-                    
-                    fftOut = fft(analysisFrame);
-                    magnitudes = abs(fftOut(1:n_fft2+1)).^2;
-                    
-                    % Calculate the raw chroma vector
-                    rawChroma = plugin.chromaTransformMatrix * magnitudes;
-                    
-                    % Normalize chroma vector
-                    chromaVector = zeros(12,1);
-                    rawMax = max(rawChroma);
-                    for i = 1:12
-                        chromaVector(i) = rawChroma(i) / rawMax;
-                    end
-                    
-                    best_similarity = 0;
-                    best_sim_index = 0;
-                    for i = 1:36
-                        similarity = dot(chord_templates(i,:), chromaVector) / ...
-                            (norm(chord_templates(i,:)) * norm(chromaVector));
-                        if similarity > best_similarity
-                            best_similarity = similarity;
-                            best_sim_index = i;
-                        end
-                        if i == 13
-                            disp(['A major similarity: ', num2str(similarity)]);
-                        end
-                    end
-                    disp(['Best similarity: ', num2str(best_similarity)]);
-                    disp(best_sim_index);
-                end
+                chord_templates = plugin.chordTemplates;
+                
+                %test
+                %todo - move to separate helper functions
+                %todo - system for updating chord settings and rules
+                %for how to update them
+                
+                % Rules for updating:
+                % 1. If the current winning estimate matches the
+                % previous estimate, then we're fine. Stay there.
+                % 2. If the current winning estimate is different, but
+                % its score does not significantly outdo the score
+                % associated with the previous chord estimate, then
+                % don't update chord estimate. Could also go by mode
+                % and then maybe mean/mode of previous estimates
+                % 3. If no current estimate's similarity score is > .6
+                % (or .55 maybe? - should test this out), then don't
+                % update.
+                % 4. Else: update.
+                % As part of this, perhaps I should just save the
+                % similarity score matrix
+                
+                magnitudes = getPowSpectrum(plugin, n_fft, n_fft2);
+                
+                % Get normalized chroma vector %test
+                chromaVector = getNormChroma(plugin,magnitudes);
+                
+                % Calculate similarity values with chord templates
+                prevIndex = plugin.prevEstimateIndex;
+                [best_sim_index, best_similarity, prevEstSim] =...
+                    getSimilarities(plugin,chromaVector,...
+                    chord_templates, prevIndex);
+                
+                % Store raw estimates
+                write(plugin.prevChordEstimates, ...
+                    [best_sim_index, best_similarity]);
+                
+                chordEstimate = getChordEstimate(plugin, best_sim_index,...
+                    best_similarity, prevIndex, prevEstSim);
+                plugin.estSmooth = chordEstimate;
+                
+                %todo - get rid of this estimation buffer?
+                estimations = read(plugin.prevChordEstimates,5,4);
+                plugin.prevEstimateIndex = plugin.estSmooth;
+                disp(estimations);
+                disp(['Previous estimate score: ', num2str(prevEstSim)]);
+                disp(['Best similarity score: ', num2str(best_similarity)]);
+                disp(['Smoothed estimate: ', num2str(plugin.estSmooth)]);
+                estMode = mode(estimations(:,1));
+                disp(['Mode of last five estimates: ', num2str(estMode)]);
+                
+                
             end
             
             %todo I need a new logical state variable for automatic
@@ -1330,7 +1324,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             initializeTransformMatrix(plugin);
             
             % Design highpass filter for automatic chord analysis
-            [plugin.butterB, plugin.butterA] = butter(6, 90/fs, 'high');
+            [plugin.butterLowB, plugin.butterLowA] = butter(6, 110/fs, 'high'); %todo: create a single cutoff value for these to use
+            [plugin.butterHiB, plugin.butterHiA] = butter(6, 704/fs);
             
             % Build Hann window
             plugin.hannWindow = hann(plugin.nFFT,'periodic');
@@ -1339,6 +1334,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.analysisBuffer = dsp.AsyncBuffer;
             write(plugin.analysisBuffer, [0; 0]);
             read(plugin.analysisBuffer, 2);
+            
+            % Reset chord detection smoothing buffer
+            plugin.prevChordEstimates = dsp.AsyncBuffer;
+            write(plugin.prevChordEstimates, [0 0; 0 0]);
+            read(plugin.prevChordEstimates, 2);
         end
         
     end
@@ -1348,6 +1348,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
     %----------------------------------------------------------------------
     methods
         
+        %Constructor
         function plugin = HarmonEQ()
             fs = getSampleRate(plugin);
             % Initialize filter coefficients to an allpass filter for the
@@ -1356,7 +1357,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.A = [0 0 1];
             
             % Design highpass filter for automatic chord analysis
-            [plugin.butterB, plugin.butterA] = butter(6, 90/fs, 'high');
+            [plugin.butterLowB, plugin.butterLowA] = butter(6, 110/fs, 'high');
+            [plugin.butterHiB, plugin.butterHiA] = butter(6, 704/fs);
             
             % Build Hann window
             plugin.hannWindow = hann(plugin.nFFT,'periodic');
@@ -1365,6 +1367,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.analysisBuffer = dsp.AsyncBuffer;
             write(plugin.analysisBuffer, [0; 0]);
             read(plugin.analysisBuffer, 2);
+            
+            % Initialize chord detection smoothing buffer
+            plugin.prevChordEstimates = dsp.AsyncBuffer;
+            write(plugin.prevChordEstimates, [0 0; 0 0]);
+            read(plugin.prevChordEstimates, 2);
             
         end
         
@@ -1413,158 +1420,59 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 disp('Activated manual mode.');
                 % Reset the buffer so that it's fresh for the next time
                 % automatic mode is activated
-                %todo - move this to a helper function
-                plugin.analysisBuffer.reset;
+                resetAnalysisBuffer(plugin);
             end
         end
         
         %----------------------------Root note-----------------------------
         function set.rootNote(plugin,val)
-            plugin.rootNote = val;
-            
-            switch (plugin.rootNote)
-                case EQRootNote.off
-                    deactivateRootFilters(plugin);
-                    deactivateThirdFilters(plugin);
-                    deactivateFifthFilters(plugin);
-                    deactivateSeventhFilters(plugin);
-                otherwise
-                    activateRootFilters(plugin);
-                    updateChordType(plugin);
-            end
-            
-            setUpdateRootFilters(plugin);
-            setUpdateThirdFilters(plugin);
-            setUpdateFifthFilters(plugin);
-            setUpdateSeventhFilters(plugin);
-            
-            updateRootFrequencies(plugin);
-            updateThirdFrequencies(plugin);
-            updateFifthFrequencies(plugin);
-            updateSeventhFrequencies(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        %todo: Do I need a getter function?
-        
-        
-        %--------------------------Harmonic Third--------------------------
-        %todo: deprecated
-        function set.thirdInterval(plugin,val)
-            validatestring(val, {'off','Sus2','Min3','Maj3','Sus4'},...
-                'set.thirdInterval','ThirdInterval');
-            plugin.thirdInterval = val;
-            if val == "off"
-                deactivateThirdFilters(plugin);
-            else
-                %todo: clean up
-                switch val
-                    case 'Sus2'
-                        %plugin.thirdIntervalDistance = 2;
-                        setThirdIntervalDistance(plugin,2);
-                    case 'Min3'
-                        %plugin.thirdIntervalDistance = 3;
-                        setThirdIntervalDistance(plugin,3);
-                    case 'Maj3'
-                        %plugin.thirdIntervalDistance = 4;
-                        setThirdIntervalDistance(plugin,4);
-                    case 'Sus4'
-                        %plugin.thirdIntervalDistance = 5;
-                        setThirdIntervalDistance(plugin,5);
+            % Update rootNote if in manual mode, do nothing if in automatic
+            % chord detection mode
+            mode = plugin.checkMode;
+            if ~mode % case: manual mode
+                plugin.rootNote = val;
+                
+                switch (plugin.rootNote)
+                    case EQRootNote.off
+                        deactivateRootFilters(plugin);
+                        deactivateThirdFilters(plugin);
+                        deactivateFifthFilters(plugin);
+                        deactivateSeventhFilters(plugin);
+                    otherwise
+                        activateRootFilters(plugin);
+                        updateChordType(plugin);
                 end
                 
-                %plugin.thirdFiltersActive = true;
-                activateThirdFilters(plugin);
-                updateThirdFrequencies(plugin);
+                setUpdateRootFilters(plugin);
                 setUpdateThirdFilters(plugin);
-            end
-            
-            % update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        
-        %--------------------------Harmonic Fifth--------------------------
-        %todo: deprecated
-        function set.fifthInterval(plugin,val)
-            validatestring(val, {'off','Dim5','Perf5','Aug5'},...
-                'set.fifthInterval','FifthInterval');
-            plugin.fifthInterval = val;
-            
-            %todo: clean up
-            if val == "off"
-                %plugin.fifthFiltersActive = false;
-                deactivateFifthFilters(plugin);
-            else
-                switch val
-                    case 'Dim5'
-                        %plugin.fifthIntervalDistance = 6;
-                        setFifthIntervalDistance(plugin,6);
-                    case 'Perf5'
-                        %plugin.fifthIntervalDistance = 7;
-                        setFifthIntervalDistance(plugin,7);
-                    case 'Aug5'
-                        %plugin.fifthIntervalDistance = 8;
-                        setFifthIntervalDistance(plugin,8);
-                end
-                
-                %if plugin.rootNoteFiltersActive == true?
-                %plugin.fifthFiltersActive = true;
-                activateFifthFilters(plugin);
-                updateFifthFrequencies(plugin);
                 setUpdateFifthFilters(plugin);
-            end
-            
-            % update visualizer
-            updateStateChangeStatus(plugin,true);
-        end
-        
-        
-        %--------------------------Harmonic Seventh--------------------------
-        %todo: deprecated
-        function set.seventhInterval(plugin,val)
-            validatestring(val, {'off','Dim7','Min7','Maj7'},...
-                'set.seventhInterval','SeventhInterval');
-            plugin.seventhInterval = val;
-            if val == "off" %todo: can't I just make this a case for the switch?
-                %plugin.seventhFiltersActive = false;
-                deactivateSeventhFilters(plugin);
-            else
-                switch val
-                    case 'Dim7'
-                        %plugin.seventhIntervalDistance = 9;
-                        setSeventhIntervalDistance(plugin,9);
-                    case 'Min7'
-                        %plugin.seventhIntervalDistance = 10;
-                        setSeventhIntervalDistance(plugin,10);
-                    case 'Maj7'
-                        %plugin.seventhIntervalDistance = 11;
-                        setSeventhIntervalDistance(plugin,11);
-                end
-                
-                %if plugin.rootNoteFiltersActive == true?
-                %plugin.seventhFiltersActive = true;
-                activateSeventhFilters(plugin);
-                updateSeventhFrequencies(plugin);
                 setUpdateSeventhFilters(plugin);
+                
+                updateRootFrequencies(plugin);
+                updateThirdFrequencies(plugin);
+                updateFifthFrequencies(plugin);
+                updateSeventhFrequencies(plugin);
+                
+                % Update visualizer
+                updateStateChangeStatus(plugin,true);
             end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
         end
         
         %-------------------------Chord type setter------------------------
         function set.chordType(plugin,val)
-            plugin.chordType = val;
-            
-            updateChordType(plugin);
-            
-            setUpdateThirdFilters(plugin);
-            setUpdateFifthFilters(plugin);
-            setUpdateSeventhFilters(plugin);
-            updateStateChangeStatus(plugin,true);
+            % Update chordType if in manual mode, do nothing if in
+            % automatic chord detection mode
+            mode = plugin.checkMode;
+            if ~mode % case: manual mode
+                plugin.chordType = val;
+                
+                updateChordType(plugin);
+                
+                setUpdateThirdFilters(plugin);
+                setUpdateFifthFilters(plugin);
+                setUpdateSeventhFilters(plugin);
+                updateStateChangeStatus(plugin,true);
+            end
             
         end
         
@@ -6477,7 +6385,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %--------------------Harmonic Analysis Helpers---------------------
         function initializeTransformMatrix(plugin)
             fs = getSampleRate(plugin);
-            
+
             % Set analysis FFT size based on samplerate
             if fs <= 48000
                 numFFT = 2048;
@@ -6485,7 +6393,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             elseif fs <= 96000
                 numFFT = 4096;
                 plugin.nFFT = 4096;
-            elseif fs <= 192000
+            else
                 numFFT = 8192;
                 plugin.nFFT = 8192;
             end
@@ -6500,6 +6408,91 @@ classdef HarmonEQ < matlab.System & audioPlugin
             if n == 2
                 monoOut = sum(in, 2);
             end
+        end
+        
+        function resetAnalysisBuffer(plugin)
+            plugin.analysisBuffer.reset;
+        end
+        
+        function out = getPowSpectrum(plugin, n_fft, n_fft2)
+            % Reads from analysis buffer with n_fft/2 overlap, applies a
+            % Hann window, performs FFT, and returns the power spectrum for
+            % the first 1 + n_fft/2 points.
+            analysisFrame = read(plugin.analysisBuffer, n_fft, n_fft2);
+            analysisFrame = analysisFrame .* plugin.hannWindow;
+            
+            fftOut = fft(analysisFrame);
+            mag = abs(fftOut(1:n_fft2+1));
+            out = mag .^ 2;
+        end
+        
+        function chromaVector = getNormChroma(plugin,powSpectrum)
+            rawChroma = plugin.chromaTransformMatrix * powSpectrum;
+            
+            % Normalize chroma vector
+            chromaVector = zeros(12,1);
+            rawMax = max(rawChroma);
+            for i = 1:12
+                chromaVector(i) = rawChroma(i) / rawMax;
+            end
+        end
+        
+        function [bestSimIndex, bestSimilarity, simOfPrevEstimate] = ...
+                getSimilarities(~,chromaVector, chordTemplates,...
+                previousIndex)
+            bestSimilarity = 0;
+            bestSimIndex = 0;
+            simOfPrevEstimate = 0;
+            [m,~] = size(chordTemplates);
+            disp(m);
+            
+            for i = 1:m
+                similarity = dot(chordTemplates(i,:), chromaVector) / ...
+                    (norm(chordTemplates(i,:)) * norm(chromaVector));
+                if i < 13
+                    similarity = 0.94 * similarity; % De-emphasize 5 chords
+                elseif i > 37
+                    similarity = 0.8 * similarity; % De-emphasize chords
+                end
+                if i == previousIndex
+                    similarity = 1.025 * similarity; % Give weighting to previous estimate
+                    simOfPrevEstimate = similarity;
+                end
+                if similarity > bestSimilarity
+                    bestSimilarity = similarity;
+                    bestSimIndex = i;
+                end
+            end
+        end
+        
+        function mode = checkMode(plugin)
+            mode = plugin.automaticMode;
+        end
+        
+        function estimateOut = getChordEstimate(~,...
+                bestSimilarityIndex, bestSimilarity,...
+                prevIndex, prevIndexSimilarity)
+            if bestSimilarityIndex == prevIndex
+                % If current best similarity index matches the previous
+                % index, then they're in agreement and use that
+                estimateOut = bestSimilarityIndex;
+            else
+                if 1 - prevIndexSimilarity/bestSimilarity < 0.065
+                    % If the similarity of the new estimate is not
+                    % significantly more than the similarity of the last,
+                    % don't update. Default to stability.
+                    estimateOut = prevIndex;
+                else
+                    % If the current best similarity is significantly more
+                    % confident greater than 0.6, update to new one
+                    if bestSimilarity > 0.6
+                        estimateOut = bestSimilarityIndex;
+                    else
+                        estimateOut = prevIndex;
+                    end
+                end
+            end
+            
         end
         
     end
