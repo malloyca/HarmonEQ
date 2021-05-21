@@ -80,6 +80,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
     
     properties (Access = private)
         privateRootNote = EQRootNote.C;
+        privateChordType = EQChordType.noChord;
         
         %--------------------------Harmonic root---------------------------
         % Center frequencies for root bands
@@ -917,8 +918,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter9QSmooth = false
         seventhFilter9QStep = Inf;
         
-        inputBuffer = dsp.AsyncBuffer;
-        outputBuffer = dsp.AsyncBuffer;
+        inputBuffer;
+        outputBuffer;
         numberOfSmoothSteps = 3;
         gainOutSmooth = 1;
         
@@ -947,7 +948,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %------------------------Harmonic analysis-------------------------
         chordTemplates;
         chromaTransformMatrix;
-        analysisBuffer = dsp.AsyncBuffer;
+        analysisBuffer;
         
         % filter coefficient variables for HP filter
         butterLowB;
@@ -961,6 +962,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         peakAlpha = 0.07;
         prevLevel = 0;
+        
+        resetAnalysisBufferFlag = false;
     end
     
     
@@ -980,6 +983,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             monoIn = double(in); % Ensure doubles for analysis
             % Sum to mono for harmonic analysis
             monoIn = plugin.sumToMono(monoIn);
+            level = plugin.prevLevel;
             for i = 1:length(monoIn)
                 level = peakLevelDetection(plugin, monoIn(i));
             end
@@ -988,8 +992,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % write to input buffer
             write(plugin.inputBuffer, in);
-            if m > 128
+            if fs <= 96000 && m > 128
                 bufferLength = n_fft2 / 8; % 128 <= 48k, 256 @ 96k, 512 @ 192k
+            elseif fs > 96000 && m > 256
+                bufferLength = n_fft2 / 8;
             else
                 bufferLength = m;
             end
@@ -1047,6 +1053,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 % interference with chord detection
                 monoIn = filter(plugin.butterLowB, plugin.butterLowA, monoIn);
                 monoIn = filter(plugin.butterHiB, plugin.butterHiA, monoIn);
+                if plugin.resetAnalysisBufferFlag
+                    resetAnalysisBuffer(plugin);
+                end
                 write(plugin.analysisBuffer,monoIn);
                 % Prep chord templates
                 chord_templates = plugin.chordTemplates;
@@ -1138,6 +1147,19 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % Build Chroma Transform Matrix
             initializeTransformMatrix(plugin);
+            
+            % Initialize buffer for harmonic analysis
+            plugin.analysisBuffer = dsp.AsyncBuffer;
+            write(plugin.analysisBuffer, [0; 0]);
+            read(plugin.analysisBuffer, 2);
+            
+            plugin.inputBuffer = dsp.AsyncBuffer;
+            write(plugin.inputBuffer, [0 0; 0 0]);
+            read(plugin.inputBuffer);
+            
+            plugin.outputBuffer = dsp.AsyncBuffer;
+            write(plugin.outputBuffer, [0 0; 0 0]);
+            read(plugin.outputBuffer);
         end
         
         
@@ -1155,17 +1177,20 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.hannWindow = hann(plugin.nFFT,'periodic');
             
             % Reset buffer
-            plugin.analysisBuffer = dsp.AsyncBuffer;
-            write(plugin.analysisBuffer, [0; 0]);
             read(plugin.analysisBuffer);
-            
-            plugin.inputBuffer = dsp.AsyncBuffer;
-            write(plugin.inputBuffer, [0 0; 0 0]);
             read(plugin.inputBuffer);
-            
-            plugin.outputBuffer = dsp.AsyncBuffer;
-            write(plugin.outputBuffer, [0 0; 0 0]);
             read(plugin.outputBuffer);
+%             plugin.analysisBuffer = dsp.AsyncBuffer;
+%             write(plugin.analysisBuffer, [0; 0]);
+%             read(plugin.analysisBuffer);
+%             
+%             plugin.inputBuffer = dsp.AsyncBuffer;
+%             write(plugin.inputBuffer, [0 0; 0 0]);
+%             read(plugin.inputBuffer);
+%             
+%             plugin.outputBuffer = dsp.AsyncBuffer;
+%             write(plugin.outputBuffer, [0 0; 0 0]);
+%             read(plugin.outputBuffer);
         end
         
     end
@@ -1189,11 +1214,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % Build Hann window
             plugin.hannWindow = hann(plugin.nFFT,'periodic');
-            
-            % Initialize buffer for harmonic analysis
-            plugin.analysisBuffer = dsp.AsyncBuffer;
-            write(plugin.analysisBuffer, [0; 0]);
-            read(plugin.analysisBuffer, 2);
         end
         
         function Visualizer(plugin)
@@ -1231,11 +1251,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function set.automaticMode(plugin,val)
             plugin.automaticMode = val;
-            if ~plugin.automaticMode
-                % Reset the buffer so that it's fresh for the next time
-                % automatic mode is activated
-                resetAnalysisBuffer(plugin);
-            end
         end
         
         function set.gainOut(plugin,val)
@@ -1275,6 +1290,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % Update chordType if in manual mode, do nothing if in
             % automatic chord detection mode
             plugin.chordType = val;
+            plugin.privateChordType = val;
+            
             updateChord(plugin);
             
             setUpdateRootFilters(plugin);
@@ -1287,7 +1304,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateChord(plugin)
-            chord = plugin.chordType;
+            chord = plugin.privateChordType;
             
             switch chord
                 case EQChordType.noChord
@@ -6423,9 +6440,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function resetAnalysisBuffer(plugin)
-            % Reset analysis buffer and forget the last chord estimate
-            plugin.analysisBuffer.reset;
+            % Clear analysis buffer and forget the last chord estimate
+            read(plugin.analysisBuffer);
             plugin.prevEstimateIndex = 0;
+            plugin.resetAnalysisBufferFlag = false;
         end
         
         function out = getPowSpectrum(plugin, n_fft, n_fft2)
@@ -6563,7 +6581,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 activateRootFilters(plugin);
             end
             changeRootFilterNote(plugin);
-            updateChord;
+            updateChord(plugin);
             
             setUpdateRootFilters(plugin);
             setUpdateThirdFilters(plugin);
@@ -6580,44 +6598,44 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % estimation.
            switch chordType
                case 'five'
-                   if plugin.chordType ~= EQChordType.five
-                       plugin.chordType = EQChordType.five;
+                   if plugin.privateChordType ~= EQChordType.five
+                       plugin.privateChordType = EQChordType.five;
                    end
                case 'minor'
-                   if plugin.chordType ~= EQChordType.minor
-                       plugin.chordType = EQChordType.minor;
+                   if plugin.privateChordType ~= EQChordType.minor
+                       plugin.privateChordType = EQChordType.minor;
                    end
                case 'major'
-                   if plugin.chordType ~= EQChordType.major
-                       plugin.chordType = EQChordType.major;
+                   if plugin.privateChordType ~= EQChordType.major
+                       plugin.privateChordType = EQChordType.major;
                    end
                case 'diminished'
-                   if plugin.chordType ~= EQChordType.diminished
-                       plugin.chordType = EQChordType.diminished;
+                   if plugin.privateChordType ~= EQChordType.diminished
+                       plugin.privateChordType = EQChordType.diminished;
                    end
                case 'augmented'
-                   if plugin.chordType ~= EQChordType.augmented
-                       plugin.chordType = EQChordType.augmented;
+                   if plugin.privateChordType ~= EQChordType.augmented
+                       plugin.privateChordType = EQChordType.augmented;
                    end
                case 'minor7'
-                   if plugin.chordType ~= EQChordType.minor7
-                       plugin.chordType = EQChordType.minor7;
+                   if plugin.privateChordType ~= EQChordType.minor7
+                       plugin.privateChordType = EQChordType.minor7;
                    end
                case 'dominant7'
-                   if plugin.chordType ~= EQChordType.dominant7
-                       plugin.chordType = EQChordType.dominant7;
+                   if plugin.privateChordType ~= EQChordType.dominant7
+                       plugin.privateChordType = EQChordType.dominant7;
                    end
                case 'major7'
-                   if plugin.chordType ~= EQChordType.major7
-                       plugin.chordType = EQChordType.major7;
+                   if plugin.privateChordType ~= EQChordType.major7
+                       plugin.privateChordType = EQChordType.major7;
                    end
                case 'minor7b5'
-                   if plugin.chordType ~= EQChordType.minor7b5
-                       plugin.chordType = EQChordType.minor7b5;
+                   if plugin.privateChordType ~= EQChordType.minor7b5
+                       plugin.privateChordType = EQChordType.minor7b5;
                    end
                case 'diminished7'
-                   if plugin.chordType ~= EQChordType.diminished7
-                       plugin.chordType = EQChordType.diminished7;
+                   if plugin.privateChordType ~= EQChordType.diminished7
+                       plugin.privateChordType = EQChordType.diminished7;
                    end
            end
         end
@@ -6625,11 +6643,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function out = peakLevelDetection(plugin, in)
             % Input in signal level, output in dB
             inLevel = abs(in);
+            out = inLevel;
             if inLevel > plugin.prevLevel
-                out = inLevel;
-            else
                 out = (1 - plugin.peakAlpha) * plugin.prevLevel + ...
-                plugin.peakAlpha * abs(in);
+                plugin.peakAlpha * inLevel;
             end
             plugin.prevLevel = out;
             out = mag2db(out);

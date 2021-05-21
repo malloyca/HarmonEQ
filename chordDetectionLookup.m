@@ -3,8 +3,8 @@ function [chordName, rootNote, chordType] = chordDetectionLookup(index)
 % matrix index chord information
 %
 % Input:
-% index - This is an integer value corresponding to the index of the chord
-% template returned by the chord detection system.
+% index - This is an integer value < 121 corresponding to the index of the
+% chord template returned by the chord detection system.
 %
 % Output:
 % chordName - This is a string containing the name of the chord.
@@ -12,6 +12,11 @@ function [chordName, rootNote, chordType] = chordDetectionLookup(index)
 % chord for updating plugin.rootNote.
 % chordType - This is a string corresponding to the chord type to use for
 % updating plugin.chordType.
+
+% Initialize variables to pass validation
+chordName = 'A5';
+rootNote = 'A';
+chordType = 'five';
 
     if index < 13 % case: five chord
         switch index
