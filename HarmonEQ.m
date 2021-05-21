@@ -906,7 +906,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter9QSmooth = false
         seventhFilter9QStep = Inf;
         
-        numberOfSmoothSteps = 3; %todo: Find a good value for this
+        numberOfSmoothSteps = 10; %todo: Find a good value for this
         
         
         % Active state variables
@@ -939,15 +939,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         nFFT = 2048;
         hannWindow;
-        
-        % Store previous estimates in a buffer
-        % Channel one (int) is chord estimate
-        % Channel two (float) is similarity score with chroma vector
-        %todo - determine how many to store for smoothing chord detection
-        prevChordEstimates = dsp.AsyncBuffer;
-        prevEstimateIndex;
-        estSmooth;
-        currentChord = 'no chord';
+        prevEstimateIndex = 0;
     end
     
     
@@ -961,6 +953,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             n_fft = plugin.nFFT;
             n_fft2 = n_fft / 2;
             monoIn = double(in); % Ensure doubles for analysis
+            audio = in;
             
             %-------------------Update filter parameters-------------------
             %-----Update root filters
@@ -1089,132 +1082,42 @@ classdef HarmonEQ < matlab.System & audioPlugin
             %TODO: convert these to functions
             %todo: change output name from 'in'
             if plugin.rootFiltersActive
-                [in, plugin.rootPrevState1] = filter(plugin.rootCoeffb1,...
-                    plugin.rootCoeffa1, in, plugin.rootPrevState1);
-                [in, plugin.rootPrevState2] = filter(plugin.rootCoeffb2,...
-                    plugin.rootCoeffa2, in, plugin.rootPrevState2);
-                [in, plugin.rootPrevState3] = filter(plugin.rootCoeffb3,...
-                    plugin.rootCoeffa3, in, plugin.rootPrevState3);
-                [in, plugin.rootPrevState4] = filter(plugin.rootCoeffb4,...
-                    plugin.rootCoeffa4, in, plugin.rootPrevState4);
-                [in, plugin.rootPrevState5] = filter(plugin.rootCoeffb5,...
-                    plugin.rootCoeffa5, in, plugin.rootPrevState5);
-                [in, plugin.rootPrevState6] = filter(plugin.rootCoeffb6,...
-                    plugin.rootCoeffa6, in, plugin.rootPrevState6);
-                [in, plugin.rootPrevState7] = filter(plugin.rootCoeffb7,...
-                    plugin.rootCoeffa7, in, plugin.rootPrevState7);
-                [in, plugin.rootPrevState8] = filter(plugin.rootCoeffb8,...
-                    plugin.rootCoeffa8, in, plugin.rootPrevState8);
-                [in, plugin.rootPrevState9] = filter(plugin.rootCoeffb9,...
-                    plugin.rootCoeffa9, in, plugin.rootPrevState9);
+                audio = processRootFilters(plugin,audio);
             end
             
             if plugin.thirdFiltersActive
-                [in, plugin.thirdPrevState1] = filter(plugin.thirdCoeffb1,...
-                    plugin.thirdCoeffa1, in, plugin.thirdPrevState1);
-                [in, plugin.thirdPrevState2] = filter(plugin.thirdCoeffb2,...
-                    plugin.thirdCoeffa2, in, plugin.thirdPrevState2);
-                [in, plugin.thirdPrevState3] = filter(plugin.thirdCoeffb3,...
-                    plugin.thirdCoeffa3, in, plugin.thirdPrevState3);
-                [in, plugin.thirdPrevState4] = filter(plugin.thirdCoeffb4,...
-                    plugin.thirdCoeffa4, in, plugin.thirdPrevState4);
-                [in, plugin.thirdPrevState5] = filter(plugin.thirdCoeffb5,...
-                    plugin.thirdCoeffa5, in, plugin.thirdPrevState5);
-                [in, plugin.thirdPrevState6] = filter(plugin.thirdCoeffb6,...
-                    plugin.thirdCoeffa6, in, plugin.thirdPrevState6);
-                [in, plugin.thirdPrevState7] = filter(plugin.thirdCoeffb7,...
-                    plugin.thirdCoeffa7, in, plugin.thirdPrevState7);
-                [in, plugin.thirdPrevState8] = filter(plugin.thirdCoeffb8,...
-                    plugin.thirdCoeffa8, in, plugin.thirdPrevState8);
-                [in, plugin.thirdPrevState9] = filter(plugin.thirdCoeffb9,...
-                    plugin.thirdCoeffa9, in, plugin.thirdPrevState9);
+                audio = processThirdFilters(plugin,audio);
             end
             
             if plugin.fifthFiltersActive
-                [in, plugin.fifthPrevState1] = filter(plugin.fifthCoeffb1,...
-                    plugin.fifthCoeffa1, in, plugin.fifthPrevState1);
-                [in, plugin.fifthPrevState2] = filter(plugin.fifthCoeffb2,...
-                    plugin.fifthCoeffa2, in, plugin.fifthPrevState2);
-                [in, plugin.fifthPrevState3] = filter(plugin.fifthCoeffb3,...
-                    plugin.fifthCoeffa3, in, plugin.fifthPrevState3);
-                [in, plugin.fifthPrevState4] = filter(plugin.fifthCoeffb4,...
-                    plugin.fifthCoeffa4, in, plugin.fifthPrevState4);
-                [in, plugin.fifthPrevState5] = filter(plugin.fifthCoeffb5,...
-                    plugin.fifthCoeffa5, in, plugin.fifthPrevState5);
-                [in, plugin.fifthPrevState6] = filter(plugin.fifthCoeffb6,...
-                    plugin.fifthCoeffa6, in, plugin.fifthPrevState6);
-                [in, plugin.fifthPrevState7] = filter(plugin.fifthCoeffb7,...
-                    plugin.fifthCoeffa7, in, plugin.fifthPrevState7);
-                [in, plugin.fifthPrevState8] = filter(plugin.fifthCoeffb8,...
-                    plugin.fifthCoeffa8, in, plugin.fifthPrevState8);
-                [in, plugin.fifthPrevState9] = filter(plugin.fifthCoeffb9,...
-                    plugin.fifthCoeffa9, in, plugin.fifthPrevState9);
+                audio = processFifthFilters(plugin,audio);
             end
             
             if plugin.seventhFiltersActive
-                [in, plugin.seventhPrevState1] = filter(plugin.seventhCoeffb1,...
-                    plugin.seventhCoeffa1, in, plugin.seventhPrevState1);
-                [in, plugin.seventhPrevState2] = filter(plugin.seventhCoeffb2,...
-                    plugin.seventhCoeffa2, in, plugin.seventhPrevState2);
-                [in, plugin.seventhPrevState3] = filter(plugin.seventhCoeffb3,...
-                    plugin.seventhCoeffa3, in, plugin.seventhPrevState3);
-                [in, plugin.seventhPrevState4] = filter(plugin.seventhCoeffb4,...
-                    plugin.seventhCoeffa4, in, plugin.seventhPrevState4);
-                [in, plugin.seventhPrevState5] = filter(plugin.seventhCoeffb5,...
-                    plugin.seventhCoeffa5, in, plugin.seventhPrevState5);
-                [in, plugin.seventhPrevState6] = filter(plugin.seventhCoeffb6,...
-                    plugin.seventhCoeffa6, in, plugin.seventhPrevState6);
-                [in, plugin.seventhPrevState7] = filter(plugin.seventhCoeffb7,...
-                    plugin.seventhCoeffa7, in, plugin.seventhPrevState7);
-                [in, plugin.seventhPrevState8] = filter(plugin.seventhCoeffb8,...
-                    plugin.seventhCoeffa8, in, plugin.seventhPrevState8);
-                [in, plugin.seventhPrevState9] = filter(plugin.seventhCoeffb9,...
-                    plugin.seventhCoeffa9, in, plugin.seventhPrevState9);
+                audio = processSeventhFilters(plugin,audio);
             end
             
             %TODO: output gain?
             %out = 10.^(plugin.outputGain/20) * in);
-            out = in;
+            out = audio;
             
-            %TODO: updating visualizer too often? Really only need to
-            %update it if the values change. Can track those.
             if ~isempty(plugin.visualizerObject) && plugin.stateChange
                 updateVisualizer(plugin);
             end
             
             %-----Harmonic analysis
-            %test
             if plugin.automaticMode
                 % Sum to mono for harmonic analysis
                 monoIn = plugin.sumToMono(monoIn);
-                % HP filter to reduce low freq noise which can interfere
-                % with chord detection
+                % HP and LP filter to reduce high and low pitch noise
+                % interference with chord detection
                 monoIn = filter(plugin.butterLowB, plugin.butterLowA, monoIn);
                 monoIn = filter(plugin.butterHiB, plugin.butterHiA, monoIn);
                 write(plugin.analysisBuffer,monoIn);
-                
+                % Prep chord templates
                 chord_templates = plugin.chordTemplates;
                 
                 %test
-                %todo - move to separate helper functions
-                %todo - system for updating chord settings and rules
-                %for how to update them
-                
-                % Rules for updating:
-                % 1. If the current winning estimate matches the
-                % previous estimate, then we're fine. Stay there.
-                % 2. If the current winning estimate is different, but
-                % its score does not significantly outdo the score
-                % associated with the previous chord estimate, then
-                % don't update chord estimate. Could also go by mode
-                % and then maybe mean/mode of previous estimates
-                % 3. If no current estimate's similarity score is > .6
-                % (or .55 maybe? - should test this out), then don't
-                % update.
-                % 4. Else: update.
-                % As part of this, perhaps I should just save the
-                % similarity score matrix
-                
                 if plugin.analysisBuffer.NumUnreadSamples >=n_fft2
                     
                     magnitudes = getPowSpectrum(plugin, n_fft, n_fft2);
@@ -1227,23 +1130,20 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     [best_sim_index, best_similarity, prevEstSim] =...
                         getSimilarities(plugin,chromaVector,...
                         chord_templates, prevIndex);
-                    
-                    % Store raw estimates
-                    write(plugin.prevChordEstimates, ...
-                        [best_sim_index, best_similarity]);
-                    
                     chordEstimate = getChordEstimate(plugin, best_sim_index,...
                         best_similarity, prevIndex, prevEstSim);
-                    plugin.estSmooth = chordEstimate;
                     
-                    %todo - get rid of this estimation buffer?
-                    plugin.prevEstimateIndex = plugin.estSmooth;
+                    disp(chordEstimate);
+                    if chordEstimate > 0
+                        [~, smooth_root,smooth_chord_type] = ...
+                            chordDetectionLookup(chordEstimate);
+                        %test
+                        updateRootNote(plugin, smooth_root);
+                        updateChordType(plugin, smooth_chord_type);
+                    end
                     
-                    [~, smooth_root,smooth_chord_type] = ...
-                        chordDetectionLookup(plugin.estSmooth);
-                    %test
-                    updateRootNote(plugin, smooth_root);
-                    updateChordType(plugin, smooth_chord_type);
+                    % Store for next iteration
+                    plugin.prevEstimateIndex = chordEstimate;
                 end
                 
             end
@@ -1324,11 +1224,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.analysisBuffer = dsp.AsyncBuffer;
             write(plugin.analysisBuffer, [0; 0]);
             read(plugin.analysisBuffer, 2);
-            
-            % Reset chord detection smoothing buffer
-            plugin.prevChordEstimates = dsp.AsyncBuffer;
-            write(plugin.prevChordEstimates, [0 0; 0 0]);
-            read(plugin.prevChordEstimates, 2);
         end
         
     end
@@ -1357,12 +1252,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             plugin.analysisBuffer = dsp.AsyncBuffer;
             write(plugin.analysisBuffer, [0; 0]);
             read(plugin.analysisBuffer, 2);
-            
-            % Initialize chord detection smoothing buffer
-            plugin.prevChordEstimates = dsp.AsyncBuffer;
-            write(plugin.prevChordEstimates, [0 0; 0 0]);
-            read(plugin.prevChordEstimates, 2);
-            
         end
         
         function Visualizer(plugin)
@@ -1420,13 +1309,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % chord detection mode
             plugin.rootNote = val;
             
-            %todo: If I have time, set up a internalRootUpdate boolean
-            %state variable so that I can ignore updates from the user in
-            %automatic mode and accept only internal updates
-%             mode = plugin.checkMode;
-%             if ~mode % case: manual mode
-            
-            switch (plugin.rootNote)
+            switch plugin.rootNote
                 case EQRootNote.off
                     deactivateRootFilters(plugin);
                     deactivateThirdFilters(plugin);
@@ -1447,29 +1330,26 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateFifthFrequencies(plugin);
             updateSeventhFrequencies(plugin);
             
+            updateRootFilterParams(plugin);
+            updateThirdFilterParams(plugin);
+            updateFifthFilterParams(plugin);
+            updateSeventhFilterParams(plugin);
+            
             % Update visualizer
             updateStateChangeStatus(plugin,true);
-%             end
         end
         
         %-------------------------Chord type setter------------------------
         function set.chordType(plugin,val)
             % Update chordType if in manual mode, do nothing if in
             % automatic chord detection mode
-            
-            %todo: same as above about filtering user vs internal updates
-%             mode = plugin.checkMode;
-%             if ~mode % case: manual mode
             plugin.chordType = val;
-            
             updateChord(plugin);
             
             setUpdateThirdFilters(plugin);
             setUpdateFifthFilters(plugin);
             setUpdateSeventhFilters(plugin);
             updateStateChangeStatus(plugin,true);
-%             end
-            
         end
         
         function updateChord(plugin)
@@ -4648,7 +4528,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function activateRootFilters(plugin)
             plugin.rootFiltersActive = true;
-            
+            updateRootFilterParams(plugin);
+        end
+        
+        function updateRootFilterParams(plugin)
             updateRootGain1(plugin, plugin.lowRegionGain);
             updateRootQFactor1(plugin, plugin.lowRegionQFactor);
             updateRootFilter2Params(plugin);
@@ -5178,7 +5061,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function activateThirdFilters(plugin)
             plugin.thirdFiltersActive = true;
-            
+            updateThirdFilterParams(plugin);
+        end
+        
+        function updateThirdFilterParams(plugin)
             updateThirdGain1(plugin, plugin.lowRegionGain);
             updateThirdQFactor1(plugin, plugin.lowRegionQFactor);
             updateThirdFilter2Params(plugin);
@@ -5708,7 +5594,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function activateFifthFilters(plugin)
             plugin.fifthFiltersActive = true;
-            
+            updateFifthFilterParams(plugin);
+        end
+        
+        function updateFifthFilterParams(plugin)
             updateFifthGain1(plugin, plugin.lowRegionGain);
             updateFifthQFactor1(plugin, plugin.lowRegionQFactor);
             updateFifthFilter2Params(plugin);
@@ -6234,7 +6123,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function activateSeventhFilters(plugin)
             plugin.seventhFiltersActive = true;
-            
+            updateSeventhFilterParams(plugin);
+        end
+        
+        function updateSeventhFilterParams(plugin)
             updateSeventhGain1(plugin, plugin.lowRegionGain);
             updateSeventhQFactor1(plugin, plugin.lowRegionQFactor);
             updateSeventhFilter2Params(plugin);
@@ -6377,6 +6269,91 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateStateChangeStatus(plugin,false);
         end
         
+        %--------------------Audio Processing Helpers----------------------
+        function out = processRootFilters(plugin,in)
+            [out, plugin.rootPrevState1] = filter(plugin.rootCoeffb1,...
+                plugin.rootCoeffa1, in, plugin.rootPrevState1);
+            [out, plugin.rootPrevState2] = filter(plugin.rootCoeffb2,...
+                plugin.rootCoeffa2, out, plugin.rootPrevState2);
+            [out, plugin.rootPrevState3] = filter(plugin.rootCoeffb3,...
+                plugin.rootCoeffa3, out, plugin.rootPrevState3);
+            [out, plugin.rootPrevState4] = filter(plugin.rootCoeffb4,...
+                plugin.rootCoeffa4, out, plugin.rootPrevState4);
+            [out, plugin.rootPrevState5] = filter(plugin.rootCoeffb5,...
+                plugin.rootCoeffa5, out, plugin.rootPrevState5);
+            [out, plugin.rootPrevState6] = filter(plugin.rootCoeffb6,...
+                plugin.rootCoeffa6, out, plugin.rootPrevState6);
+            [out, plugin.rootPrevState7] = filter(plugin.rootCoeffb7,...
+                plugin.rootCoeffa7, out, plugin.rootPrevState7);
+            [out, plugin.rootPrevState8] = filter(plugin.rootCoeffb8,...
+                plugin.rootCoeffa8, out, plugin.rootPrevState8);
+            [out, plugin.rootPrevState9] = filter(plugin.rootCoeffb9,...
+                plugin.rootCoeffa9, out, plugin.rootPrevState9);
+        end
+        
+        function out = processThirdFilters(plugin,in)
+            [out, plugin.thirdPrevState1] = filter(plugin.thirdCoeffb1,...
+                plugin.thirdCoeffa1, in, plugin.thirdPrevState1);
+            [out, plugin.thirdPrevState2] = filter(plugin.thirdCoeffb2,...
+                plugin.thirdCoeffa2, out, plugin.thirdPrevState2);
+            [out, plugin.thirdPrevState3] = filter(plugin.thirdCoeffb3,...
+                plugin.thirdCoeffa3, out, plugin.thirdPrevState3);
+            [out, plugin.thirdPrevState4] = filter(plugin.thirdCoeffb4,...
+                plugin.thirdCoeffa4, out, plugin.thirdPrevState4);
+            [out, plugin.thirdPrevState5] = filter(plugin.thirdCoeffb5,...
+                plugin.thirdCoeffa5, out, plugin.thirdPrevState5);
+            [out, plugin.thirdPrevState6] = filter(plugin.thirdCoeffb6,...
+                plugin.thirdCoeffa6, out, plugin.thirdPrevState6);
+            [out, plugin.thirdPrevState7] = filter(plugin.thirdCoeffb7,...
+                plugin.thirdCoeffa7, out, plugin.thirdPrevState7);
+            [out, plugin.thirdPrevState8] = filter(plugin.thirdCoeffb8,...
+                plugin.thirdCoeffa8, out, plugin.thirdPrevState8);
+            [out, plugin.thirdPrevState9] = filter(plugin.thirdCoeffb9,...
+                plugin.thirdCoeffa9, out, plugin.thirdPrevState9);
+        end
+        
+        function out = processFifthFilters(plugin,in)
+            [out, plugin.fifthPrevState1] = filter(plugin.fifthCoeffb1,...
+                plugin.fifthCoeffa1, in, plugin.fifthPrevState1);
+            [out, plugin.fifthPrevState2] = filter(plugin.fifthCoeffb2,...
+                plugin.fifthCoeffa2, out, plugin.fifthPrevState2);
+            [out, plugin.fifthPrevState3] = filter(plugin.fifthCoeffb3,...
+                plugin.fifthCoeffa3, out, plugin.fifthPrevState3);
+            [out, plugin.fifthPrevState4] = filter(plugin.fifthCoeffb4,...
+                plugin.fifthCoeffa4, out, plugin.fifthPrevState4);
+            [out, plugin.fifthPrevState5] = filter(plugin.fifthCoeffb5,...
+                plugin.fifthCoeffa5, out, plugin.fifthPrevState5);
+            [out, plugin.fifthPrevState6] = filter(plugin.fifthCoeffb6,...
+                plugin.fifthCoeffa6, out, plugin.fifthPrevState6);
+            [out, plugin.fifthPrevState7] = filter(plugin.fifthCoeffb7,...
+                plugin.fifthCoeffa7, out, plugin.fifthPrevState7);
+            [out, plugin.fifthPrevState8] = filter(plugin.fifthCoeffb8,...
+                plugin.fifthCoeffa8, out, plugin.fifthPrevState8);
+            [out, plugin.fifthPrevState9] = filter(plugin.fifthCoeffb9,...
+                plugin.fifthCoeffa9, out, plugin.fifthPrevState9);
+        end
+        
+        function out = processSeventhFilters(plugin,in)
+            [out, plugin.seventhPrevState1] = filter(plugin.seventhCoeffb1,...
+                plugin.seventhCoeffa1, in, plugin.seventhPrevState1);
+            [out, plugin.seventhPrevState2] = filter(plugin.seventhCoeffb2,...
+                plugin.seventhCoeffa2, out, plugin.seventhPrevState2);
+            [out, plugin.seventhPrevState3] = filter(plugin.seventhCoeffb3,...
+                plugin.seventhCoeffa3, out, plugin.seventhPrevState3);
+            [out, plugin.seventhPrevState4] = filter(plugin.seventhCoeffb4,...
+                plugin.seventhCoeffa4, out, plugin.seventhPrevState4);
+            [out, plugin.seventhPrevState5] = filter(plugin.seventhCoeffb5,...
+                plugin.seventhCoeffa5, out, plugin.seventhPrevState5);
+            [out, plugin.seventhPrevState6] = filter(plugin.seventhCoeffb6,...
+                plugin.seventhCoeffa6, out, plugin.seventhPrevState6);
+            [out, plugin.seventhPrevState7] = filter(plugin.seventhCoeffb7,...
+                plugin.seventhCoeffa7, out, plugin.seventhPrevState7);
+            [out, plugin.seventhPrevState8] = filter(plugin.seventhCoeffb8,...
+                plugin.seventhCoeffa8, out, plugin.seventhPrevState8);
+            [out, plugin.seventhPrevState9] = filter(plugin.seventhCoeffb9,...
+                plugin.seventhCoeffa9, out, plugin.seventhPrevState9);
+        end
+        
         
         %--------------------Harmonic Analysis Helpers---------------------
         function initializeTransformMatrix(plugin)
@@ -6424,7 +6401,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function chromaVector = getNormChroma(plugin,powSpectrum)
             rawChroma = plugin.chromaTransformMatrix * powSpectrum;
-            
             % Normalize chroma vector
             chromaVector = zeros(12,1);
             rawMax = max(rawChroma);
@@ -6471,21 +6447,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 % If current best similarity index matches the previous
                 % index, then they're in agreement and use that
                 estimateOut = bestSimilarityIndex;
+            elseif 1 - prevIndexSimilarity/bestSimilarity < 0.06
+                % If the similarity of the new estimate is not
+                % significantly more than the similarity of the last,
+                % don't update. Default to stability.
+                estimateOut = prevIndex;
+            elseif bestSimilarity > 0.6
+                % If the current best similarity is significantly more
+                % confident greater than 0.6, update to new one
+                estimateOut = bestSimilarityIndex;
             else
-                if 1 - prevIndexSimilarity/bestSimilarity < 0.06
-                    % If the similarity of the new estimate is not
-                    % significantly more than the similarity of the last,
-                    % don't update. Default to stability.
-                    estimateOut = prevIndex;
-                else
-                    % If the current best similarity is significantly more
-                    % confident greater than 0.6, update to new one
-                    if bestSimilarity > 0.6
-                        estimateOut = bestSimilarityIndex;
-                    else
-                        estimateOut = prevIndex;
-                    end
-                end
+                estimateOut = prevIndex;
             end
         end
         
@@ -6545,6 +6517,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         function updateChordType(plugin, chordType)
+            % Update the chord type if it does not match the newest
+            % estimation.
            switch chordType
                case 'five'
                    if plugin.chordType ~= EQChordType.five
