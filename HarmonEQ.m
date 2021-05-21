@@ -1152,7 +1152,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             if isempty(plugin.visualizerObject)
                 fs = getSampleRate(plugin);
-                % TODO: design filters...
                 plugin.visualizerObject = dsp.DynamicFilterVisualizer(...
                     2048, fs, [20 20e3],...
                     'XScale','Log',...
@@ -1179,12 +1178,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %test
         function set.automaticMode(plugin,val)
             plugin.automaticMode = val;
-            %todo - Use this space to trigger activation / deactivation
-            %behavior
-            if plugin.automaticMode
-                disp('Activated automatic mode.');
-            else
-                disp('Activated manual mode.');
+            if ~plugin.automaticMode
                 % Reset the buffer so that it's fresh for the next time
                 % automatic mode is activated
                 resetAnalysisBuffer(plugin);
