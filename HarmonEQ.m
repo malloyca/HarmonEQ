@@ -906,8 +906,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         seventhFilter9QSmooth = false
         seventhFilter9QStep = Inf;
         
-        numberOfSmoothSteps = 10; %todo: Find a good value for this
-        
+        numberOfSmoothSteps = 15; %todo: Find a good value for this
         
         % Active state variables
         rootFiltersActive = true;
@@ -926,10 +925,11 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         
         %------------------------Harmonic analysis-------------------------
-        %test
         chordTemplates;
         chromaTransformMatrix;
         analysisBuffer = dsp.AsyncBuffer;
+        inputBuffer = dsp.AsyncBuffer;
+        outputBuffer = dsp.AsyncBuffer;
         
         % filter coefficient variables for HP filter
         butterLowB;
@@ -940,6 +940,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         nFFT = 2048;
         hannWindow;
         prevEstimateIndex = 0;
+        
+        alpha = 0.07;
+        prevLevel = 0;
     end
     
     
@@ -950,42 +953,55 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function out = stepImpl(plugin,in)
             %-------------------Get necessary parameters-------------------
             fs = getSampleRate(plugin);
-            n_fft = plugin.nFFT;
+            n_fft = plugin.nFFT; % 2048 @ <= 48k, 4096 @ 96k, 8192 @ 192k
             n_fft2 = n_fft / 2;
             monoIn = double(in); % Ensure doubles for analysis
-            audio = in;
+            % Sum to mono for harmonic analysis
+            monoIn = plugin.sumToMono(monoIn);
+            level = peakLevelDetection(plugin, monoIn);
             
-            %-------------------Update filter parameters-------------------
-            updateRootFiltersForProcessing(plugin,fs);
-            updateThirdFiltersForProcessing(plugin,fs);
-            updateFifthFiltersForProcessing(plugin,fs);
-            updateSeventhFiltersForProcessing(plugin,fs);
+            % write to input buffer
+            write(plugin.inputBuffer, in);
+            bufferLength = n_fft2 / 4; % 256 <= 48k, 512 @ 96k, 8291 @ 192k
+            numLoops = floor(plugin.inputBuffer.NumUnreadSamples / bufferLength);
             
-            % update plugin.B and plugin.A coefficient matrices for
-            % visualization
-            updateFilterCoefficientsMatrix(plugin);
-            
-            %------------------------Process audio-------------------------
-            %TODO: Implement universal gain
-            %TODO: Do I want pre-filter gain or just post-filter gain?
-            %in = 10.^(plugin.inputGain/20) * in;
-            
-            if plugin.rootFiltersActive
-                audio = processRootFilters(plugin,audio);
+            % EQ audio in subloops
+            for i = 1:numLoops
+                audio = read(plugin.inputBuffer, bufferLength);
+                %-------------------Update filter parameters-------------------
+                updateRootFiltersForProcessing(plugin,fs);
+                updateThirdFiltersForProcessing(plugin,fs);
+                updateFifthFiltersForProcessing(plugin,fs);
+                updateSeventhFiltersForProcessing(plugin,fs);
+                
+                % update plugin.B and plugin.A coefficient matrices for
+                % visualization
+                updateFilterCoefficientsMatrix(plugin);
+                
+                %------------------------Process audio-------------------------
+                %TODO: Implement universal gain
+                %TODO: Do I want pre-filter gain or just post-filter gain?
+                %in = 10.^(plugin.inputGain/20) * in;
+                
+                if plugin.rootFiltersActive
+                    audio = processRootFilters(plugin,audio);
+                end
+                if plugin.thirdFiltersActive
+                    audio = processThirdFilters(plugin,audio);
+                end
+                if plugin.fifthFiltersActive
+                    audio = processFifthFilters(plugin,audio);
+                end
+                if plugin.seventhFiltersActive
+                    audio = processSeventhFilters(plugin,audio);
+                end
+                
+                % write to output buffer
+                write(plugin.outputBuffer, audio);
             end
-            if plugin.thirdFiltersActive
-                audio = processThirdFilters(plugin,audio);
-            end
-            if plugin.fifthFiltersActive
-                audio = processFifthFilters(plugin,audio);
-            end
-            if plugin.seventhFiltersActive
-                audio = processSeventhFilters(plugin,audio);
-            end
-            
             %TODO: output gain?
             %out = 10.^(plugin.outputGain/20) * in);
-            out = audio;
+            out = read(plugin.outputBuffer);
             
             if ~isempty(plugin.visualizerObject) && plugin.stateChange
                 updateVisualizer(plugin);
@@ -993,8 +1009,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             %-----Harmonic analysis
             if plugin.automaticMode
-                % Sum to mono for harmonic analysis
-                monoIn = plugin.sumToMono(monoIn);
                 % HP and LP filter to reduce high and low pitch noise
                 % interference with chord detection
                 monoIn = filter(plugin.butterLowB, plugin.butterLowA, monoIn);
@@ -1019,16 +1033,17 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     chordEstimate = getChordEstimate(plugin, best_sim_index,...
                         best_similarity, prevIndex, prevEstSim);
                     
-                    if chordEstimate > 0
-                        [~, smooth_root,smooth_chord_type] = ...
-                            chordDetectionLookup(chordEstimate);
-                        %test
-                        updateRootNote(plugin, smooth_root);
-                        updateChordType(plugin, smooth_chord_type);
+                    % Don't update chord if the audio level is low 
+                    if level > -24 
+                        if chordEstimate > 0
+                            [~, smooth_root,smooth_chord_type] = ...
+                                chordDetectionLookup(chordEstimate);
+                            updateRootNote(plugin, smooth_root);
+                            updateChordType(plugin, smooth_chord_type);
+                        end
+                        % Store for next iteration
+                        plugin.prevEstimateIndex = chordEstimate;
                     end
-                    
-                    % Store for next iteration
-                    plugin.prevEstimateIndex = chordEstimate;
                 end
                 
             end
@@ -1102,10 +1117,18 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % Build Hann window
             plugin.hannWindow = hann(plugin.nFFT,'periodic');
             
-            % Reset analysis buffer
+            % Reset buffer
             plugin.analysisBuffer = dsp.AsyncBuffer;
             write(plugin.analysisBuffer, [0; 0]);
-            read(plugin.analysisBuffer, 2);
+            read(plugin.analysisBuffer);
+            
+            plugin.inputBuffer = dsp.AsyncBuffer;
+            write(plugin.inputBuffer, [0 0; 0 0]);
+            read(plugin.inputBuffer);
+            
+            plugin.outputBuffer = dsp.AsyncBuffer;
+            write(plugin.outputBuffer, [0 0; 0 0]);
+            read(plugin.outputBuffer);
         end
         
     end
@@ -6487,6 +6510,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
                        plugin.chordType = EQChordType.diminished7;
                    end
            end
+        end
+        
+        function out = peakLevelDetection(plugin, in)
+            out = (1 - plugin.alpha) * plugin.prevLevel + ...
+                plugin.alpha * abs(in);
+            plugin.prevLevel = out;
+            out = mag2db(out);
+            disp(out);
         end
         
     end
