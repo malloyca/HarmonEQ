@@ -956,118 +956,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
             audio = in;
             
             %-------------------Update filter parameters-------------------
-            %-----Update root filters
-            if plugin.updateRootFilter1
-                buildRootFilter1(plugin,fs);
-            end
-            if plugin.updateRootFilter2
-                buildRootFilter2(plugin, fs);
-            end
-            if plugin.updateRootFilter3
-                buildRootFilter3(plugin, fs);
-            end
-            if plugin.updateRootFilter4
-                buildRootFilter4(plugin, fs);
-            end
-            if plugin.updateRootFilter5
-                buildRootFilter5(plugin, fs);
-            end
-            if plugin.updateRootFilter6
-                buildRootFilter6(plugin, fs);
-            end
-            if plugin.updateRootFilter7
-                buildRootFilter7(plugin, fs);
-            end
-            if plugin.updateRootFilter8
-                buildRootFilter8(plugin, fs);
-            end
-            if plugin.updateRootFilter9
-                buildRootFilter9(plugin, fs);
-            end
-            %-----Update harmonic third filters
-            if plugin.updateThirdFilter1
-                buildThirdFilter1(plugin,fs);
-            end
-            if plugin.updateThirdFilter2
-                buildThirdFilter2(plugin, fs);
-            end
-            if plugin.updateThirdFilter3
-                buildThirdFilter3(plugin, fs);
-            end
-            if plugin.updateThirdFilter4
-                buildThirdFilter4(plugin, fs);
-            end
-            if plugin.updateThirdFilter5
-                buildThirdFilter5(plugin, fs);
-            end
-            if plugin.updateThirdFilter6
-                buildThirdFilter6(plugin, fs);
-            end
-            if plugin.updateThirdFilter7
-                buildThirdFilter7(plugin, fs);
-            end
-            if plugin.updateThirdFilter8
-                buildThirdFilter8(plugin, fs);
-            end
-            if plugin.updateThirdFilter9
-                buildThirdFilter9(plugin, fs);
-            end
-            %-----Update harmonic fifth filters
-            if plugin.updateFifthFilter1
-                buildFifthFilter1(plugin,fs);
-            end
-            if plugin.updateFifthFilter2
-                buildFifthFilter2(plugin, fs);
-            end
-            if plugin.updateFifthFilter3
-                buildFifthFilter3(plugin, fs);
-            end
-            if plugin.updateFifthFilter4
-                buildFifthFilter4(plugin, fs);
-            end
-            if plugin.updateFifthFilter5
-                buildFifthFilter5(plugin, fs);
-            end
-            if plugin.updateFifthFilter6
-                buildFifthFilter6(plugin, fs);
-            end
-            if plugin.updateFifthFilter7
-                buildFifthFilter7(plugin, fs);
-            end
-            if plugin.updateFifthFilter8
-                buildFifthFilter8(plugin, fs);
-            end
-            if plugin.updateFifthFilter9
-                buildFifthFilter9(plugin, fs);
-            end
-            %-----Update harmonic seventh filters
-            if plugin.updateSeventhFilter1
-                buildSeventhFilter1(plugin,fs);
-            end
-            if plugin.updateSeventhFilter2
-                buildSeventhFilter2(plugin, fs);
-            end
-            if plugin.updateSeventhFilter3
-                buildSeventhFilter3(plugin, fs);
-            end
-            if plugin.updateSeventhFilter4
-                buildSeventhFilter4(plugin, fs);
-            end
-            if plugin.updateSeventhFilter5
-                buildSeventhFilter5(plugin, fs);
-            end
-            if plugin.updateSeventhFilter6
-                buildSeventhFilter6(plugin, fs);
-            end
-            if plugin.updateSeventhFilter7
-                buildSeventhFilter7(plugin, fs);
-            end
-            if plugin.updateSeventhFilter8
-                buildSeventhFilter8(plugin, fs);
-            end
-            if plugin.updateSeventhFilter9
-                buildSeventhFilter9(plugin, fs);
-            end
+            updateRootFiltersForProcessing(plugin,fs);
+            updateThirdFiltersForProcessing(plugin,fs);
+            updateFifthFiltersForProcessing(plugin,fs);
+            updateSeventhFiltersForProcessing(plugin,fs);
             
             % update plugin.B and plugin.A coefficient matrices for
             % visualization
@@ -1080,7 +972,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
             % Root note filters
             %TODO: convert these to functions
-            %todo: change output name from 'in'
             if plugin.rootFiltersActive
                 audio = processRootFilters(plugin,audio);
             end
@@ -1206,9 +1097,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function resetImpl(plugin)
             fs = getSampleRate(plugin);
-            %TODO: resetFilters / resetAllFilters / resetRootFilters /
-            %resetThirdFilters / resetFifthFilters / resetSeventhFilters
-            
             % Rebuild Chroma transform matrix in case the sample rate
             % changed
             initializeTransformMatrix(plugin);
@@ -6270,6 +6158,126 @@ classdef HarmonEQ < matlab.System & audioPlugin
         end
         
         %--------------------Audio Processing Helpers----------------------
+        function updateRootFiltersForProcessing(plugin,fs)
+            if plugin.updateRootFilter1
+                buildRootFilter1(plugin,fs);
+            end
+            if plugin.updateRootFilter2
+                buildRootFilter2(plugin, fs);
+            end
+            if plugin.updateRootFilter3
+                buildRootFilter3(plugin, fs);
+            end
+            if plugin.updateRootFilter4
+                buildRootFilter4(plugin, fs);
+            end
+            if plugin.updateRootFilter5
+                buildRootFilter5(plugin, fs);
+            end
+            if plugin.updateRootFilter6
+                buildRootFilter6(plugin, fs);
+            end
+            if plugin.updateRootFilter7
+                buildRootFilter7(plugin, fs);
+            end
+            if plugin.updateRootFilter8
+                buildRootFilter8(plugin, fs);
+            end
+            if plugin.updateRootFilter9
+                buildRootFilter9(plugin, fs);
+            end
+        end
+        
+        function updateThirdFiltersForProcessing(plugin,fs)
+            if plugin.updateThirdFilter1
+                buildThirdFilter1(plugin,fs);
+            end
+            if plugin.updateThirdFilter2
+                buildThirdFilter2(plugin, fs);
+            end
+            if plugin.updateThirdFilter3
+                buildThirdFilter3(plugin, fs);
+            end
+            if plugin.updateThirdFilter4
+                buildThirdFilter4(plugin, fs);
+            end
+            if plugin.updateThirdFilter5
+                buildThirdFilter5(plugin, fs);
+            end
+            if plugin.updateThirdFilter6
+                buildThirdFilter6(plugin, fs);
+            end
+            if plugin.updateThirdFilter7
+                buildThirdFilter7(plugin, fs);
+            end
+            if plugin.updateThirdFilter8
+                buildThirdFilter8(plugin, fs);
+            end
+            if plugin.updateThirdFilter9
+                buildThirdFilter9(plugin, fs);
+            end
+        end
+        
+        function updateFifthFiltersForProcessing(plugin,fs)
+            if plugin.updateFifthFilter1
+                buildFifthFilter1(plugin,fs);
+            end
+            if plugin.updateFifthFilter2
+                buildFifthFilter2(plugin, fs);
+            end
+            if plugin.updateFifthFilter3
+                buildFifthFilter3(plugin, fs);
+            end
+            if plugin.updateFifthFilter4
+                buildFifthFilter4(plugin, fs);
+            end
+            if plugin.updateFifthFilter5
+                buildFifthFilter5(plugin, fs);
+            end
+            if plugin.updateFifthFilter6
+                buildFifthFilter6(plugin, fs);
+            end
+            if plugin.updateFifthFilter7
+                buildFifthFilter7(plugin, fs);
+            end
+            if plugin.updateFifthFilter8
+                buildFifthFilter8(plugin, fs);
+            end
+            if plugin.updateFifthFilter9
+                buildFifthFilter9(plugin, fs);
+            end
+        end
+        
+        function updateSeventhFiltersForProcessing(plugin,fs)
+            if plugin.updateSeventhFilter1
+                buildSeventhFilter1(plugin,fs);
+            end
+            if plugin.updateSeventhFilter2
+                buildSeventhFilter2(plugin, fs);
+            end
+            if plugin.updateSeventhFilter3
+                buildSeventhFilter3(plugin, fs);
+            end
+            if plugin.updateSeventhFilter4
+                buildSeventhFilter4(plugin, fs);
+            end
+            if plugin.updateSeventhFilter5
+                buildSeventhFilter5(plugin, fs);
+            end
+            if plugin.updateSeventhFilter6
+                buildSeventhFilter6(plugin, fs);
+            end
+            if plugin.updateSeventhFilter7
+                buildSeventhFilter7(plugin, fs);
+            end
+            if plugin.updateSeventhFilter8
+                buildSeventhFilter8(plugin, fs);
+            end
+            if plugin.updateSeventhFilter9
+                buildSeventhFilter9(plugin, fs);
+            end
+        end
+        
         function out = processRootFilters(plugin,in)
             [out, plugin.rootPrevState1] = filter(plugin.rootCoeffb1,...
                 plugin.rootCoeffa1, in, plugin.rootPrevState1);
