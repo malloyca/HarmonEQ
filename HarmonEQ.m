@@ -79,6 +79,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
     
     
     properties (Access = private)
+        privateRootNote = EQRootNote.C;
+        
         %--------------------------Harmonic root---------------------------
         % Center frequencies for root bands
         rootFrequency1 = 32.70320;
@@ -1245,8 +1247,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % Update rootNote if in manual mode, do nothing if in automatic
             % chord detection mode
             plugin.rootNote = val;
+            plugin.privateRootNote = val;
             
-            switch (plugin.rootNote)
+            switch (plugin.privateRootNote)
                 case EQRootNote.off
                     deactivateRootFilters(plugin);
                     deactivateThirdFilters(plugin);
@@ -3883,7 +3886,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %-----------------------Root filter updaters-----------------------
         function updateRootFrequencies(plugin)
-            root_note = plugin.rootNote;
+            root_note = plugin.privateRootNote;
             rootNoteNumber = plugin.rootNoteValue;
             rootFreq = plugin.rootFrequency1;
             
@@ -6499,59 +6502,77 @@ classdef HarmonEQ < matlab.System & audioPlugin
             end
         end
         
+        %test
         function updateRootNote(plugin, rootNote)
             % Update the root note if it does not match the newest
             % estimation.
+            %TODO: change this to mimic set.rootnote without changing the
+            %external state
             switch rootNote
                 case 'A'
-                    if plugin.rootNote ~= EQRootNote.A
-                        plugin.rootNote = EQRootNote.A;
+                    if plugin.privateRootNote ~= EQRootNote.A
+                        plugin.privateRootNote = EQRootNote.A;
                     end
                 case 'Bb'
-                    if plugin.rootNote ~= EQRootNote.Bb
-                        plugin.rootNote = EQRootNote.Bb;
+                    if plugin.privateRootNote ~= EQRootNote.Bb
+                        plugin.privateRootNote = EQRootNote.Bb;
                     end
                 case 'B'
-                    if plugin.rootNote ~= EQRootNote.B
-                        plugin.rootNote = EQRootNote.B;
+                    if plugin.privateRootNote ~= EQRootNote.B
+                        plugin.privateRootNote = EQRootNote.B;
                     end
                 case 'C'
-                    if plugin.rootNote ~= EQRootNote.C
-                        plugin.rootNote = EQRootNote.C;
+                    if plugin.privateRootNote ~= EQRootNote.C
+                        plugin.privateRootNote = EQRootNote.C;
                     end
                 case 'Db'
-                    if plugin.rootNote ~= EQRootNote.Db
-                        plugin.rootNote = EQRootNote.Db;
+                    if plugin.privateRootNote ~= EQRootNote.Db
+                        plugin.privateRootNote = EQRootNote.Db;
                     end
                 case 'D'
-                    if plugin.rootNote ~= EQRootNote.D
-                        plugin.rootNote = EQRootNote.D;
+                    if plugin.privateRootNote ~= EQRootNote.D
+                        plugin.privateRootNote = EQRootNote.D;
                     end
                 case 'Eb'
-                    if plugin.rootNote ~= EQRootNote.Eb
-                        plugin.rootNote = EQRootNote.Eb;
+                    if plugin.privateRootNote ~= EQRootNote.Eb
+                        plugin.privateRootNote = EQRootNote.Eb;
                     end
                 case 'E'
-                    if plugin.rootNote ~= EQRootNote.E
-                        plugin.rootNote = EQRootNote.E;
+                    if plugin.privateRootNote ~= EQRootNote.E
+                        plugin.privateRootNote = EQRootNote.E;
                     end
                 case 'F'
-                    if plugin.rootNote ~= EQRootNote.F
-                        plugin.rootNote = EQRootNote.F;
+                    if plugin.privateRootNote ~= EQRootNote.F
+                        plugin.privateRootNote = EQRootNote.F;
                     end
                 case 'Gb'
-                    if plugin.rootNote ~= EQRootNote.Gb
-                        plugin.rootNote = EQRootNote.Gb;
+                    if plugin.privateRootNote ~= EQRootNote.Gb
+                        plugin.privateRootNote = EQRootNote.Gb;
                     end
                 case 'G'
-                    if plugin.rootNote ~= EQRootNote.G
-                        plugin.rootNote = EQRootNote.G;
+                    if plugin.privateRootNote ~= EQRootNote.G
+                        plugin.privateRootNote = EQRootNote.G;
                     end
                 case 'Ab'
-                    if plugin.rootNote ~= EQRootNote.Ab
-                        plugin.rootNote = EQRootNote.Ab;
+                    if plugin.privateRootNote ~= EQRootNote.Ab
+                        plugin.privateRootNote = EQRootNote.Ab;
                     end
             end
+            
+            if ~plugin.rootFiltersActive
+                activateRootFilters(plugin);
+            end
+            changeRootFilterNote(plugin);
+            updateChord;
+            
+            setUpdateRootFilters(plugin);
+            setUpdateThirdFilters(plugin);
+            setUpdateFifthFilters(plugin);
+            setUpdateSeventhFilters(plugin);
+            
+            % Update visualizer
+            updateStateChangeStatus(plugin,true);
+            
         end
         
         function updateChordType(plugin, chordType)
