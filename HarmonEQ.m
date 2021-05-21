@@ -957,7 +957,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         hannWindow;
         prevEstimateIndex = 0;
         
-        alpha = 0.07;
+        peakAlpha = 0.07;
         prevLevel = 0;
     end
     
@@ -1000,10 +1000,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 updateFilterCoefficientsMatrix(plugin);
                 
                 %------------------------Process audio-------------------------
-                %TODO: Implement universal gain
-                %TODO: Do I want pre-filter gain or just post-filter gain?
-                %in = 10.^(plugin.inputGain/20) * in;
-                
                 if plugin.rootFiltersActive
                     audio = processRootFilters(plugin,audio);
                 end
@@ -1024,8 +1020,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 % write to output buffer
                 write(plugin.outputBuffer, audio);
             end
-            %TODO: output gain?
-            %out = 10.^(plugin.outputGain/20) * in);
             out = read(plugin.outputBuffer);
             plugin.gainOutSmooth = outputGain;
             
@@ -1033,7 +1027,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 updateVisualizer(plugin);
             end
             
-            %-----Harmonic analysis
+            %----------------------Harmonic analysis-----------------------
             if plugin.automaticMode
                 % HP and LP filter to reduce high and low pitch noise
                 % interference with chord detection
@@ -1240,7 +1234,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % chord detection mode
             plugin.rootNote = val;
             
-            %test
             switch (plugin.rootNote)
                 case EQRootNote.off
                     deactivateRootFilters(plugin);
@@ -1248,7 +1241,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     deactivateFifthFilters(plugin);
                     deactivateSeventhFilters(plugin);
                 otherwise
-                    %test
                     activateRootFilters(plugin);
                     changeRootFilterNote(plugin);
                     updateChord(plugin);
@@ -1258,16 +1250,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             setUpdateThirdFilters(plugin);
             setUpdateFifthFilters(plugin);
             setUpdateSeventhFilters(plugin);
-            
-            %updateRootFrequencies(plugin);
-            %updateThirdFrequencies(plugin);
-            %updateFifthFrequencies(plugin);
-            %updateSeventhFrequencies(plugin);
-            
-            %updateRootFilterParams(plugin);
-            %updateThirdFilterParams(plugin);
-            %updateFifthFilterParams(plugin);
-            %updateSeventhFilterParams(plugin);
             
             % Update visualizer
             updateStateChangeStatus(plugin,true);
@@ -1285,16 +1267,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             setUpdateFifthFilters(plugin);
             setUpdateSeventhFilters(plugin);
             
-            %updateRootFrequencies(plugin);
-            %updateThirdFrequencies(plugin);
-            %updateFifthFrequencies(plugin);
-            %updateSeventhFrequencies(plugin);
-            
-            %updateRootFilterParams(plugin);
-            %updateThirdFilterParams(plugin);
-            %updateFifthFilterParams(plugin);
-            %updateSeventhFilterParams(plugin);
-            
             % Update visualizer
             updateStateChangeStatus(plugin,true);
         end
@@ -1302,80 +1274,66 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function updateChord(plugin)
             chord = plugin.chordType;
             
-            %test
-            %TODO!!!!!!!
             switch chord
                 case EQChordType.noChord
                     deactivateThirdFilters(plugin);
                     deactivateFifthFilters(plugin);
                     deactivateSeventhFilters(plugin);
-                case EQChordType.five %test
+                case EQChordType.five
                     if plugin.rootFiltersActive
                         activateFifthFilters(plugin);
                     end
                     deactivateThirdFilters(plugin);
                     setFifthIntervalDistance(plugin,7);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
-                case EQChordType.minor%test
+                case EQChordType.minor
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
                     setThirdIntervalDistance(plugin,3);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
-                case EQChordType.major %test
+                case EQChordType.major
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
                     setThirdIntervalDistance(plugin,4);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
-                case EQChordType.diminished %test
+                case EQChordType.diminished
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
                     setThirdIntervalDistance(plugin,3);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
-                case EQChordType.augmented %test
+                case EQChordType.augmented
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
                     end
                     setThirdIntervalDistance(plugin,4);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,8);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     deactivateSeventhFilters(plugin);
                 case EQChordType.minor7
                     setThirdIntervalDistance(plugin,3);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,10);
                     changeSeventhFilterNote(plugin);
-                    %updateSeventhFrequencies(plugin);
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
                         activateFifthFilters(plugin);
@@ -1389,13 +1347,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     end
                     setThirdIntervalDistance(plugin,4);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,10);
                     changeSeventhFilterNote(plugin);
-                    %updateSeventhFrequencies(plugin);
                 case EQChordType.major7
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
@@ -1404,13 +1359,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     end
                     setThirdIntervalDistance(plugin,4);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,7);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,11);
                     changeSeventhFilterNote(plugin);
-                    %updateSeventhFrequencies(plugin);
                 case EQChordType.minor7b5
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
@@ -1419,13 +1371,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     end
                     setThirdIntervalDistance(plugin,3);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,10);
                     changeSeventhFilterNote(plugin);
-                    %updateSeventhFrequencies(plugin);
                 case EQChordType.diminished7
                     if plugin.rootFiltersActive
                         activateThirdFilters(plugin);
@@ -1434,13 +1383,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     end
                     setThirdIntervalDistance(plugin,3);
                     changeThirdFilterNote(plugin);
-                    %updateThirdFrequencies(plugin);
                     setFifthIntervalDistance(plugin,6);
                     changeFifthFilterNote(plugin);
-                    %updateFifthFrequencies(plugin);
                     setSeventhIntervalDistance(plugin,9);
                     changeSeventhFilterNote(plugin);
-                    %updateSeventhFrequencies(plugin);
             end
         end
         
@@ -2071,7 +2017,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootFilter1GainDiff = 0;
                     plugin.rootFilter1GainSmooth = false; % Set gain smoothing to false
                     
-                    %test
                     if plugin.rootFiltersDeactivating
                         plugin.rootFiltersActive = false;
                         plugin.rootFiltersDeactivating = false;
@@ -2540,7 +2485,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdFilter1GainDiff = 0;
                     plugin.thirdFilter1GainSmooth = false; % Set gain smoothing to false
                     
-                    %test
                     if plugin.thirdFiltersDeactivating
                         plugin.thirdFiltersActive = false;
                         plugin.thirdFiltersDeactivating = false;
@@ -3011,7 +2955,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthFilter1GainDiff = 0;
                     plugin.fifthFilter1GainSmooth = false; % Set gain smoothing to false
                     
-                    %test
                     if plugin.fifthFiltersDeactivating
                         plugin.fifthFiltersActive = false;
                         plugin.fifthFiltersDeactivating = false;
@@ -3481,7 +3424,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhFilter1GainDiff = 0;
                     plugin.seventhFilter1GainSmooth = false; % Set gain smoothing to false
                     
-                    %test
                     if plugin.seventhFiltersDeactivating
                         plugin.seventhFiltersActive = false;
                         plugin.seventhFiltersDeactivating = false;
@@ -4444,7 +4386,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateRootGain9(plugin, 0);
         end
         
-        %test
         function activateRootFilters(plugin)
             if ~plugin.rootFiltersActive
                 plugin.rootFiltersActive = true;
@@ -4453,7 +4394,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             end
         end
         
-        %test
         function changeRootFilterNote(plugin)
             plugin.rootFiltersChangingNote = true;
             updateRootGain1(plugin, 0);
@@ -4989,7 +4929,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
-        %test
         function activateThirdFilters(plugin)
             if ~plugin.thirdFiltersActive
                 plugin.thirdFiltersActive = true;
@@ -5531,7 +5470,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             updateFifthGain8(plugin, 0);
             updateFifthGain9(plugin, 0);
         end
-        %test
+        
         function activateFifthFilters(plugin)
             if ~plugin.fifthFiltersActive
                 plugin.fifthFiltersActive = true;
@@ -6081,7 +6020,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             end
         end
         
-        %test
         function changeSeventhFilterNote(plugin)
             plugin.seventhFiltersChangingNote = true;
             updateSeventhGain1(plugin, 0);
@@ -6214,9 +6152,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 plugin.A = [A_root; A_third; A_fifth; A_seventh];
                 
             else
-                % If not, set to an allpass filter
-                plugin.B = [0 0 0];
-                plugin.A = [0 0 0];
+                % If not, set to an allpass filter (just for visual)
+                plugin.B = [1 0 0];
+                plugin.A = [0 0 1];
             end
         end
         
@@ -6657,8 +6595,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
             if inLevel > plugin.prevLevel
                 out = inLevel;
             else
-                out = (1 - plugin.alpha) * plugin.prevLevel + ...
-                plugin.alpha * abs(in);
+                out = (1 - plugin.peakAlpha) * plugin.prevLevel + ...
+                plugin.peakAlpha * abs(in);
             end
             plugin.prevLevel = out;
             out = mag2db(out);
