@@ -978,17 +978,29 @@ classdef HarmonEQ < matlab.System & audioPlugin
             monoIn = double(in); % Ensure doubles for analysis
             % Sum to mono for harmonic analysis
             monoIn = plugin.sumToMono(monoIn);
-            level = peakLevelDetection(plugin, monoIn);
+            for i = 1:length(monoIn)
+                level = peakLevelDetection(plugin, monoIn(i));
+            end
             outputGain = plugin.gainOutSmooth;
+            [m,~] = size(in);
             
             % write to input buffer
             write(plugin.inputBuffer, in);
-            bufferLength = n_fft2 / 8; % 128 <= 48k, 256 @ 96k, 512 @ 192k
-            numLoops = floor(plugin.inputBuffer.NumUnreadSamples / bufferLength);
+            if m > 128
+                bufferLength = n_fft2 / 8; % 128 <= 48k, 256 @ 96k, 512 @ 192k
+            else
+                bufferLength = m;
+            end
+            
+            numLoops = ceil(plugin.inputBuffer.NumUnreadSamples / bufferLength);
             
             % EQ audio in subloops
             for i = 1:numLoops
-                audio = read(plugin.inputBuffer, bufferLength);
+                if i < numLoops
+                    audio = read(plugin.inputBuffer, bufferLength);
+                else
+                    audio = read(plugin.inputBuffer);
+                end
                 %-------------------Update filter parameters-------------------
                 updateRootFiltersForProcessing(plugin,fs);
                 updateThirdFiltersForProcessing(plugin,fs);
