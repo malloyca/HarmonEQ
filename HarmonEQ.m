@@ -2,7 +2,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
     % HarmonEQ.m
     % Harmonic Equalizer plugin
     % v0.4-alpha
-    % Last updated: 30 April 2021
+    % Autho: Colin Malloy
+    % MATLAB version: R2021a
+    % Last updated: 21 May 2021
     %
     % This plugin presents a new control scheme for the traditional equalizer.
     % Most people are familiar with the various types of EQs out there
@@ -1251,6 +1253,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function set.automaticMode(plugin,val)
             plugin.automaticMode = val;
+            setResetAnalysisBufferFlag(plugin);
         end
         
         function set.gainOut(plugin,val)
@@ -1262,27 +1265,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % Update rootNote if in manual mode, do nothing if in automatic
             % chord detection mode
             plugin.rootNote = val;
-            plugin.privateRootNote = val;
-            
-            switch (plugin.privateRootNote)
-                case EQRootNote.off
-                    deactivateRootFilters(plugin);
-                    deactivateThirdFilters(plugin);
-                    deactivateFifthFilters(plugin);
-                    deactivateSeventhFilters(plugin);
-                otherwise
-                    activateRootFilters(plugin);
-                    changeRootFilterNote(plugin);
-                    updateChord(plugin);
-            end
-            
-            setUpdateRootFilters(plugin);
-            setUpdateThirdFilters(plugin);
-            setUpdateFifthFilters(plugin);
-            setUpdateSeventhFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
+            updatePrivateRootNote(plugin,val);
         end
         
         %-------------------------Chord type setter------------------------
@@ -1290,17 +1273,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
             % Update chordType if in manual mode, do nothing if in
             % automatic chord detection mode
             plugin.chordType = val;
-            plugin.privateChordType = val;
-            
-            updateChord(plugin);
-            
-            setUpdateRootFilters(plugin);
-            setUpdateThirdFilters(plugin);
-            setUpdateFifthFilters(plugin);
-            setUpdateSeventhFilters(plugin);
-            
-            % Update visualizer
-            updateStateChangeStatus(plugin,true);
+            updatePrivateChordType(plugin,val);
         end
         
         function updateChord(plugin)
@@ -1426,533 +1399,57 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %------------------------High Region Controls----------------------
         function set.highRegionGain(plugin,val)
             plugin.highRegionGain = val;
-            
-            % This currently always controls the high octave of filters and
-            % can be configured to control the 8th octave as well
-            if plugin.rootFiltersActive
-                updateRootGain9(plugin,val);
-                setUpdateRootFilter9(plugin);
-                if (plugin.rootFrequency8 > plugin.highCrossoverFreq)
-                    updateRootGain8(plugin,val);
-                    setUpdateRootFilter8(plugin);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                updateThirdGain9(plugin,val);
-                setUpdateThirdFilter9(plugin);
-                if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
-                    updateThirdGain8(plugin,val);
-                    setUpdateThirdFilter8(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                updateFifthGain9(plugin,val);
-                setUpdateFifthFilter9(plugin);
-                if (plugin.fifthFrequency8 > plugin.highCrossoverFreq)
-                    updateFifthGain8(plugin,val);
-                    setUpdateFifthFilter8(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                updateSeventhGain9(plugin,val);
-                if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
-                    updateSeventhGain8(plugin,val);
-                    setUpdateSeventhFilter8(plugin);
-                end
-            end
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
+            updateHighRegionGain(plugin,val);
         end
         
         function set.highRegionQFactor(plugin,val)
             plugin.highRegionQFactor = val;
-            
-            if plugin.rootFiltersActive
-                    updateRootQFactor9(plugin,val);
-                    setUpdateRootFilter9(plugin);
-                if (plugin.rootFrequency8 > plugin.highCrossoverFreq)
-                    updateRootQFactor8(plugin,val);
-                    setUpdateRootFilter8(plugin);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                    updateThirdQFactor9(plugin,val);
-                    setUpdateThirdFilter9(plugin);
-                if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
-                    updateThirdQFactor8(plugin,val);
-                    setUpdateThirdFilter8(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                    updateFifthQFactor9(plugin,val);
-                    setUpdateFifthFilter9(plugin);
-                if (plugin.fifthFrequency8 > plugin.highCrossoverFreq)
-                    updateFifthQFactor8(plugin,val);
-                    setUpdateFifthFilter8(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                    updateSeventhQFactor9(plugin,val);
-                    setUpdateSeventhFilter9(plugin);
-                if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
-                    updateSeventhQFactor8(plugin,val);
-                    setUpdateSeventhFilter8(plugin);
-                end
-            end
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
+            updateHighRegionQFactor(plugin,val);
         end
         
         %----------------------High-Mid Region Controls--------------------
         function set.highMidRegionGain(plugin,val)
             plugin.highMidRegionGain = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
-                    updateRootGain8(plugin,val);
-                    setUpdateRootFilter8(plugin);
-                end
-                updateRootGain7(plugin,val);
-                setUpdateRootFilter7(plugin);
-                if (plugin.rootFrequency6 > plugin.midHighCrossoverFreq)
-                    updateRootGain6(plugin,val);
-                    setUpdateRootFilter6(plugin);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
-                    updateThirdGain8(plugin,val);
-                    setUpdateThirdFilter8(plugin);
-                end
-                updateThirdGain7(plugin,val);
-                setUpdateThirdFilter7(plugin);
-                if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
-                    updateThirdGain6(plugin,val);
-                    setUpdateThirdFilter6(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency8 < plugin.highCrossoverFreq)
-                    updateFifthGain8(plugin,val);
-                    setUpdateFifthFilter8(plugin);
-                end
-                updateFifthGain7(plugin,val);
-                setUpdateFifthFilter7(plugin);
-                if (plugin.fifthFrequency6 > plugin.midHighCrossoverFreq)
-                    updateFifthGain6(plugin,val);
-                    setUpdateFifthFilter6(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
-                    updateSeventhGain8(plugin,val);
-                    setUpdateSeventhFilter8(plugin);
-                end
-                updateSeventhGain7(plugin,val);
-                setUpdateSeventhFilter7(plugin);
-                if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
-                    updateSeventhGain6(plugin,val);
-                    setUpdateSeventhFilter6(plugin);
-                end
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
-            
+            updateHighMidRegionGain(plugin,val);
         end
         
         function set.highMidRegionQFactor(plugin,val)
             plugin.highMidRegionQFactor = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
-                    updateRootQFactor8(plugin,val);
-                    setUpdateRootFilter8(plugin);
-                end
-                updateRootQFactor7(plugin,val);
-                setUpdateRootFilter7(plugin);
-                if (plugin.rootFrequency6 > plugin.midHighCrossoverFreq)
-                    updateRootQFactor6(plugin,val);
-                    setUpdateRootFilter6(plugin);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
-                    updateThirdQFactor8(plugin,val);
-                    setUpdateThirdFilter8(plugin);
-                end
-                updateThirdQFactor7(plugin,val);
-                setUpdateThirdFilter7(plugin);
-                if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
-                    updateThirdQFactor6(plugin,val);
-                    setUpdateThirdFilter6(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency8 < plugin.highCrossoverFreq)
-                    updateFifthQFactor8(plugin,val);
-                    setUpdateFifthFilter8(plugin);
-                end
-                updateFifthQFactor7(plugin,val);
-                setUpdateFifthFilter7(plugin);
-                if (plugin.fifthFrequency6 > plugin.midHighCrossoverFreq)
-                    updateFifthQFactor6(plugin,val);
-                    setUpdateFifthFilter6(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
-                    updateSeventhQFactor8(plugin,val);
-                    setUpdateSeventhFilter8(plugin);
-                end
-                updateSeventhQFactor7(plugin,val);
-                setUpdateSeventhFilter7(plugin);
-                if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
-                    updateSeventhQFactor6(plugin,val);
-                    setUpdateSeventhFilter6(plugin);
-                end
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
+            updateHighMidRegionQFactor(plugin,val)
         end
         
         %------------------------Mid Region Controls-----------------------
         function set.midRegionGain(plugin,val)
             plugin.midRegionGain = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
-                    updateRootGain6(plugin,val);
-                    setUpdateRootFilter6(plugin);
-                end
-                updateRootGain5(plugin,val);
-                setUpdateRootFilter5(plugin);
-                if (plugin.rootFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateRootGain4(plugin,val);
-                    setUpdateRootFilter4(plugin);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
-                    updateThirdGain6(plugin,val);
-                    setUpdateThirdFilter6(plugin);
-                end
-                updateThirdGain5(plugin,val);
-                setUpdateThirdFilter5(plugin);
-                if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateThirdGain4(plugin,val);
-                    setUpdateThirdFilter4(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
-                    updateFifthGain6(plugin,val);
-                    setUpdateFifthFilter6(plugin);
-                end
-                updateFifthGain5(plugin,val);
-                setUpdateFifthFilter5(plugin);
-                if (plugin.fifthFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateFifthGain4(plugin,val);
-                    setUpdateFifthFilter4(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
-                    updateSeventhGain6(plugin,val);
-                    setUpdateSeventhFilter6(plugin);
-                end
-                updateSeventhGain5(plugin,val);
-                setUpdateSeventhFilter5(plugin);
-                if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateSeventhGain4(plugin,val);
-                    setUpdateSeventhFilter4(plugin);
-                end
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
-            
+            updateMidRegionGain(plugin,val)
         end
         
         function set.midRegionQFactor(plugin,val)
             plugin.midRegionQFactor = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
-                    updateRootQFactor6(plugin,val);
-                    setUpdateRootFilter6(plugin);
-                end
-                updateRootQFactor5(plugin,val);
-                setUpdateRootFilter5(plugin);
-                if (plugin.rootFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateRootQFactor4(plugin,val);
-                    setUpdateRootFilter4(plugin);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
-                    updateThirdQFactor6(plugin,val);
-                    setUpdateThirdFilter6(plugin);
-                end
-                updateThirdQFactor5(plugin,val);
-                setUpdateThirdFilter5(plugin);
-                if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateThirdQFactor4(plugin,val);
-                    setUpdateThirdFilter4(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
-                    updateFifthQFactor6(plugin,val);
-                    setUpdateFifthFilter6(plugin);
-                end
-                updateFifthQFactor5(plugin,val);
-                setUpdateFifthFilter5(plugin);
-                if (plugin.fifthFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateFifthQFactor4(plugin,val);
-                    setUpdateFifthFilter4(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
-                    updateSeventhQFactor6(plugin,val);
-                    setUpdateSeventhFilter6(plugin);
-                end
-                updateSeventhQFactor5(plugin,val);
-                setUpdateSeventhFilter5(plugin);
-                if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
-                    updateSeventhQFactor4(plugin,val);
-                    setUpdateSeventhFilter4(plugin);
-                end
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
+            updateMidRegionQFactor(plugin,val);
         end
         
         %----------------------Low-Mid Region Controls---------------------
         function set.lowMidRegionGain(plugin,val)
             plugin.lowMidRegionGain = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateRootGain4(plugin,val);
-                    setUpdateRootFilter4(plugin);
-                end
-                updateRootGain3(plugin,val);
-                setUpdateRootFilter3(plugin);
-                if (plugin.rootFrequency2 > plugin.lowCrossoverFreq)
-                    updateRootGain2(plugin,val);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateThirdGain4(plugin,val);
-                    setUpdateThirdFilter4(plugin);
-                end
-                updateThirdGain3(plugin,val);
-                setUpdateThirdFilter3(plugin);
-                if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
-                    updateThirdGain2(plugin,val);
-                    setUpdateThirdFilter2(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateFifthGain4(plugin,val);
-                    setUpdateFifthFilter4(plugin);
-                end
-                updateFifthGain3(plugin,val);
-                setUpdateFifthFilter3(plugin);
-                if (plugin.fifthFrequency2 > plugin.lowCrossoverFreq)
-                    updateFifthGain2(plugin,val);
-                    setUpdateFifthFilter2(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateSeventhGain4(plugin,val);
-                    setUpdateSeventhFilter4(plugin);
-                end
-                updateSeventhGain3(plugin,val);
-                setUpdateSeventhFilter3(plugin);
-                if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
-                    updateSeventhGain2(plugin,val);
-                    setUpdateSeventhFilter2(plugin);
-                end
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
-            
+            updateLowMidRegionGain(plugin,val);
         end
         
         function set.lowMidRegionQFactor(plugin,val)
             plugin.lowMidRegionQFactor = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateRootQFactor4(plugin,val);
-                    setUpdateRootFilter4(plugin);
-                end
-                updateRootQFactor3(plugin,val);
-                setUpdateRootFilter3(plugin);
-                if (plugin.rootFrequency2 > plugin.lowCrossoverFreq)
-                    updateRootQFactor2(plugin,val);
-                    setUpdateRootFilter2(plugin);
-                end
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateThirdQFactor4(plugin,val);
-                    setUpdateThirdFilter4(plugin);
-                end
-                updateThirdQFactor3(plugin,val);
-                setUpdateThirdFilter3(plugin);
-                if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
-                    updateThirdQFactor2(plugin,val);
-                    setUpdateThirdFilter2(plugin);
-                end
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateFifthQFactor4(plugin,val);
-                    setUpdateFifthFilter4(plugin);
-                end
-                updateFifthQFactor3(plugin,val);
-                setUpdateFifthFilter3(plugin);
-                if (plugin.fifthFrequency2 > plugin.lowCrossoverFreq)
-                    updateFifthQFactor2(plugin,val);
-                    setUpdateFifthFilter2(plugin);
-                end
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
-                    updateSeventhQFactor4(plugin,val);
-                    setUpdateSeventhFilter4(plugin);
-                end
-                updateSeventhQFactor3(plugin,val);
-                setUpdateSeventhFilter3(plugin);
-                if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
-                    updateSeventhQFactor2(plugin,val);
-                    setUpdateSeventhFilter2(plugin);
-                end
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
+            updateLowMidRegionQFactor(plugin,val);
         end
         
         
         %------------------------Low Region Controls-----------------------
         function set.lowRegionGain(plugin,val)
             plugin.lowRegionGain = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
-                    updateRootGain2(plugin,val);
-                end
-                updateRootGain1(plugin,val);
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
-                    updateThirdGain2(plugin,val);
-                    setUpdateThirdFilter2(plugin);
-                end
-                updateThirdGain1(plugin,val);
-                setUpdateThirdFilter1(plugin);
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency2 < plugin.lowCrossoverFreq)
-                    updateFifthGain2(plugin,val);
-                    setUpdateFifthFilter2(plugin);
-                end
-                updateFifthGain1(plugin,val);
-                setUpdateFifthFilter1(plugin);
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
-                    updateSeventhGain2(plugin,val);
-                    setUpdateSeventhFilter2(plugin);
-                end
-                updateSeventhGain1(plugin,val);
-                setUpdateSeventhFilter1(plugin);
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
-            
+            updateLowRegionGain(plugin,val);
         end
         
         function set.lowRegionQFactor(plugin,val)
             plugin.lowRegionQFactor = val;
-            
-            if plugin.rootFiltersActive
-                if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
-                    updateRootQFactor2(plugin,val);
-                    setUpdateRootFilter2(plugin);
-                end
-                updateRootQFactor1(plugin,val);
-                setUpdateRootFilter1(plugin);
-            end
-            
-            if plugin.thirdFiltersActive
-                if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
-                    updateThirdQFactor2(plugin,val);
-                    setUpdateThirdFilter2(plugin);
-                end
-                updateThirdQFactor1(plugin,val);
-                setUpdateThirdFilter1(plugin);
-            end
-            
-            if plugin.fifthFiltersActive
-                if (plugin.fifthFrequency2 < plugin.lowCrossoverFreq)
-                    updateFifthQFactor2(plugin,val);
-                    setUpdateFifthFilter2(plugin);
-                end
-                updateFifthQFactor1(plugin,val);
-                setUpdateFifthFilter1(plugin);
-            end
-            
-            if plugin.seventhFiltersActive
-                if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
-                    updateSeventhQFactor2(plugin,val);
-                    setUpdateSeventhFilter2(plugin);
-                end
-                updateSeventhQFactor1(plugin,val);
-                setUpdateSeventhFilter1(plugin);
-            end
-            
-            % State change update for visualizer
-            updateStateChangeStatus(plugin,true);
+            updateLowRegionQFactor(plugin,val)
         end
         
         %------------------------Crossover controls------------------------
@@ -3898,8 +3395,548 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         
         %------------------------------------------------------------------
-        % UPDATERS
+        % UPDATERS & HELPERS
         %------------------------------------------------------------------
+        
+        function updatePrivateRootNote(plugin,val)
+            plugin.privateRootNote = val;
+            
+            switch (plugin.privateRootNote)
+                case EQRootNote.off
+                    deactivateRootFilters(plugin);
+                    deactivateThirdFilters(plugin);
+                    deactivateFifthFilters(plugin);
+                    deactivateSeventhFilters(plugin);
+                otherwise
+                    activateRootFilters(plugin);
+                    changeRootFilterNote(plugin);
+                    updateChord(plugin);
+            end
+            
+            setUpdateRootFilters(plugin);
+            setUpdateThirdFilters(plugin);
+            setUpdateFifthFilters(plugin);
+            setUpdateSeventhFilters(plugin);
+            
+            % Update visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updatePrivateChordType(plugin,val)
+            plugin.privateChordType = val;
+            updateChord(plugin);
+            
+            setUpdateRootFilters(plugin);
+            setUpdateThirdFilters(plugin);
+            setUpdateFifthFilters(plugin);
+            setUpdateSeventhFilters(plugin);
+            
+            % Update visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        %----------------------Control Region Helpers----------------------
+        function updateHighRegionGain(plugin,val)
+            % This currently always controls the high octave of filters and
+            % can be configured to control the 8th octave as well
+            if plugin.rootFiltersActive
+                updateRootGain9(plugin,val);
+                setUpdateRootFilter9(plugin);
+                if (plugin.rootFrequency8 > plugin.highCrossoverFreq)
+                    updateRootGain8(plugin,val);
+                    setUpdateRootFilter8(plugin);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                updateThirdGain9(plugin,val);
+                setUpdateThirdFilter9(plugin);
+                if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
+                    updateThirdGain8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                updateFifthGain9(plugin,val);
+                setUpdateFifthFilter9(plugin);
+                if (plugin.fifthFrequency8 > plugin.highCrossoverFreq)
+                    updateFifthGain8(plugin,val);
+                    setUpdateFifthFilter8(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                updateSeventhGain9(plugin,val);
+                if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
+                    updateSeventhGain8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
+            end
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateHighRegionQFactor(plugin,val)
+            if plugin.rootFiltersActive
+                    updateRootQFactor9(plugin,val);
+                    setUpdateRootFilter9(plugin);
+                if (plugin.rootFrequency8 > plugin.highCrossoverFreq)
+                    updateRootQFactor8(plugin,val);
+                    setUpdateRootFilter8(plugin);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                    updateThirdQFactor9(plugin,val);
+                    setUpdateThirdFilter9(plugin);
+                if (plugin.thirdFrequency8 > plugin.highCrossoverFreq)
+                    updateThirdQFactor8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                    updateFifthQFactor9(plugin,val);
+                    setUpdateFifthFilter9(plugin);
+                if (plugin.fifthFrequency8 > plugin.highCrossoverFreq)
+                    updateFifthQFactor8(plugin,val);
+                    setUpdateFifthFilter8(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                    updateSeventhQFactor9(plugin,val);
+                    setUpdateSeventhFilter9(plugin);
+                if (plugin.seventhFrequency8 > plugin.highCrossoverFreq)
+                    updateSeventhQFactor8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
+            end
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateHighMidRegionGain(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
+                    updateRootGain8(plugin,val);
+                    setUpdateRootFilter8(plugin);
+                end
+                updateRootGain7(plugin,val);
+                setUpdateRootFilter7(plugin);
+                if (plugin.rootFrequency6 > plugin.midHighCrossoverFreq)
+                    updateRootGain6(plugin,val);
+                    setUpdateRootFilter6(plugin);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
+                    updateThirdGain8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
+                updateThirdGain7(plugin,val);
+                setUpdateThirdFilter7(plugin);
+                if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
+                    updateThirdGain6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency8 < plugin.highCrossoverFreq)
+                    updateFifthGain8(plugin,val);
+                    setUpdateFifthFilter8(plugin);
+                end
+                updateFifthGain7(plugin,val);
+                setUpdateFifthFilter7(plugin);
+                if (plugin.fifthFrequency6 > plugin.midHighCrossoverFreq)
+                    updateFifthGain6(plugin,val);
+                    setUpdateFifthFilter6(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
+                    updateSeventhGain8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
+                updateSeventhGain7(plugin,val);
+                setUpdateSeventhFilter7(plugin);
+                if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
+                    updateSeventhGain6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateHighMidRegionQFactor(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
+                    updateRootQFactor8(plugin,val);
+                    setUpdateRootFilter8(plugin);
+                end
+                updateRootQFactor7(plugin,val);
+                setUpdateRootFilter7(plugin);
+                if (plugin.rootFrequency6 > plugin.midHighCrossoverFreq)
+                    updateRootQFactor6(plugin,val);
+                    setUpdateRootFilter6(plugin);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency8 < plugin.highCrossoverFreq)
+                    updateThirdQFactor8(plugin,val);
+                    setUpdateThirdFilter8(plugin);
+                end
+                updateThirdQFactor7(plugin,val);
+                setUpdateThirdFilter7(plugin);
+                if (plugin.thirdFrequency6 > plugin.midHighCrossoverFreq)
+                    updateThirdQFactor6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency8 < plugin.highCrossoverFreq)
+                    updateFifthQFactor8(plugin,val);
+                    setUpdateFifthFilter8(plugin);
+                end
+                updateFifthQFactor7(plugin,val);
+                setUpdateFifthFilter7(plugin);
+                if (plugin.fifthFrequency6 > plugin.midHighCrossoverFreq)
+                    updateFifthQFactor6(plugin,val);
+                    setUpdateFifthFilter6(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency8 < plugin.highCrossoverFreq)
+                    updateSeventhQFactor8(plugin,val);
+                    setUpdateSeventhFilter8(plugin);
+                end
+                updateSeventhQFactor7(plugin,val);
+                setUpdateSeventhFilter7(plugin);
+                if (plugin.seventhFrequency6 > plugin.midHighCrossoverFreq)
+                    updateSeventhQFactor6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateMidRegionGain(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
+                    updateRootGain6(plugin,val);
+                    setUpdateRootFilter6(plugin);
+                end
+                updateRootGain5(plugin,val);
+                setUpdateRootFilter5(plugin);
+                if (plugin.rootFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateRootGain4(plugin,val);
+                    setUpdateRootFilter4(plugin);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
+                    updateThirdGain6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
+                updateThirdGain5(plugin,val);
+                setUpdateThirdFilter5(plugin);
+                if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateThirdGain4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
+                    updateFifthGain6(plugin,val);
+                    setUpdateFifthFilter6(plugin);
+                end
+                updateFifthGain5(plugin,val);
+                setUpdateFifthFilter5(plugin);
+                if (plugin.fifthFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateFifthGain4(plugin,val);
+                    setUpdateFifthFilter4(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
+                    updateSeventhGain6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
+                updateSeventhGain5(plugin,val);
+                setUpdateSeventhFilter5(plugin);
+                if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateSeventhGain4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateMidRegionQFactor(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
+                    updateRootQFactor6(plugin,val);
+                    setUpdateRootFilter6(plugin);
+                end
+                updateRootQFactor5(plugin,val);
+                setUpdateRootFilter5(plugin);
+                if (plugin.rootFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateRootQFactor4(plugin,val);
+                    setUpdateRootFilter4(plugin);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency6 < plugin.midHighCrossoverFreq)
+                    updateThirdQFactor6(plugin,val);
+                    setUpdateThirdFilter6(plugin);
+                end
+                updateThirdQFactor5(plugin,val);
+                setUpdateThirdFilter5(plugin);
+                if (plugin.thirdFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateThirdQFactor4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency6 < plugin.midHighCrossoverFreq)
+                    updateFifthQFactor6(plugin,val);
+                    setUpdateFifthFilter6(plugin);
+                end
+                updateFifthQFactor5(plugin,val);
+                setUpdateFifthFilter5(plugin);
+                if (plugin.fifthFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateFifthQFactor4(plugin,val);
+                    setUpdateFifthFilter4(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency6 < plugin.midHighCrossoverFreq)
+                    updateSeventhQFactor6(plugin,val);
+                    setUpdateSeventhFilter6(plugin);
+                end
+                updateSeventhQFactor5(plugin,val);
+                setUpdateSeventhFilter5(plugin);
+                if (plugin.seventhFrequency4 > plugin.lowMidCrossoverFreq)
+                    updateSeventhQFactor4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateLowMidRegionGain(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateRootGain4(plugin,val);
+                    setUpdateRootFilter4(plugin);
+                end
+                updateRootGain3(plugin,val);
+                setUpdateRootFilter3(plugin);
+                if (plugin.rootFrequency2 > plugin.lowCrossoverFreq)
+                    updateRootGain2(plugin,val);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateThirdGain4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
+                updateThirdGain3(plugin,val);
+                setUpdateThirdFilter3(plugin);
+                if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
+                    updateThirdGain2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateFifthGain4(plugin,val);
+                    setUpdateFifthFilter4(plugin);
+                end
+                updateFifthGain3(plugin,val);
+                setUpdateFifthFilter3(plugin);
+                if (plugin.fifthFrequency2 > plugin.lowCrossoverFreq)
+                    updateFifthGain2(plugin,val);
+                    setUpdateFifthFilter2(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateSeventhGain4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
+                updateSeventhGain3(plugin,val);
+                setUpdateSeventhFilter3(plugin);
+                if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
+                    updateSeventhGain2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateLowMidRegionQFactor(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateRootQFactor4(plugin,val);
+                    setUpdateRootFilter4(plugin);
+                end
+                updateRootQFactor3(plugin,val);
+                setUpdateRootFilter3(plugin);
+                if (plugin.rootFrequency2 > plugin.lowCrossoverFreq)
+                    updateRootQFactor2(plugin,val);
+                    setUpdateRootFilter2(plugin);
+                end
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateThirdQFactor4(plugin,val);
+                    setUpdateThirdFilter4(plugin);
+                end
+                updateThirdQFactor3(plugin,val);
+                setUpdateThirdFilter3(plugin);
+                if (plugin.thirdFrequency2 > plugin.lowCrossoverFreq)
+                    updateThirdQFactor2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateFifthQFactor4(plugin,val);
+                    setUpdateFifthFilter4(plugin);
+                end
+                updateFifthQFactor3(plugin,val);
+                setUpdateFifthFilter3(plugin);
+                if (plugin.fifthFrequency2 > plugin.lowCrossoverFreq)
+                    updateFifthQFactor2(plugin,val);
+                    setUpdateFifthFilter2(plugin);
+                end
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency4 < plugin.lowMidCrossoverFreq)
+                    updateSeventhQFactor4(plugin,val);
+                    setUpdateSeventhFilter4(plugin);
+                end
+                updateSeventhQFactor3(plugin,val);
+                setUpdateSeventhFilter3(plugin);
+                if (plugin.seventhFrequency2 > plugin.lowCrossoverFreq)
+                    updateSeventhQFactor2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateLowRegionGain(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
+                    updateRootGain2(plugin,val);
+                end
+                updateRootGain1(plugin,val);
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
+                    updateThirdGain2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
+                updateThirdGain1(plugin,val);
+                setUpdateThirdFilter1(plugin);
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency2 < plugin.lowCrossoverFreq)
+                    updateFifthGain2(plugin,val);
+                    setUpdateFifthFilter2(plugin);
+                end
+                updateFifthGain1(plugin,val);
+                setUpdateFifthFilter1(plugin);
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
+                    updateSeventhGain2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
+                updateSeventhGain1(plugin,val);
+                setUpdateSeventhFilter1(plugin);
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
+        
+        function updateLowRegionQFactor(plugin,val)
+            if plugin.rootFiltersActive
+                if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
+                    updateRootQFactor2(plugin,val);
+                    setUpdateRootFilter2(plugin);
+                end
+                updateRootQFactor1(plugin,val);
+                setUpdateRootFilter1(plugin);
+            end
+            
+            if plugin.thirdFiltersActive
+                if (plugin.thirdFrequency2 < plugin.lowCrossoverFreq)
+                    updateThirdQFactor2(plugin,val);
+                    setUpdateThirdFilter2(plugin);
+                end
+                updateThirdQFactor1(plugin,val);
+                setUpdateThirdFilter1(plugin);
+            end
+            
+            if plugin.fifthFiltersActive
+                if (plugin.fifthFrequency2 < plugin.lowCrossoverFreq)
+                    updateFifthQFactor2(plugin,val);
+                    setUpdateFifthFilter2(plugin);
+                end
+                updateFifthQFactor1(plugin,val);
+                setUpdateFifthFilter1(plugin);
+            end
+            
+            if plugin.seventhFiltersActive
+                if (plugin.seventhFrequency2 < plugin.lowCrossoverFreq)
+                    updateSeventhQFactor2(plugin,val);
+                    setUpdateSeventhFilter2(plugin);
+                end
+                updateSeventhQFactor1(plugin,val);
+                setUpdateSeventhFilter1(plugin);
+            end
+            
+            % State change update for visualizer
+            updateStateChangeStatus(plugin,true);
+        end
         
         %-----------------------Root filter updaters-----------------------
         function updateRootFrequencies(plugin)
@@ -6412,6 +6449,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         
         %--------------------Harmonic Analysis Helpers---------------------
+        function setResetAnalysisBufferFlag(plugin)
+            plugin.resetAnalysisBufferFlag = true;
+        end
+        
         function initializeTransformMatrix(plugin)
             fs = getSampleRate(plugin);
 

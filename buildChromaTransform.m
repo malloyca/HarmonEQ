@@ -19,7 +19,7 @@ function transformMatrix = buildChromaTransform(n_fft, samplerate)
 % the chroma vector, element 1 will be for A, 2 for Bb, etc. It currently
 % does not support tuning adjustment, but that is a planned feature.
 
-% This function is based on the chroma filter from the Librosa audio
+% This function is based on chroma_stft method from the Librosa audio
 % analysis library. Code and information is available at www.librosa.org.
 
     NUM_CHROMA = 12;
