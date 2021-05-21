@@ -1452,12 +1452,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.highMidRegionGain(plugin,val)
             plugin.highMidRegionGain = val;
             
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
-            
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
                     updateRootGain8(plugin,val);
@@ -1517,12 +1511,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         function set.highMidRegionQFactor(plugin,val)
             plugin.highMidRegionQFactor = val;
-            
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
             
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency8 < plugin.highCrossoverFreq)
@@ -1584,11 +1572,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.midRegionGain(plugin,val)
             plugin.midRegionGain = val;
             
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
                     updateRootGain6(plugin,val);
@@ -1649,11 +1632,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.midRegionQFactor(plugin,val)
             plugin.midRegionQFactor = val;
             
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency6 < plugin.midHighCrossoverFreq)
                     updateRootQFactor6(plugin,val);
@@ -1714,18 +1692,13 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.lowMidRegionGain(plugin,val)
             plugin.lowMidRegionGain = val;
             
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency4 < plugin.lowMidCrossoverFreq)
                     updateRootGain4(plugin,val);
                     setUpdateRootFilter4(plugin);
                 end
                 updateRootGain3(plugin,val);
-                %setUpdateRootFilter3(plugin); %todo: clean up?
+                setUpdateRootFilter3(plugin);
                 if (plugin.rootFrequency2 > plugin.lowCrossoverFreq)
                     updateRootGain2(plugin,val);
                 end
@@ -1778,11 +1751,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.lowMidRegionQFactor(plugin,val)
             plugin.lowMidRegionQFactor = val;
             
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency4 < plugin.lowMidCrossoverFreq)
                     updateRootQFactor4(plugin,val);
@@ -1844,11 +1812,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.lowRegionGain(plugin,val)
             plugin.lowRegionGain = val;
             
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when the update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
                     updateRootGain2(plugin,val);
@@ -1891,13 +1854,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function set.lowRegionQFactor(plugin,val)
             plugin.lowRegionQFactor = val;
             
-            % todo: Maybe I should update the setUpdate... filter plugins
-            % to check the freq and Q when thet update rather than doing it
-            % here. Or have setUpdateRootFilter8 call updateRootGain8 from
-            % within that. Then I don't have to manage gain and Q
-            % directly...
-            
-            %todo - can probably call updateRootFilter2Params here
             if plugin.rootFiltersActive
                 if (plugin.rootFrequency2 < plugin.lowCrossoverFreq)
                     updateRootQFactor2(plugin,val);
@@ -2026,7 +1982,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain1 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter1GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter1GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter1GainTarget; 
                     plugin.rootGain1 = gain;
                     
                     plugin.rootFilter1GainDiff = 0;
@@ -2082,7 +2038,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain2 = gain; % store updated gain value
                     
                 else % Case: gain smoothing completed
-                    gain = plugin.rootFilter2GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is compplete...
+                    gain = plugin.rootFilter2GainTarget;
                     plugin.rootGain2 = gain;
                     
                     plugin.rootFilter2GainDiff = 0;
@@ -2132,7 +2088,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain3 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter3GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter3GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter3GainTarget; 
                     plugin.rootGain3 = gain;
                     
                     plugin.rootFilter3GainDiff = 0;
@@ -2183,7 +2139,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain4 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter4GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter4GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter4GainTarget; 
                     plugin.rootGain4 = gain;
                     
                     plugin.rootFilter4GainDiff = 0;
@@ -2234,7 +2190,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain5 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter5GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter5GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter5GainTarget; 
                     plugin.rootGain5 = gain;
                     
                     plugin.rootFilter5GainDiff = 0;
@@ -2285,7 +2241,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain6 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter6GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter6GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter6GainTarget; 
                     plugin.rootGain6 = gain;
                     
                     plugin.rootFilter6GainDiff = 0;
@@ -2336,7 +2292,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain7 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter7GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter7GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter7GainTarget; 
                     plugin.rootGain7 = gain;
                     
                     plugin.rootFilter7GainDiff = 0;
@@ -2387,7 +2343,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain8 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter8GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter8GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter8GainTarget; 
                     plugin.rootGain8 = gain;
                     
                     plugin.rootFilter8GainDiff = 0;
@@ -2438,7 +2394,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.rootGain9 = gain; % store updated gain value
                     
                 elseif plugin.rootFilter9GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.rootFilter9GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.rootFilter9GainTarget; 
                     plugin.rootGain9 = gain;
                     
                     plugin.rootFilter9GainDiff = 0;
@@ -2546,7 +2502,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain2 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter2GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter2GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter2GainTarget; 
                     plugin.thirdGain2 = gain;
                     
                     plugin.thirdFilter2GainDiff = 0;
@@ -2597,7 +2553,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain3 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter3GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter3GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter3GainTarget; 
                     plugin.thirdGain3 = gain;
                     
                     plugin.thirdFilter3GainDiff = 0;
@@ -2648,7 +2604,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain4 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter4GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter4GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter4GainTarget; 
                     plugin.thirdGain4 = gain;
                     
                     plugin.thirdFilter4GainDiff = 0;
@@ -2699,7 +2655,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain5 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter5GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter5GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter5GainTarget; 
                     plugin.thirdGain5 = gain;
                     
                     plugin.thirdFilter5GainDiff = 0;
@@ -2750,7 +2706,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain6 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter6GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter6GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter6GainTarget; 
                     plugin.thirdGain6 = gain;
                     
                     plugin.thirdFilter6GainDiff = 0;
@@ -2801,7 +2757,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain7 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter7GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter7GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter7GainTarget; 
                     plugin.thirdGain7 = gain;
                     
                     plugin.thirdFilter7GainDiff = 0;
@@ -2852,7 +2808,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain8 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter8GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter8GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter8GainTarget; 
                     plugin.thirdGain8 = gain;
                     
                     plugin.thirdFilter8GainDiff = 0;
@@ -2903,7 +2859,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.thirdGain9 = gain; % store updated gain value
                     
                 elseif plugin.thirdFilter9GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.thirdFilter9GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.thirdFilter9GainTarget; 
                     plugin.thirdGain9 = gain;
                     
                     plugin.thirdFilter9GainDiff = 0;
@@ -2955,7 +2911,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain1 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter1GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter1GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter1GainTarget; 
                     plugin.fifthGain1 = gain;
                     
                     plugin.fifthFilter1GainDiff = 0;
@@ -3011,7 +2967,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain2 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter2GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter2GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter2GainTarget; 
                     plugin.fifthGain2 = gain;
                     
                     plugin.fifthFilter2GainDiff = 0;
@@ -3062,7 +3018,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain3 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter3GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter3GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter3GainTarget; 
                     plugin.fifthGain3 = gain;
                     
                     plugin.fifthFilter3GainDiff = 0;
@@ -3113,7 +3069,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain4 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter4GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter4GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter4GainTarget; 
                     plugin.fifthGain4 = gain;
                     
                     plugin.fifthFilter4GainDiff = 0;
@@ -3164,7 +3120,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain5 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter5GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter5GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter5GainTarget; 
                     plugin.fifthGain5 = gain;
                     
                     plugin.fifthFilter5GainDiff = 0;
@@ -3215,7 +3171,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain6 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter6GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter6GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter6GainTarget; 
                     plugin.fifthGain6 = gain;
                     
                     plugin.fifthFilter6GainDiff = 0;
@@ -3266,7 +3222,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain7 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter7GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter7GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter7GainTarget; 
                     plugin.fifthGain7 = gain;
                     
                     plugin.fifthFilter7GainDiff = 0;
@@ -3317,7 +3273,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain8 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter8GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter8GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter8GainTarget; 
                     plugin.fifthGain8 = gain;
                     
                     plugin.fifthFilter8GainDiff = 0;
@@ -3368,7 +3324,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.fifthGain9 = gain; % store updated gain value
                     
                 elseif plugin.fifthFilter9GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.fifthFilter9GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.fifthFilter9GainTarget; 
                     plugin.fifthGain9 = gain;
                     
                     plugin.fifthFilter9GainDiff = 0;
@@ -3420,7 +3376,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain1 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter1GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter1GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter1GainTarget; 
                     plugin.seventhGain1 = gain;
                     
                     plugin.seventhFilter1GainDiff = 0;
@@ -3476,7 +3432,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain2 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter2GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter2GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter2GainTarget; 
                     plugin.seventhGain2 = gain;
                     
                     plugin.seventhFilter2GainDiff = 0;
@@ -3527,7 +3483,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain3 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter3GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter3GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter3GainTarget; 
                     plugin.seventhGain3 = gain;
                     
                     plugin.seventhFilter3GainDiff = 0;
@@ -3578,7 +3534,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain4 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter4GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter4GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter4GainTarget; 
                     plugin.seventhGain4 = gain;
                     
                     plugin.seventhFilter4GainDiff = 0;
@@ -3629,7 +3585,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain5 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter5GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter5GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter5GainTarget; 
                     plugin.seventhGain5 = gain;
                     
                     plugin.seventhFilter5GainDiff = 0;
@@ -3680,7 +3636,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain6 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter6GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter6GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter6GainTarget; 
                     plugin.seventhGain6 = gain;
                     
                     plugin.seventhFilter6GainDiff = 0;
@@ -3731,7 +3687,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain7 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter7GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter7GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter7GainTarget; 
                     plugin.seventhGain7 = gain;
                     
                     plugin.seventhFilter7GainDiff = 0;
@@ -3782,7 +3738,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain8 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter8GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter8GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter8GainTarget; 
                     plugin.seventhGain8 = gain;
                     
                     plugin.seventhFilter8GainDiff = 0;
@@ -3833,7 +3789,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     plugin.seventhGain9 = gain; % store updated gain value
                     
                 elseif plugin.seventhFilter9GainSmooth % Case: final step of gain smoothing
-                    gain = plugin.seventhFilter9GainTarget; %todo: Make sure this is safe, the target should be left alone after smoothing is complete...
+                    gain = plugin.seventhFilter9GainTarget; 
                     plugin.seventhGain9 = gain;
                     
                     plugin.seventhFilter9GainDiff = 0;
@@ -3870,10 +3826,10 @@ classdef HarmonEQ < matlab.System & audioPlugin
         %-----------------------Root filter updaters-----------------------
         function updateRootFrequencies(plugin)
             root_note = plugin.rootNote;
-            rootNoteNumber = plugin.rootNoteValue; % todo: Declaring this here to pass validation
-            rootFreq = plugin.rootFrequency1; % todo: Declaring this here to pass validation
+            rootNoteNumber = plugin.rootNoteValue;
+            rootFreq = plugin.rootFrequency1;
             
-            switch root_note %TODO: Eventually create a getBaseFreq function for this...
+            switch root_note
                 case EQRootNote.off
                 case EQRootNote.A
                     rootFreq = 55;
@@ -3929,8 +3885,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
             
         end
         
-        %todo: This can probably just call updateRoot2Gain() and
-        %updateRoot2Q()...
         function updateRootFilter2Params(plugin)
             % Case: root filter two is in low control region
             if plugin.rootFrequency2 < plugin.lowCrossoverFreq
@@ -4414,13 +4368,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %-----------------------Third filter updaters----------------------
         function updateThirdFrequencies(plugin)
-            %todo: This really need to know the root note and harmonic
-            %third interval
-            
-            thirdFreq = plugin.thirdFrequency1; % todo: Declaring this here to pass validation
+            thirdFreq = plugin.thirdFrequency1;
             thirdNoteNumber = mod(plugin.rootNoteValue + plugin.thirdIntervalDistance, 12);
             
-            %TODO: Eventually create a getBaseFreq function for this...
             switch thirdNoteNumber
                 case 9
                     thirdFreq = 55;
@@ -4948,13 +4898,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %-----------------------Fifth filter updaters----------------------
         function updateFifthFrequencies(plugin)
-            %todo: This really need to know the root note and harmonic
-            %third interval
-            
-            fifthFreq = plugin.fifthFrequency1; % todo: Declaring this here to pass validation
+            fifthFreq = plugin.fifthFrequency1;
             fifthNoteNumber = mod(plugin.rootNoteValue + plugin.fifthIntervalDistance, 12);
             
-            %TODO: Eventually create a getBaseFreq function for this...
             switch fifthNoteNumber
                 case 9
                     fifthFreq = 55;
@@ -5481,11 +5427,9 @@ classdef HarmonEQ < matlab.System & audioPlugin
         
         %----------------------Seventh filter updaters---------------------
         function updateSeventhFrequencies(plugin)
-            
-            seventhFreq = plugin.seventhFrequency1; % todo: Declaring this here to pass validation
+            seventhFreq = plugin.seventhFrequency1;
             seventhNoteNumber = mod(plugin.rootNoteValue + plugin.seventhIntervalDistance, 12);
             
-            %TODO: Eventually create a getBaseFreq function for this...
             switch seventhNoteNumber
                 case 9
                     seventhFreq = 55;
@@ -6111,11 +6055,8 @@ classdef HarmonEQ < matlab.System & audioPlugin
                 
             else
                 % If not, set to an allpass filter
-                % TODO: This should just be for visualization, in the
-                % proessing the plugin should just adjust the gain if
-                % necessary and then pass through the input
-                plugin.B = [1 0 0];
-                plugin.A = [0 0 1];
+                plugin.B = [0 0 0];
+                plugin.A = [0 0 0];
             end
         end
         
