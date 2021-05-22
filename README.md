@@ -7,6 +7,7 @@ The user can then define gain and Q values for five different ranges: low, low-m
 
 ## Demo video
 [![Demo video](https://github.com/malloyca/HarmonEQ/blob/4d2fd777141e77f6b9c2302f6d13eea520b50bd0/video_title_screen.png)](https://youtu.be/qlQ4hnX0gDU)
+(Click image to view YouTube video.)
 
 ## Compiled plugins
 Pre-compiled versions of the plugin are available:
