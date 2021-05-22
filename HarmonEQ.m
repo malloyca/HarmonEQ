@@ -985,10 +985,16 @@ classdef HarmonEQ < matlab.System & audioPlugin
             monoIn = double(in); % Ensure doubles for analysis
             % Sum to mono for harmonic analysis
             monoIn = plugin.sumToMono(monoIn);
-            level = plugin.prevLevel;
+            previousLevel = plugin.prevLevel;
+            level = previousLevel;
+            alpha = plugin.peakAlpha;
             for i = 1:length(monoIn)
-                level = peakLevelDetection(plugin, monoIn(i));
+                previousLevel = peakLevelDetection(plugin, monoIn(i), previousLevel, alpha);
+                if previousLevel > level
+                    level = previousLevel;
+                end
             end
+            plugin.prevLevel = previousLevel;
             outputGain = plugin.gainOutSmooth;
             [m,~] = size(in);
             
@@ -1078,7 +1084,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                         best_similarity, prevIndex, prevEstSim);
                     
                     % Don't update chord if the audio level is low 
-                    if level > -30
+                    if level > -20
                         if chordEstimate > 0
                             [~, smooth_root,smooth_chord_type] = ...
                                 chordDetectionLookup(chordEstimate);
@@ -6526,7 +6532,7 @@ classdef HarmonEQ < matlab.System & audioPlugin
                     similarity = 0.75 * similarity; % De-emphasize non major/minor chords
                 end
                 if i == previousIndex
-                    similarity = 1.03 * similarity; % Give weighting to previous estimate
+                    similarity = 1.035 * similarity; % Give weighting to previous estimate
                     simOfPrevEstimate = similarity;
                 end
                 if similarity > bestSimilarity
@@ -6565,8 +6571,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
         function updateRootNote(plugin, rootNote)
             % Update the root note if it does not match the newest
             % estimation.
-            %TODO: change this to mimic set.rootnote without changing the
-            %external state
             switch rootNote
                 case 'A'
                     if plugin.privateRootNote ~= EQRootNote.A
@@ -6681,15 +6685,14 @@ classdef HarmonEQ < matlab.System & audioPlugin
            end
         end
         
-        function out = peakLevelDetection(plugin, in)
+        function out = peakLevelDetection(plugin, in, prevLevel, peakAlpha)
             % Input in signal level, output in dB
             inLevel = abs(in);
             out = inLevel;
-            if inLevel > plugin.prevLevel
-                out = (1 - plugin.peakAlpha) * plugin.prevLevel + ...
-                plugin.peakAlpha * inLevel;
+            if inLevel > prevLevel
+                out = (1 - peakAlpha) * prevLevel + ...
+                peakAlpha * inLevel;
             end
-            plugin.prevLevel = out;
             out = mag2db(out);
         end
         
@@ -6701,7 +6704,6 @@ classdef HarmonEQ < matlab.System & audioPlugin
     
     
 end
-
 
 
 
