@@ -5,7 +5,8 @@ HarmonEQ differs from other equalizers in its control scheme. It is a parametric
 Rather than having precise control over filter frequencies, the user tunes HarmonEQ to a specific musical note or chord.
 The user can then define gain and Q values for five different ranges: low, low-mid, mid, high-mid, high.
 
-Development is currently ongoing and stable functionality is not guaranteed.
+## Demo video
+[![Demo video](https://github.com/malloyca/HarmonEQ/blob/4d2fd777141e77f6b9c2302f6d13eea520b50bd0/video_title_screen.png)](https://youtu.be/qlQ4hnX0gDU)
 
 ## Compiled plugins
 Pre-compiled versions of the plugin are available:
