@@ -5,17 +5,19 @@ HarmonEQ differs from other equalizers in its control scheme. It is a parametric
 Rather than having precise control over filter frequencies, the user tunes HarmonEQ to a specific musical note or chord.
 The user can then define gain and Q values for five different ranges: low, low-mid, mid, high-mid, high.
 
-Development is currently ongoing and stable functionality is not guaranteed.
+## Demo video
+[![Demo video](https://github.com/malloyca/HarmonEQ/blob/4d2fd777141e77f6b9c2302f6d13eea520b50bd0/video_title_screen.png)](https://youtu.be/qlQ4hnX0gDU)
+(Click image to view YouTube video.)
 
 ## Compiled plugins
 Pre-compiled versions of the plugin are available:
 - macOS
   - VST:
-    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ_mono.vst.zip)
-    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ.vst.zip)
+    - [mono (v0.4)](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ_mono.vst.zip)
+    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.5/HarmonEQ.vst.zip)
   - AU:
-    - [mono](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ_mono.component.zip)
-    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ.component.zip)
+    - [mono (v0.4)](https://github.com/malloyca/HarmonEQ/releases/download/v0.4/HarmonEQ_mono.component.zip)
+    - [stereo](https://github.com/malloyca/HarmonEQ/releases/download/v0.5/HarmonEQ.component.zip)
 - Windows
   - Coming soon. I need a Windows installation in order to be able to compile for Windows...
 
