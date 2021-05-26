@@ -29,6 +29,11 @@ Pre-compiled versions of the plugin are available:
   - Move `HarmonEQ.vst` to the `/VST/` folder and `HarmonEQ.component` to the `/components/` folder.
   - On newer versions of macOS (10.14 or 10.15 and later) you will need to manually remove the plugins from quarantine. Instructions for that will be posted soon.
 
+#### Instructions for de-quarantining unsigned plugins
+- Open the Terminal app
+  - If you're not familiar it, click the magnifying glass in the upper left corner, type `terminal`, and hit `Enter` to launch it.
+- Type `sudo xattr -rd com.apple.quarantine /Library/Audio/Plug-Ins/<folder name>`, replacing `<folder name>` with the name of the folders that contain the plugins the need to be de-quarantined.
+
 ## Prereqs for compiling
 - MATLAB R2021a
   - DSP Toolbox
