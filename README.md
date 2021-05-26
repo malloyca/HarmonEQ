@@ -33,6 +33,9 @@ Pre-compiled versions of the plugin are available:
 - Open the Terminal app
   - If you're not familiar it, click the magnifying glass in the upper left corner, type `terminal`, and hit `Enter` to launch it.
 - Type `sudo xattr -rd com.apple.quarantine /Library/Audio/Plug-Ins/<folder name>`, replacing `<folder name>` with the name of the folders that contain the plugins the need to be de-quarantined.
+  - Examples:
+    - `sudo xattr -rd com.apple.quarantine /Library/Audio/Plug-Ins/VST/`
+    - `udo xattr -rd com.apple.quarantine /Library/Audio/Plug-Ins/Components/`
 
 ## Prereqs for compiling
 - MATLAB R2021a
